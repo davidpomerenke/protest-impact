@@ -62,3 +62,6 @@ movement_keywords = {
         "hygienedemo",
     ],
 }
+
+# the exact search string was:
+# *protest* OR Versammlung* OR demonstr* OR Kundgebung* OR Kampagne* OR “Soziale Bewegung*” OR Hausbesetzung* OR Streik* OR Unterschriftensammlung* OR Hasskriminalit ̈ at* OR Unruhen* OR Aufruhr* OR Aufstand* OR Boykott* OR Riot* OR Aktivis* OR Widerstand* OR Mobilisierung* OR B ̈ urgerinitiative* OR B ̈ urgerbegehren*.

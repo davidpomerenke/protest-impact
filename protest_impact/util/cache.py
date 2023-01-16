@@ -1,7 +1,8 @@
 import requests
 from joblib import Memory
+from protest_impact.util.path import project_root
 
-memory = Memory("../.cache", verbose=0)
+memory = Memory(project_root / ".cache", verbose=0)
 cache = memory.cache
 
 

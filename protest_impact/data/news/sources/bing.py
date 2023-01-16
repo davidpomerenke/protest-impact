@@ -15,13 +15,17 @@ Cost: 4$/1000 searches -> 0.004$/search
 load_dotenv()
 
 
-def search(query: str, date: date, offset=0) -> NewsItem:
+def search(
+    query: str | None, date: date, site: str = None, offset: int = 0
+) -> NewsItem:
     results_per_page = 100
+    query = query or ""
+    site = f"site:{site}" if site else ""
     response = get(
         "https://api.bing.microsoft.com/v7.0/search",
         headers={"Ocp-Apim-Subscription-Key": environ["BING_API_KEY"]},
         params={
-            "q": f"{query} language:de loc:de",
+            "q": f"{query} {site} language:de loc:de",
             "mkt": "de-DE",
             "responseFilter": "webPages",
             "freshness": date.isoformat(),
@@ -40,9 +44,8 @@ def search(query: str, date: date, offset=0) -> NewsItem:
         )
         for item in json["value"]
     ]
-    print(offset, json["totalEstimatedMatches"])
     if json["totalEstimatedMatches"] > offset + results_per_page:
-        if offset >= 1000:
+        if offset >= 500:
             raise Exception("too many results")
         sleep(0.5)
         results += search(query, date, offset + results_per_page)

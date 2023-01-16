@@ -16,16 +16,19 @@ Cost: free
 load_dotenv()
 
 
-def search(query: str, date: date, offset=0) -> NewsItem:
+def search(
+    query: str, date: date, media_id: int = None, last_processed_stories_id: int = 0
+) -> NewsItem:
     results_per_page = 100
     response = get(
         "https://api.mediacloud.org/api/v2/stories_public/list/",
         params={
-            "last_processed_stories_id": offset,
+            "last_processed_stories_id": last_processed_stories_id,
             "rows": results_per_page,
             "q": query,
             "fq": [
-                "tags_id_media:34412409",
+                f"media_id:{media_id}" if media_id else "",
+                # "tags_id_media:34412409",
                 f"publish_date:[{date.isoformat()}T00:00:00Z TO {(date + timedelta(days=1)).isoformat()}T00:00:00Z]",
             ],
             "key": environ["MEDIACLOUD_API_KEY"],
@@ -34,7 +37,11 @@ def search(query: str, date: date, offset=0) -> NewsItem:
     )
     response.raise_for_status()
     json = response.json()
-    return [
+    results = [
         NewsItem(date=date, url=item["url"], title=item["title"], content="")
         for item in json
     ]
+    if len(results) == results_per_page:
+        last_processed_stories_id = json[-1]["processed_stories_id"]
+        results += search(query, date, media_id, last_processed_stories_id)
+    return list(set(results))

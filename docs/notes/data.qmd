@@ -1,0 +1,193 @@
+---
+jupyter: python3
+---
+
+# Newspaper data
+
+Newspaper data will be used for three different purposes:
+
+- **Extracting protest events**, which will represent the **treatment**. For this, only articles that contain keywords such as "protest", "demonstration", etc. are relevant. Text of the whole articles may not be necessary, snippets around the keywords may suffice.
+- **Representing unknown confounders**. Here I want to use the full texts of all articles of one or multiple or all newspapers. This is much more data than for the above purpose, and finding a good data source here will be challenging.
+- **Extracting discourse characteristics**, which will represent the **effect**. Here it could be useful to use full texts and apply topic models, but counting keywords could also suffice, at least for a first try.
+
+I want to focus:
+
+- **on Germany**: because I am familiar with the language, the politics, and the protest movements of thus country,
+- **during the past decade** (2013-2022): because I want to reduce time bias as much as possible, and because I believe that for the last decade there will be good coverage of online media,
+- **on all protest movements**, and especially the climate justice movements: mostly because I am personally interested in them,
+- **via either print or online news** or both: wherever I can find the best consistent dataset.
+
+## How much data is needed?
+
+Before comparing potential data sources, it is useful to estimate how much data I will need to retrieve, because this will have an effect on the cost and thereby the feasibility of some sources.
+
+```{python}
+from datetime import date, timedelta
+from faker import Faker
+import random
+
+seed = 20230116
+Faker.seed(seed)
+
+# generate random dates in the past decade
+dates = [
+        Faker().date_between(start_date="-10y", end_date=date(2022, 12, 31))
+        for i in range(12)
+]
+dates
+```
+
+```{python}
+from protest_impact.data.news.sources.bing import search as bing_search
+from protest_impact.data.news.sources.google import search as google_search
+from protest_impact.data.news.sources.mediacloud import search as mediacloud_search
+
+engines = [
+    ("google", google_search),
+    ("mediacloud", mediacloud_search),
+]
+
+sites = (
+    [  # some hand-selected news sites, with their mediacloud id
+        ("bild.de", 22009),
+        ("spiegel.de", 19831),
+        ("zeit.de", 22119),
+        ("bz-berlin.de", 144263),
+        ("stuttgarter-zeitung.de", 39696),
+        ("lvz.de", 518104),
+    ]
+)
+```
+
+```{python}
+import pandas as pd
+
+data = []
+for date in dates:
+    for site in sites:
+        for name, engine in engines:
+            site_ = site[1] if name == "mediacloud" else site[0]
+            n_articles = len(engine(None, date, site_))
+            data.append(
+                {
+                    "engine": name,
+                    "site": site[0],
+                    "date": date,
+                    "n_articles": n_articles,
+                }
+            )
+df = pd.DataFrame(data)
+df.head()
+```
+
+```{python}
+import seaborn as sns
+
+ax = sns.swarmplot(data=df, x="engine", y="n_articles", hue="site", dodge=True)
+sns.move_legend(ax, "upper left", bbox_to_anchor=(1, 1))
+```
+
+```{python}
+df[df.engine == "google"].groupby("site").n_articles.mean()
+```
+
+```{python}
+df[df.engine == "google"].n_articles.mean()
+```
+
+One newspaper publishes roughly $32 \cdot 365 \approx 10{\small,}000$ articles per year, so 100k articles for the envisioned 10-year period. Most search engines have a limit of 100 articles per query, thus this corresponds to 1000 queries per newspaper. The minimum amount of different newspapers might be 5, so that different regions could be compared. More regions (say, 10) with 3 newspapers on average, plus 20 national newspapers, would result in 50 newspapers, thus 50k queries.
+
+Under the assumption (not verified) that an article contains bout 1 Kilobyte of text, that would amount to full text data in the order of 5GB.
+
+## Which data sources are suitable?
+
+
+The following potential sources of newspaper articles have been considered. The 💰 symbol gives the price for 50k queries.
+
+Data suitability:
+🟡 perfect
+🟠 okay
+🔴 not suitable
+
+- 🟡 [Media Cloud](https://mediacloud.org/) - open source portal with many corpora, very convenient, quality should be tested, completely free
+- 🟠 Google News via 3rd party API (max. 100 results/query each)
+	- ? DataForSeo 💰 100€ for instant responses / 30€ for queued responses
+	- 🟠 ScaleSerp 💰 150€
+	- 🟠 SerpMaster 💰 200€
+	- 🟠 ZenSerp 💰 200€
+	- 🔴 SerpAPI: 50€/5k calls/month, 250€/30k calls/month
+- 🟠 [mediastack](https://mediastack.com/documentation) - 25€/10k calls/month, 100€/50k calls/month, 250€/250k calls/month, max. 100 results/query 💰 100€
+- 🟠 [News API](https://newsapi.ai/) (by EventRegistry) - 90€/5k calls/month, 400€/50k calls/month, max. 100 results/query 💰 400€
+- 🟠 Bing Web Search - fewer newspapers than on Google 💰 150€
+- 🟠 archives of single newspapers
+	- 🟡 [Zeit](https://www.zeit.de/2023/index) - free epubs of the print version
+	- 🟠 [Süddeutsche](https://www.sueddeutsche.de/archiv/politik/2016) - article lists for each year/topic, could be scraped
+	- 🟠 [Welt](https://www.welt.de/schlagzeilen) - article lists for each day, could be scraped
+	- 🟠 Bild - article lists for each day, could be scraped
+	- 🔴 [FAZ](https://www.faz-rechte.de/anwendungen-services/text-und-datamining/) - can send them statistical queries, no full-text access
+	- 🔴 Tagesspiegel - cannot find archive
+- 🟠 Internet Archive - could be scraped, bigger newspaper = more coverage: Zeit coverage goes ~10y back, Süddeutsche ~5y, Berliner Zeitung ~3y, Gäubote ~1y
+- 🟠 Deutsches Referenzkorpus - print publications until 2020, access via [KorAP](https://korap.ids-mannheim.de/doc/api), is conceived for retrieving linguistic statistics, retrieving full-texts seems possible but would be hacky
+- 🔴 Bing News - only 14 days into the past
+- 🔴 LexisNexis / Nexis Uni - great selection of print newspapers with full texts, no proper API
+- 🔴 Genios (via Berlin Library) - great content, but no API, even BibBot uses Puppeteer for access of single articles
+- 🔴 Google Search / News - possible to search just by site and date, but no API
+- 🔴 RSS feeds - very shallow history
+- 🔴 Reuters archives - can only find images and videos, no press statements
+- 🔴 DPA - cannot find archive
+
+## How is the quality of the Media Cloud data?
+
+### How consistent is the Media Cloud data?
+
+
+### How does the Media Cloud data compare to other data sources?
+
+### Can all data be collected?
+
+## Can all full texts be scraped?
+
+```{python}
+# sources = {}
+# items = {}
+# for name, search in engines:
+#     items[name] = search("protest", date.fromisoformat("2022-11-27"))
+#     print(name, len(items[name]))
+#     sources[name] = {website_name(a.url) for a in items[name]}
+# core = set.intersection(*sources.values())
+# print("core:", *core)
+# extended_core = set.union(
+#     sources["bing"].intersection(sources["google"]),
+#     sources["bing"].intersection(sources["mediacloud"]),
+#     sources["google"].intersection(sources["mediacloud"]),
+# )
+# print("extended_core:", *extended_core)
+# for name, sources_ in sources.items():
+#     print(name.upper())
+#     print()
+#     print("additional")
+#     print()
+#     additional = sources_.difference(extended_core)
+#     print(*additional)
+#     print()
+#     stories_add = [
+#         f"{website_name(item.url)}: {item.title}"
+#         for item in items[name]
+#         if website_name(item.url) in additional
+#     ]
+#     print("\n".join(stories_add))
+#     print()
+#     print("missing")
+#     print()
+#     missing = extended_core.difference(sources_)
+#     print(*missing)
+#     print()
+#     # stories_miss = [
+#     #     f"{website_name(item.url)}: {item.title}"
+#     #     for item in items[name]
+#     #     if website_name(item.url) in missing
+#     # ]
+#     # print("\n".join(stories_miss))
+#     # print()
+```
+
