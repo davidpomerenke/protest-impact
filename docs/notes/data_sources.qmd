@@ -25,14 +25,15 @@ Before comparing potential data sources, it is useful to estimate how much data 
 from datetime import date, timedelta
 from faker import Faker
 import random
+from tqdm.notebook import tqdm
 
 seed = 20230116
 Faker.seed(seed)
 
 # generate random dates in the past decade
 dates = [
-        Faker().date_between(start_date="-10y", end_date=date(2022, 12, 31))
-        for i in range(12)
+    Faker().date_between(start_date="-10y", end_date=date(2022, 12, 31))
+    for i in range(10)
 ]
 dates
 ```
@@ -47,37 +48,48 @@ engines = [
     ("mediacloud", mediacloud_search),
 ]
 
-sites = (
-    [  # some hand-selected news sites, with their mediacloud id
-        ("bild.de", 22009),
-        ("spiegel.de", 19831),
-        ("zeit.de", 22119),
-        ("bz-berlin.de", 144263),
-        ("stuttgarter-zeitung.de", 39696),
-        ("lvz.de", 518104),
-    ]
-)
+sites = [  # some hand-selected news sites, with their mediacloud id
+    ("bild.de", 22009),  # national, low
+    ("spiegel.de", 19831),  # national, medium
+    ("zeit.de", 22119),  # national, high
+    ("bz-berlin.de", 144263),  # local, capital
+    ("stuttgarter-zeitung.de", 39696),  # local, west
+    ("lvz.de", 518104),  # local, east
+]
 ```
 
 ```{python}
 import pandas as pd
 
 data = []
-for date in dates:
+for date in dates[:3]:
     for site in sites:
         for name, engine in engines:
-            site_ = site[1] if name == "mediacloud" else site[0]
-            n_articles = len(engine(None, date, site_))
+            print(f"{name} {site[0]} {date}")
+            site_args = (
+                dict(media_id=site[1]) if name == "mediacloud" else dict(site=site[0])
+            )
+            n_articles = len(engine(None, date=date, **site_args))
             data.append(
                 {
                     "engine": name,
                     "site": site[0],
-                    "date": date,
+                    "date": str(date),
                     "n_articles": n_articles,
                 }
             )
 df = pd.DataFrame(data)
 df.head()
+```
+
+```{python}
+import altair as alt
+
+alt.Chart(df).mark_boxplot().encode(
+    x="engine:N",
+    y="n_articles:Q",
+    column="site:N",
+)
 ```
 
 ```{python}
@@ -111,10 +123,10 @@ Data suitability:
 
 - 🟡 [Media Cloud](https://mediacloud.org/) - open source portal with many corpora, very convenient, quality should be tested, completely free
 - 🟠 Google News via 3rd party API (max. 100 results/query each)
-	- ? DataForSeo 💰 100€ for instant responses / 30€ for queued responses
-	- 🟠 ScaleSerp 💰 150€
+	- 🟠 ScaleSerp - upgradable plans, basically pay-per-use 💰 150€
 	- 🟠 SerpMaster 💰 200€
 	- 🟠 ZenSerp 💰 200€
+	- 🔴 DataForSeo - 5x price increase for using "site:" 💰 500€ for instant responses / 150€ for queued responses
 	- 🔴 SerpAPI: 50€/5k calls/month, 250€/30k calls/month
 - 🟠 [mediastack](https://mediastack.com/documentation) - 25€/10k calls/month, 100€/50k calls/month, 250€/250k calls/month, max. 100 results/query 💰 100€
 - 🟠 [News API](https://newsapi.ai/) (by EventRegistry) - 90€/5k calls/month, 400€/50k calls/month, max. 100 results/query 💰 400€
@@ -140,6 +152,57 @@ Data suitability:
 
 ### How consistent is the Media Cloud data?
 
+```{python}
+data = []
+for name, engine in engines:
+    for site in sites:
+        for i, start_date in enumerate(dates):
+            start_date_ = start_date - timedelta(
+                days=start_date.weekday()
+            )  # choose monday before the date
+            num_days = 14
+            end_date = start_date_ + timedelta(days=14)
+            site_args = (
+                dict(media_id=site[1]) if name == "mediacloud" else dict(site=site[0])
+            )
+            results = engine(None, date=start_date_, end_date=end_date, **site_args)
+            for num_days_ in range(num_days):
+                date_ = start_date_ + timedelta(days=num_days_)
+                n_articles = len([r for r in results if r.date == date_])
+                data.append(
+                    {
+                        "engine": name,
+                        "site": site[0],
+                        "date": date_,
+                        "n_articles": n_articles,
+                        "start_date": start_date_,
+                    }
+                )
+
+df = pd.DataFrame(data)
+df.head()
+```
+
+```{python}
+df["date"] = pd.to_datetime(df["date"])
+df["start_date"] = pd.to_datetime(df["start_date"])
+
+alt.Chart(df, width=2000, height=50).mark_bar().encode(
+    x="date:T",
+    y="n_articles:Q",
+    row="site:N",
+    color="start_date:N",
+)
+```
+
+```{python}
+alt.Chart(df[df["engine"] == "mediacloud"], width=1000, height=50).mark_bar().encode(
+    x="date:O",
+    y="n_articles:Q",
+    row="site:N",
+    color="start_date:N",
+)
+```
 
 ### How does the Media Cloud data compare to other data sources?
 
@@ -147,47 +210,42 @@ Data suitability:
 
 ## Can all full texts be scraped?
 
-```{python}
-# sources = {}
-# items = {}
-# for name, search in engines:
-#     items[name] = search("protest", date.fromisoformat("2022-11-27"))
-#     print(name, len(items[name]))
-#     sources[name] = {website_name(a.url) for a in items[name]}
-# core = set.intersection(*sources.values())
-# print("core:", *core)
-# extended_core = set.union(
-#     sources["bing"].intersection(sources["google"]),
-#     sources["bing"].intersection(sources["mediacloud"]),
-#     sources["google"].intersection(sources["mediacloud"]),
-# )
-# print("extended_core:", *extended_core)
-# for name, sources_ in sources.items():
-#     print(name.upper())
-#     print()
-#     print("additional")
-#     print()
-#     additional = sources_.difference(extended_core)
-#     print(*additional)
-#     print()
-#     stories_add = [
-#         f"{website_name(item.url)}: {item.title}"
-#         for item in items[name]
-#         if website_name(item.url) in additional
-#     ]
-#     print("\n".join(stories_add))
-#     print()
-#     print("missing")
-#     print()
-#     missing = extended_core.difference(sources_)
-#     print(*missing)
-#     print()
-#     # stories_miss = [
-#     #     f"{website_name(item.url)}: {item.title}"
-#     #     for item in items[name]
-#     #     if website_name(item.url) in missing
-#     # ]
-#     # print("\n".join(stories_miss))
-#     # print()
-```
+Scraping is done via [`download.py`](../../protest_impact/data/news/download.py). Results:
+
+More than 3.5GB of full-text newspaper articles from 22 diverse German newspapers (national and regional), covering the past decade. The metadata comes from MediaCloud.org and Google News, and full-text articles have been scraped from the provided links.
+
+Below the start date of good and consistent coverage is shown (at least 250 articles per month consistently):
+
+## National
+
+- bild.de: 2013
+- faz.net: 2013
+- focus.de: 2014
+- n-tv.de: 2013
+- rnd.de: 2020
+- spiegel.de: 2013
+- stern.de: 2013
+- sueddeutsche.de: 2013
+- t-online.de: 2014
+- tagesspiegel.de: 2014
+- welt.de: 2013
+- zeit.de: 2013
+
+**≥11 national newspapers with ≥9 years coverage** (from the top 10 most read + top 4 most cited newspapers)
+
+## Local
+
+- augsburger-allgemeine.de: 2013
+- bz-berlin.de: 2018
+- haz.de: 2018
+- lvz.de: 2018
+- noz.de: 2014
+- rp-online.de: 2016
+- rundschau-online.de: 2021
+- saechsische.de: 2019
+- stuttgarter-zeitung.de: 2014
+- weser-kurier.de: 2014
+
+**≥8 regional newspapers with ≥5 years coverage, ≥4 with ≥9 years coverage** (criteria: most read, biggest cities, previous studies)
+
 

@@ -1,8 +1,11 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from os import environ
 from time import sleep
+from itertools import chain
+from math import ceil
 
 import requests
+from dateutil import parser
 from dotenv import load_dotenv
 
 from protest_impact.types import NewsItem
@@ -17,25 +20,32 @@ load_dotenv()
 
 
 def search(
-    query: str | None, date: date, site: str = None, offset: int = 0
+    query: str | None,
+    date: date,
+    end_date: date = None,
+    site: str = None,
+    offset: int = 0,
 ) -> NewsItem:
     results_per_page = 100
-    query = query or ""
+    query_ = query or ""
     site_ = f"site:{site}" if site else ""
+    end_date_ = end_date or (date + timedelta(days=1))
     response = get(
-        "https://serpapi.com/search",
+        "https://api.scaleserp.com/search",
         headers={},
         params={
-            "q": f"{query} after:{date.isoformat()} before:{(date + timedelta(days=1)).isoformat()} {site_}",
+            "search_type": "news",
+            "q": f"{query_} {site_}",
+            "location": "Germany",
+            "google_domain": "google.de",
             "gl": "de",
             "hl": "de",
-            "lr": "lang_de",
-            "google_domain": "google.de",
-            "engine": "google",
-            "tbm": "nws",
-            "api_key": environ["SERPAPI_KEY"],
+            "time_period": "custom",
+            "time_period_min": date.strftime("%m-%d-%Y"),
+            "time_period_max": end_date_.strftime("%m-%d-%Y"),
             "num": results_per_page,
-            "start": offset,
+            "page": 1 + offset,
+            "api_key": environ["SCALE_SERP_API_KEY"],
         },
     )
     response.raise_for_status()
@@ -43,15 +53,18 @@ def search(
     if "news_results" not in json:
         return []
     json = json["news_results"]
+    if type(json[0]) == list:
+        json = chain(json)
     results = [
         NewsItem(
-            date=date, url=item["link"], title=item["title"], content=item["snippet"]
+            date=parser.parse(item["date_utc"]).date(),
+            url=item["link"],
+            title=item["title"],
+            content=item["snippet"] if "snippet" in item else "",
         )
         for item in json
     ]
     if len(results) == results_per_page:
-        if offset >= 500:
-            raise Exception("too many results")
-        sleep(0.5)
-        results += search(query, date, site, offset + results_per_page)
+        print(f"Page number {offset + 1}")
+        results += search(query, date, end_date, site, offset + 1)
     return list(set(results))

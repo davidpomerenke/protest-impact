@@ -3,14 +3,8 @@ from pprint import pprint
 
 
 from protest_impact.util.cache import cache, get, memory
-from protest_impact.util.html import html2text
-from protest_impact.util.path import project_root
-
-
-def website_name(url):
-    return re.search(
-        r"^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)", url
-    ).group(1)
+from protest_impact.util.html import html2text, website_name
+from protest_impact.util.path import project_root, fulltext_path
 
 
 counter = 0

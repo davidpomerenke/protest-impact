@@ -1,4 +1,5 @@
-datasets/
+/datasets/
+/data/
 .vscode/
 *.ipynb
 
