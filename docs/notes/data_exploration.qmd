@@ -1,0 +1,138 @@
+---
+jupyter: python3
+---
+
+```{python}
+from protest_impact.data.news.config import newspapers_of_record, popular_newspapers, local_newspapers, all_newspapers_with_id
+from protest_impact.util import project_root
+import pandas as pd
+from tqdm.notebook import tqdm
+
+count_data = []
+for newspaper in tqdm(all_newspapers_with_id.keys()):
+    path = project_root / "data" / "news" / "fulltext" / newspaper
+    if not path.exists():
+        continue
+    for date in path.iterdir():
+        if not date.name.startswith("20"):
+            continue
+        count = len(list(date.iterdir()))
+        count_data.append(dict(date=date.name, newspaper=newspaper, count=count))
+count_data = pd.DataFrame(count_data)
+count_data["date"] = pd.to_datetime(count_data["date"])
+count_data.head()
+```
+
+```{python}
+from itertools import chain
+
+df = count_data.copy()
+# compute monthly averages for each newspaper
+df = df.groupby([pd.Grouper(key="date", freq="W"), "newspaper"]).mean().reset_index()
+# cap values at 50
+df["count"] = df["count"].clip(upper=20)
+# split into multiple dataframes for plotting
+df_newspapers = df[df["newspaper"].isin(newspapers_of_record)]
+df_popular = df[df["newspaper"].isin(popular_newspapers)]
+df_local = df[df["newspaper"].isin(chain(*local_newspapers.values()))]
+dfs = [df_newspapers, df_popular, df_local]
+[len(df) for df in dfs]
+```
+
+```{python}
+import altair as alt
+
+
+def plot(df):
+    # year labels in x axis
+    return (
+        alt.Chart(df, width=1200, height=100)
+        .mark_line()
+        .encode(
+            x=alt.X("date:T", axis=alt.Axis(format="%Y-%m")),
+            y="count:Q",
+            row="newspaper:N",
+            tooltip=["date:T", "count:Q", "newspaper:N"],
+        )
+    )
+```
+
+```{python}
+plot(df_newspapers)
+```
+
+```{python}
+plot(df_popular)
+```
+
+```{python}
+plot(df_local)
+```
+
+```{python}
+import numpy as np
+df= count_data.copy()
+# sample data down to 100 days per newspaper
+# df = df.groupby("newspaper").apply(lambda x: x.sample(1000, replace=True))
+# ungroup
+# df = df.reset_index(drop=True)
+# sample down to 8% of the data
+df = df.sample(frac=0.08)
+# make counts relative to the average daily count for each newspaper
+df["count"] = df["count"] / df.groupby("newspaper")["count"].transform("mean")
+# apply log transform
+df["count"] = df["count"].apply(lambda x: np.log(x))
+print(len(df))
+# plot distribution of articles per day for each newspaper (with matplotlib)
+alt.Chart(df, width=100, height=50).mark_bar().encode(
+    x=alt.X("count:Q", bin=alt.Bin(maxbins=50)),
+    y="count()",
+    column="newspaper:N"
+)
+```
+
+```{python}
+# retrieve holidays for germany from 2013 to 2022
+import holidays
+
+german_holidays = holidays.Germany(years=range(2013, 2023))
+```
+
+```{python}
+
+import matplotlib.pyplot as plt
+
+from datetime import datetime
+for year in range(2005, 2023):
+    df = count_data.copy()
+    start = datetime(year, 1, 1)
+    end = datetime(year, 12, 31)
+    df = df[(df["date"] >= start) & (df["date"] <= end)]
+    # make values relative to the average daily count for each newspaper
+    # df["count"] = df["count"] / df.groupby("newspaper")["count"].transform("mean")
+    # collect newspapers that have articles in the selected time range
+    newspapers = df[df["date"] >= start]["newspaper"].unique()
+    # plot the data for each newspaper (with matplotlib)
+    # use the object oriented interface of matplotlib
+    fig, axs = plt.subplots(len(newspapers), figsize=(20, 10), sharex=True)
+    for ax, newspaper in zip(axs, newspapers):
+        df[df["newspaper"] == newspaper].plot(x="date", y="count", ax=ax)
+        ax.set_title(newspaper)
+        # highlight weekends, holidays, and month boundaries
+        for date in pd.date_range(start, end):
+            if date.dayofweek >= 5:
+                ax.axvspan(date, date + pd.Timedelta(days=1), color="orange", alpha=0.1)
+            if date in german_holidays:
+                ax.axvspan(date, date + pd.Timedelta(days=1), color="red", alpha=0.1)
+            if date.day == 1:
+                ax.axvspan(date, date + pd.Timedelta(days=1), color="black", alpha=0.2)
+        ax.set_xlim(start, end)
+    plt.tight_layout()
+    plt.show()
+    exit()
+    # export as pdf
+    fig.savefig(f"../../data/data_{year}.pdf")
+    plt.close(fig)
+```
+
+

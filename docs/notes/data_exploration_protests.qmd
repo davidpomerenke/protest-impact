@@ -1,0 +1,138 @@
+---
+jupyter: python3
+---
+
+# Protest data
+
+## Berlin
+
+```{python}
+import pandas as pd
+
+# from https://media.frag-den-staat.de/files/media/main/94/0a/940a2c42-60f1-4c29-91ea-40f8611afa43/versammlungen-berlin.xlsx
+data1 = pd.read_excel("../../datasets/berlin1.xlsx", parse_dates=["Datum"])
+data1
+```
+
+```{python}
+# read all sheets
+# from https://fragdenstaat.de/files/foi/762832/ifg160-22-versammlungen.xlsx?download
+data2 = pd.concat(pd.read_excel("../../datasets/berlin2.xlsx", sheet_name=None), ignore_index=True)
+data2["Datum"] = pd.to_datetime(data2["Datum"], format="%d.%m.%Y")
+data2
+```
+
+```{python}
+# merge the two datasets
+data = pd.concat([data2, data1], ignore_index=True)
+# sort by date and reset index
+data = data.sort_values(by="Datum").reset_index(drop=True)
+data
+```
+
+```{python}
+# remove quotation marks (of all kinds) from the "Thema" column
+data["Thema"] = data["Thema"].str.replace('"', "")
+data["Thema"] = data["Thema"].str.replace("„", "")
+data["Thema"] = data["Thema"].str.replace("“", "")
+```
+
+### Investigate overlap between both tables
+
+```{python}
+# show data for 01.07.2020 sorted by Thema
+data[data["Datum"] == "2020-07-01"].sort_values(by="Thema")
+```
+
+```{python}
+len(data[data["Datum"] == "2020-07-01"])
+```
+
+```{python}
+# give the number of duplicates in the column Thema for 01.07.2020
+data[data["Datum"] == "2020-07-01"].duplicated(subset="Thema").sum()
+```
+
+```{python}
+omitted_df = pd.DataFrame()
+for day in range(1,21):
+    day = f"2020-07-{day:02d}"
+    # get entries from that day
+    day_data = data[data["Datum"] == day].copy()
+    # compute how often each Thema occurs on the same day
+    frequencies = day_data.groupby("Thema").size().reset_index(name="count")
+    # get the Themas that occur only once
+    uniques = frequencies[frequencies["count"] == 1]
+    # retrieve the original entries from the day that have the Thema
+    omitted = day_data[day_data["Thema"].isin(uniques["Thema"])]
+    # add the entries to the omitted_df
+    omitted_df = pd.concat([omitted_df, omitted], ignore_index=True)
+
+pd.options.display.max_rows = 100
+omitted_df[["Datum", "Von", "Bis", "Thema", "Teilnehmende (angemeldet)", "Teilnehmende (tatsächlich)"]].sort_values(by="Datum")
+```
+
+There is an overlap of both data tables. Most events are identical, but some are missing, mostly in the newer table. I assume they have been removed because it turned out that they have not taken place, and rely on the newer table.
+
+```{python}
+# restrict data1 to before 01.07.2020
+data1 = data1[data1["Datum"] < "2020-07-01"]
+# merge the two datasets
+data = pd.concat([data2, data1], ignore_index=True)
+# sort by date and reset index
+data = data.sort_values(by="Datum").reset_index(drop=True)
+# remove quotation marks (of all kinds) from the "Thema" column
+data["Thema"] = data["Thema"].str.replace('"', "")
+data["Thema"] = data["Thema"].str.replace("„", "")
+data["Thema"] = data["Thema"].str.replace("“", "")
+data
+```
+
+### Plot data
+
+```{python}
+df = data.copy()
+# plot the number of events, averaged per week
+df.groupby(df["Datum"].dt.to_period("W"))["Datum"].count().plot()
+```
+
+```{python}
+df = data.copy()
+# only keep entries with values for "Teilnehmende (tatsächlich)"
+df = df[df["Teilnehmende (tatsächlich)"].notna()]
+# plot the number of participants, averaged per week
+df.groupby(df["Datum"].dt.to_period("W"))["Teilnehmende (tatsächlich)"].sum().plot()
+```
+
+```{python}
+df = data.copy()
+# show the events with the most participants
+df.sort_values(by="Teilnehmende (tatsächlich)", ascending=False).head(20)
+```
+
+```{python}
+df = data.copy()
+import matplotlib.pyplot as plt
+import numpy as np
+# remove events with no values of 0 for "Teilnehmende (tatsächlich)"
+df = df[df["Teilnehmende (tatsächlich)"] != 0]
+df = df[df["Teilnehmende (tatsächlich)"].notna()]
+# compute log of the number of participants
+df["log_participants"] = df["Teilnehmende (tatsächlich)"].apply(lambda x: np.log10(x))
+# plot the distribution of the log of the number of participants
+# exponentiate the x-axis to get the actual number of participants
+# format the x-axis values as integers
+# use log scale for the y-axis
+df["log_participants"].plot.hist(bins=100, logy=True)
+plt.gca().set_xticks(np.arange(0, 5, 1))
+plt.gca().set_xticklabels([f"{int(10**x)}" for x in np.arange(0, 5, 1)])
+# format the y-axis values as human-readable numbers
+plt.gca().get_yaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
+```
+
+```{python}
+# export data as csv
+data.to_csv("../../datasets/berlin.csv", index=False)
+```
+
+
