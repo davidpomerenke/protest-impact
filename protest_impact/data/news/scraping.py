@@ -6,8 +6,9 @@ from urllib.parse import quote
 import requests
 
 from protest_impact.types import NewsItem
-from protest_impact.util import html2text
-from protest_impact.util.path import fulltext_path
+from protest_impact.util import html2text, fulltext_path
+
+from tqdm import tqdm
 
 
 def get_fulltext(metadata: NewsItem) -> NewsItem:
@@ -60,8 +61,8 @@ def _download_fulltext(metadata: NewsItem) -> NewsItem | Exception:
         if not "closest" in result or not result["closest"]["available"]:
             return Exception(metadata.url)
         response = requests.get(result["closest"]["url"])
-        print("😴")
-        sleep(5)
+        tqdm.write("😴")
+        sleep(4)
         if response.status_code != 200:
             return Exception(metadata.url)
         html = response.text

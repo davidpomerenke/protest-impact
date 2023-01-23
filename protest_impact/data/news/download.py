@@ -1,8 +1,10 @@
+import os
 import sys
 from datetime import date
 from time import sleep
 from random import shuffle
 from itertools import product
+from multiprocessing import Pool, freeze_support
 
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
@@ -16,6 +18,8 @@ from protest_impact.data.news.config import (
 from protest_impact.data.news.scraping import download_fulltext
 from protest_impact.data.news.sources.mediacloud import search as mediacloud_search
 from protest_impact.data.news.sources.google import search as google_search
+from protest_impact.util.html import website_name
+from protest_impact.data.news.config import all_newspapers_with_id
 
 
 def download_manually(website: str, engine_name: str, year: int, month: int):
@@ -33,20 +37,24 @@ def download_manually(website: str, engine_name: str, year: int, month: int):
     for article in tqdm(articles):
         if any(w in article.url for w in filter_words):
             continue
-        # print(article.url)
+        if website_name(article.url) not in all_newspapers_with_id.keys():
+            continue
         download_fulltext(article)
 
 
-if len(sys.argv) < 2:
-    print("Usage: python download.py random")
-    print("Usage: python download.py google|mediacloud <website>")
-    sys.exit(1)
-if sys.argv[1] == "random":
+def download_all(website: str):
+    for engine_name in ["google", "mediacloud"]:
+        for year in range(start_year, end_year + 1):
+            for month in range(1, 13):
+                download_manually(website, engine_name, year, month)
+
+
+def download_randomly(*args):
     configs = list(
         product(
-            ["google", "mediacloud"],
+            ["google"],  # "mediacloud"],
             media_ids.keys(),
-            range(start_year, end_year),
+            range(start_year, end_year + 1),
             range(1, 13),
         )
     )
@@ -55,10 +63,46 @@ if sys.argv[1] == "random":
         try:
             download_manually(website, engine_name, year, month)
         except:
+            print("ERROR")
+            print(f"Failed to download {engine_name} {website} {year}-{month:02d}")
             sleep(5)
-else:
-    engine_name = sys.argv[1]
-    website = sys.argv[2]
-    for year in range(start_year, end_year):
-        for month in range(1, 13):
-            download_manually(website, engine_name)
+
+
+def mute():
+    sys.stdout = open(os.devnull, "w")
+
+
+if __name__ == "__main__":
+    freeze_support()
+    if len(sys.argv) < 2:
+        print("Usage: python download.py random")
+        print("Usage: python download.py google|mediacloud <website>")
+        sys.exit(1)
+    if sys.argv[1] == "random":
+        download_randomly()
+    elif sys.argv[1] == "random_parallel":
+        n = int(sys.argv[2])
+        with Pool(n, initargs=mute) as p:
+            try:
+                p.map(download_randomly, range(n))
+            except KeyboardInterrupt:
+                print("Caught KeyboardInterrupt, terminating workers")
+                p.terminate()
+                p.join()
+    elif sys.argv[1] == "parallel":
+        n = int(sys.argv[2])
+        websites = list(media_ids.keys())
+        with Pool(n) as p:
+            try:
+                p.map(download_all, websites)
+            except KeyboardInterrupt:
+                print("Caught KeyboardInterrupt, terminating workers")
+                p.terminate()
+                p.join()
+    else:
+        engine_name = sys.argv[1]
+        website = sys.argv[2]
+        start_year_ = int(sys.argv[3]) if len(sys.argv) > 3 else start_year
+        for year in range(start_year_, end_year + 1):
+            for month in range(1, 13):
+                download_manually(website, engine_name, year, month)
