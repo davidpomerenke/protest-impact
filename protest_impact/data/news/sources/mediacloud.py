@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from os import environ
+from time import sleep
 
 from dotenv import load_dotenv
 from dateutil import parser
@@ -21,11 +22,31 @@ def search(
     query: str,
     date: date,
     end_date: date = None,
-    media_id: int = None,
+    newspaper: tuple[str, int] = None,
     last_processed_stories_id: int = 0,
+    threshold: int = None,
 ) -> NewsItem:
+    media_id = newspaper[1] if newspaper else None
     end_date_ = end_date or (date + timedelta(days=1))
     results_per_page = 1000
+    print(
+        get._get_argument_hash(
+            "https://api.mediacloud.org/api/v2/stories_public/list/",
+            params={
+                "last_processed_stories_id": last_processed_stories_id,
+                "rows": results_per_page,
+                "q": query,
+                "fq": [
+                    f"media_id:{media_id}" if media_id else "",
+                    # "tags_id_media:34412409",
+                    f"publish_date:[{date.isoformat()}T00:00:00Z TO {end_date_.isoformat()}T00:00:00Z]",
+                ],
+                "key": environ["MEDIACLOUD_API_KEY"],
+            },
+            headers={"Accept": "application/json"},
+        )
+    )
+    # sleep(1)
     response = get(
         "https://api.mediacloud.org/api/v2/stories_public/list/",
         params={
@@ -41,6 +62,8 @@ def search(
         },
         headers={"Accept": "application/json"},
     )
+    if response.status_code != 200:
+        print(response.text)
     response.raise_for_status()
     json = response.json()
     results = [
@@ -55,6 +78,6 @@ def search(
     ]
     if len(results) == results_per_page:
         last_processed_stories_id = json[-1]["processed_stories_id"]
-        print(f"last_processed_stories_id: {last_processed_stories_id}")
-        results += search(query, date, end_date, media_id, last_processed_stories_id)
+        # print(f"last_processed_stories_id: {last_processed_stories_id}")
+        results += search(query, date, end_date, newspaper, last_processed_stories_id)
     return list(set(results))

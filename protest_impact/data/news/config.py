@@ -1,3 +1,5 @@
+from itertools import chain
+
 newspapers_of_record = [
     "spiegel.de",
     "sueddeutsche.de",
@@ -33,7 +35,7 @@ diverse_local_newspapers = [
     "weser-kurier.de",
 ]  # cf. Wiedemann et al. 2022
 
-local_newspapers = {
+local_newspapers_ = {
     "schleswig-holstein": [
         "shz.de",
     ],
@@ -92,6 +94,8 @@ local_newspapers = {
         "merkur.de",
     ],
 }  # https://www.meedia.de/publishing/die-auflagen-bilanz-der-groessten-82-regionalzeitungen-deutliche-verluste-fuer-die-grossen-in-nrw-express-und-mopo-im-freien-fall-137638686e0416e91a6373b6be6d5810
+
+local_newspapers = list(chain(*local_newspapers_.values()))
 
 # bringing in some diversity
 other = [
@@ -158,6 +162,19 @@ media_ids = {
     "zeit.de": 22119,
 }
 
+incomplete_newspapers = [
+    "merkur.de",
+    "freiepresse.de",
+    "shz.de",
+    "ostsee-zeitung.de",
+    "maz-online.de",
+    "mz-web.de",
+    "fr.de",
+    "saarbruecker-zeitung.de",
+    "schwaebische.de",
+    "nordbayern.de",
+]
+
 all_newspapers_with_id = {
     name: media_ids[name]
     for name in sorted(
@@ -165,10 +182,25 @@ all_newspapers_with_id = {
             [
                 *newspapers_of_record,
                 *popular_newspapers,
-                *[p[0] for p in local_newspapers.values()],
+                *local_newspapers,
                 *other,
             ]
         )
+    )
+}
+
+complete_newspapers_with_id = {
+    name: media_ids[name]
+    for name in sorted(
+        set(
+            [
+                *newspapers_of_record,
+                *popular_newspapers,
+                *local_newspapers,
+                *other,
+            ]
+        )
+        - set(incomplete_newspapers)
     )
 }
 
@@ -190,5 +222,5 @@ filter_words = [
     "advent.spiegel.de",
 ]
 
-start_year = 2005
+start_year = 2013
 end_year = 2022

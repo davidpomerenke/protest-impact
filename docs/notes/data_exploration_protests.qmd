@@ -17,7 +17,9 @@ data1
 ```{python}
 # read all sheets
 # from https://fragdenstaat.de/files/foi/762832/ifg160-22-versammlungen.xlsx?download
-data2 = pd.concat(pd.read_excel("../../datasets/berlin2.xlsx", sheet_name=None), ignore_index=True)
+data2 = pd.concat(
+    pd.read_excel("../../datasets/berlin2.xlsx", sheet_name=None), ignore_index=True
+)
 data2["Datum"] = pd.to_datetime(data2["Datum"], format="%d.%m.%Y")
 data2
 ```
@@ -55,7 +57,7 @@ data[data["Datum"] == "2020-07-01"].duplicated(subset="Thema").sum()
 
 ```{python}
 omitted_df = pd.DataFrame()
-for day in range(1,21):
+for day in range(1, 21):
     day = f"2020-07-{day:02d}"
     # get entries from that day
     day_data = data[data["Datum"] == day].copy()
@@ -69,7 +71,16 @@ for day in range(1,21):
     omitted_df = pd.concat([omitted_df, omitted], ignore_index=True)
 
 pd.options.display.max_rows = 100
-omitted_df[["Datum", "Von", "Bis", "Thema", "Teilnehmende (angemeldet)", "Teilnehmende (tatsächlich)"]].sort_values(by="Datum")
+omitted_df[
+    [
+        "Datum",
+        "Von",
+        "Bis",
+        "Thema",
+        "Teilnehmende (angemeldet)",
+        "Teilnehmende (tatsächlich)",
+    ]
+].sort_values(by="Datum")
 ```
 
 There is an overlap of both data tables. Most events are identical, but some are missing, mostly in the newer table. I assume they have been removed because it turned out that they have not taken place, and rely on the newer table.
@@ -114,6 +125,7 @@ df.sort_values(by="Teilnehmende (tatsächlich)", ascending=False).head(20)
 df = data.copy()
 import matplotlib.pyplot as plt
 import numpy as np
+
 # remove events with no values of 0 for "Teilnehmende (tatsächlich)"
 df = df[df["Teilnehmende (tatsächlich)"] != 0]
 df = df[df["Teilnehmende (tatsächlich)"].notna()]
@@ -127,7 +139,9 @@ df["log_participants"].plot.hist(bins=100, logy=True)
 plt.gca().set_xticks(np.arange(0, 5, 1))
 plt.gca().set_xticklabels([f"{int(10**x)}" for x in np.arange(0, 5, 1)])
 # format the y-axis values as human-readable numbers
-plt.gca().get_yaxis().set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
+plt.gca().get_yaxis().set_major_formatter(
+    plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x)))
+)
 ```
 
 ```{python}
