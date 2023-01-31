@@ -46,11 +46,13 @@ def _download_fulltext(metadata: NewsItem) -> NewsItem | Exception:
     """Downloads and returns the full text of a news article."""
     try:
         response = requests.get(metadata.url)
-    except:
+    except Exception as e:
+        print(e)
         response = requests.get(metadata.url, allow_redirects=False)
     if response.status_code == 200:
         html = response.text
     else:
+        # return Exception(metadata.url)
         response = requests.get(
             f"http://archive.org/wayback/available?url={quote(metadata.url)}"
         )

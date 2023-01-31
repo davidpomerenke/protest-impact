@@ -197,7 +197,6 @@ complete_newspapers_with_id = {
                 *newspapers_of_record,
                 *popular_newspapers,
                 *local_newspapers,
-                *other,
             ]
         )
         - set(incomplete_newspapers)
@@ -220,6 +219,9 @@ filter_words = [
     "altavist.com",
     "planestream.de",
     "advent.spiegel.de",
+    "feedsportal.com",
+    "blog.lvz-online.de",
+    "sportschau.de",
 ]
 
 start_year = 2013

@@ -28,25 +28,6 @@ from protest_impact.data.news.config import (
 )
 
 
-def get_all_metadata():
-    data = []
-    for newspaper in complete_newspapers_with_id:
-        for engine in ["google", "mediacloud"]:
-            for year in tqdm(range(start_year, end_year)):
-                for month in range(1, 13):
-                    articles = get_monthly_metadata(newspaper, engine, year, month)
-                    for article in articles:
-                        data.append(
-                            {
-                                "newspaper": newspaper,
-                                "engine": engine,
-                                "path": fulltext_path(article),
-                            }
-                        )
-    df_sources = pd.DataFrame(data)
-    df_sources.head()
-
-
 def get_monthly_metadata(
     website: str, engine_name: str, year: int, month: int, threshold: int = None
 ):
@@ -64,45 +45,83 @@ def get_monthly_metadata(
     return articles
 
 
+def get_counts(
+    get_metadata=get_monthly_metadata, newspapers_with_id=complete_newspapers_with_id
+):
+    data = []
+    for newspaper in tqdm(newspapers_with_id):
+        for engine in ["google"]:  # , "mediacloud"]:
+            print(newspaper, engine)
+            for year in range(start_year, end_year):
+                for month in range(1, 13):
+                    articles = get_metadata(newspaper, engine, year, month)
+                    data.append(
+                        {
+                            "newspaper": newspaper,
+                            "engine": engine,
+                            "date": date(year=year, month=month, day=1),
+                            "count": len(articles),
+                        }
+                    )
+    return pd.DataFrame(data)
+
+
 def get_halfmonthly_metadata(website: str, engine_name: str, year: int, month: int):
     engine = {"google": google_search, "mediacloud": mediacloud_search}[engine_name]
-    site_args = (
-        dict(media_id=media_ids[website])
-        if engine_name == "mediacloud"
-        else dict(site=website)
-    )
     start_date = date(year=year, month=month, day=1)
     mid_date = start_date + relativedelta(days=15)
     end_date = start_date + relativedelta(months=1)
-    results = engine(None, date=start_date, end_date=mid_date, **site_args)
-    results += engine(None, date=mid_date, end_date=end_date, **site_args)
+    results = engine(
+        None,
+        date=start_date,
+        end_date=mid_date,
+        newspaper=(website, media_ids[website]),
+    )
+    results += engine(
+        None, date=mid_date, end_date=end_date, newspaper=(website, media_ids[website])
+    )
     articles = sorted(results, key=lambda r: r.date)
     return articles
 
 
 def get_weekly_metadata(website: str, engine_name: str, year: int, month: int):
     engine = {"google": google_search, "mediacloud": mediacloud_search}[engine_name]
-    site_args = (
-        dict(media_id=media_ids[website])
-        if engine_name == "mediacloud"
-        else dict(site=website)
-    )
     start_date = date(year=year, month=month, day=1)
     mid_date_1 = start_date + relativedelta(days=7)
     mid_date_2 = start_date + relativedelta(days=14)
     mid_date_3 = start_date + relativedelta(days=21)
     end_date = start_date + relativedelta(months=1)
-    results = engine(None, date=start_date, end_date=mid_date_1, **site_args)
-    results += engine(None, date=mid_date_1, end_date=mid_date_2, **site_args)
-    results += engine(None, date=mid_date_2, end_date=mid_date_3, **site_args)
-    results += engine(None, date=mid_date_3, end_date=end_date, **site_args)
+    results = engine(
+        None,
+        date=start_date,
+        end_date=mid_date_1,
+        newspaper=(website, media_ids[website]),
+    )
+    results += engine(
+        None,
+        date=mid_date_1,
+        end_date=mid_date_2,
+        newspaper=(website, media_ids[website]),
+    )
+    results += engine(
+        None,
+        date=mid_date_2,
+        end_date=mid_date_3,
+        newspaper=(website, media_ids[website]),
+    )
+    results += engine(
+        None,
+        date=mid_date_3,
+        end_date=end_date,
+        newspaper=(website, media_ids[website]),
+    )
     articles = sorted(results, key=lambda r: r.date)
     return articles
 
 
 def download_manually(website: str, engine_name: str, year: int, month: int):
     print(f"{engine_name} {website} {year}-{month:02d}")
-    for article in tqdm(get_weekly_metadata(website, engine_name, year, month)):
+    for article in tqdm(get_monthly_metadata(website, engine_name, year, month)):
         if any(w in article.url for w in filter_words):
             continue
         if website_name(article.url) not in all_newspapers_with_id.keys():
@@ -115,25 +134,6 @@ def download_all(website: str):
         for year in range(start_year, end_year + 1):
             for month in range(1, 13):
                 download_manually(website, engine_name, year, month)
-
-
-def download_randomly(*args):
-    configs = list(
-        product(
-            ["google"],  # "mediacloud"],
-            media_ids.keys(),
-            range(start_year, end_year + 1),
-            range(1, 13),
-        )
-    )
-    shuffle(configs)
-    for engine_name, website, year, month in configs:
-        try:
-            download_manually(website, engine_name, year, month)
-        except:
-            print("ERROR")
-            print(f"Failed to download {engine_name} {website} {year}-{month:02d}")
-            sleep(5)
 
 
 def mute():

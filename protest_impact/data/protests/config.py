@@ -1,3 +1,5 @@
+import re
+
 treatment_keywords = {
     "en": [
         "protest",
@@ -96,4 +98,9 @@ movement_keywords = {
 }
 
 # the exact search string was:
-# *protest* OR Versammlung* OR demonstr* OR Kundgebung* OR Kampagne* OR “Soziale Bewegung*” OR Hausbesetzung* OR Streik* OR Unterschriftensammlung* OR Hasskriminalit ̈ at* OR Unruhen* OR Aufruhr* OR Aufstand* OR Boykott* OR Riot* OR Aktivis* OR Widerstand* OR Mobilisierung* OR B ̈ urgerinitiative* OR B ̈ urgerbegehren*.
+search_string = '*protest* OR Versammlung* OR demonstr* OR Kundgebung* OR Kampagne* OR "Soziale Bewegung*" OR Hausbesetzung* OR Streik* OR Unterschriftensammlung* OR Hasskriminalität* OR Unruhen* OR Aufruhr* OR Aufstand* OR Boykott* OR Riot* OR Aktivis* OR Widerstand* OR Mobilisierung* OR Bürgerinitiative* OR Bürgerbegehren*'  # from Wiedemann et al. 2022
+
+_search_regex = re.sub(r"\*", ".*", search_string)
+_search_regex = re.sub(r" OR ", "|", _search_regex)
+_search_regex = re.sub(r'"', "", _search_regex)
+search_regex = re.compile(_search_regex, re.IGNORECASE)

@@ -23,35 +23,14 @@ def search(
     query: str | None,
     date: date,
     end_date: date = None,
-    newspaper: tuple[str, int] = None,
+    newspaper: str = None,
     offset: int = 0,
     threshold: int = None,
 ) -> NewsItem:
-    site = newspaper[0] if newspaper else None
     results_per_page = 100
     query_ = query or ""
-    site_ = f"site:{site}" if site else ""
+    site_ = f"site:{newspaper}" if newspaper else ""
     end_date_ = end_date or (date + timedelta(days=1))
-    # print(
-    #     get._get_argument_hash(
-    #         "https://api.scaleserp.com/search",
-    #         headers={},
-    #         params={
-    #             "search_type": "news",
-    #             "q": f"{query_} {site_}",
-    #             "location": "Germany",
-    #             "google_domain": "google.de",
-    #             "gl": "de",
-    #             "hl": "de",
-    #             "time_period": "custom",
-    #             "time_period_min": date.strftime("%m-%d-%Y"),
-    #             "time_period_max": end_date_.strftime("%m-%d-%Y"),
-    #             "num": results_per_page,
-    #             "page": 1 + offset,
-    #             "api_key": environ["SCALE_SERP_API_KEY"],
-    #         },
-    #     ),
-    # )
     response = get(
         "https://api.scaleserp.com/search",
         headers={},

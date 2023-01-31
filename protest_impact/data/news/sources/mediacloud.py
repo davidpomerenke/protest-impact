@@ -7,6 +7,7 @@ from dateutil import parser
 
 from protest_impact.types import NewsItem
 from protest_impact.util import get
+from protest_impact.data.news.config import media_ids
 
 """
 Documentation:
@@ -22,11 +23,11 @@ def search(
     query: str,
     date: date,
     end_date: date = None,
-    newspaper: tuple[str, int] = None,
+    newspaper: str = None,
     last_processed_stories_id: int = 0,
     threshold: int = None,
 ) -> NewsItem:
-    media_id = newspaper[1] if newspaper else None
+    media_id = media_ids[newspaper]
     end_date_ = end_date or (date + timedelta(days=1))
     results_per_page = 1000
     print(
@@ -76,7 +77,7 @@ def search(
         for item in json
         if item["publish_date"] is not None
     ]
-    if len(results) == results_per_page:
+    if len(results) >= 0.9 * results_per_page:
         last_processed_stories_id = json[-1]["processed_stories_id"]
         # print(f"last_processed_stories_id: {last_processed_stories_id}")
         results += search(query, date, end_date, newspaper, last_processed_stories_id)
