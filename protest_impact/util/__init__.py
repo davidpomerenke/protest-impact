@@ -1,11 +1,9 @@
 import re
 from pprint import pprint
 
-
 from protest_impact.util.cache import cache, get, memory
 from protest_impact.util.html import html2text, website_name
-from protest_impact.util.path import project_root, fulltext_path
-
+from protest_impact.util.path import fulltext_path, project_root
 
 counter = 0
 

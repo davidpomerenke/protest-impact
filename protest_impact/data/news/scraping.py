@@ -3,12 +3,12 @@ from datetime import date
 from os import environ
 from time import sleep
 from urllib.parse import quote
+
 import requests
+from tqdm import tqdm
 
 from protest_impact.types import NewsItem
-from protest_impact.util import html2text, fulltext_path
-
-from tqdm import tqdm
+from protest_impact.util import fulltext_path, html2text
 
 
 def get_fulltext(metadata: NewsItem) -> NewsItem:

@@ -1,7 +1,7 @@
+import re
+
 import html2text
 from readability import Document
-
-import re
 
 
 def website_name(url):

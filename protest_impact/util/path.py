@@ -1,7 +1,8 @@
 from pathlib import Path
-from protest_impact.types import NewsItem
+
 import joblib
 
+from protest_impact.types import NewsItem
 from protest_impact.util.html import website_name
 
 project_root = Path(__file__).parent.parent.parent

@@ -5,8 +5,7 @@ import pandas as pd
 from dotenv import load_dotenv
 
 from protest_impact.types import NewsItem
-from protest_impact.util import get, html2text, log
-from protest_impact.util import project_root
+from protest_impact.util import get, html2text, log, project_root
 
 """
 Documentation: https://korap.ids-mannheim.de/doc/api#page-top

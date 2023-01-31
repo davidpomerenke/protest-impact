@@ -1,8 +1,9 @@
+from datetime import datetime
+
+import holidays
 import matplotlib.pyplot as plt
 import pandas as pd
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import holidays
 
 
 def plot_history(df: pd.DataFrame, year: int = None, newspaper: str = None):

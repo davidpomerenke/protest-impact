@@ -2,12 +2,12 @@ from datetime import date, timedelta
 from os import environ
 from time import sleep
 
-from dotenv import load_dotenv
 from dateutil import parser
+from dotenv import load_dotenv
 
+from protest_impact.data.news.config import media_ids
 from protest_impact.types import NewsItem
 from protest_impact.util import get
-from protest_impact.data.news.config import media_ids
 
 """
 Documentation:

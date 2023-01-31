@@ -1,8 +1,8 @@
-from datetime import date, timedelta, datetime
-from os import environ
-from time import sleep
+from datetime import date, datetime, timedelta
 from itertools import chain
 from math import ceil
+from os import environ
+from time import sleep
 
 import requests
 from dateutil import parser

@@ -3,26 +3,22 @@ import sys
 from datetime import date
 from multiprocessing import Pool, freeze_support
 
+import pandas as pd
 from dateutil.relativedelta import relativedelta
 from tqdm import tqdm
-import pandas as pd
 
-from protest_impact.data.news.config import (
-    media_ids,
-    filter_words,
-    start_year,
-    end_year,
-)
-from protest_impact.data.news.scraping import download_fulltext
-from protest_impact.data.news.sources.mediacloud import search as mediacloud_search
-from protest_impact.data.news.sources.google import search as google_search
-from protest_impact.util import website_name, fulltext_path
 from protest_impact.data.news.config import (
     all_newspapers_with_id,
     complete_newspapers_with_id,
-    start_year,
     end_year,
+    filter_words,
+    media_ids,
+    start_year,
 )
+from protest_impact.data.news.scraping import download_fulltext
+from protest_impact.data.news.sources.google import search as google_search
+from protest_impact.data.news.sources.mediacloud import search as mediacloud_search
+from protest_impact.util import fulltext_path, website_name
 
 
 def get_monthly_metadata(

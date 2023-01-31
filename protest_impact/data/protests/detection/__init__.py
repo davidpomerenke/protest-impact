@@ -1,6 +1,7 @@
 import pandas as pd
+
+from datasets import ClassLabel, load_dataset
 from protest_impact.util import project_root
-from datasets import load_dataset, ClassLabel
 
 
 def load_glpn_dataset():
