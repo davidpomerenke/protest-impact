@@ -1,10 +1,8 @@
-# protest_impact
+> Can we use causal inference and natural language processing to quantify the impact of protest movements on public discourse?
 
 Master thesis project (in progress) by David Pomerenke
 
-> Can we use causal inference and natural language processing to quantify the impact of protest movements on public discourse?
-
-![](protest-impacts-graphical-abstract.png)
+![](docs/img/graphical-abstract.png)
 
 ## Abstract
 
@@ -13,8 +11,11 @@ Citizens in democracies have an interest in understanding the effectiveness of p
 The ultimate goal of protest is a change in policy, which is hard to quantify. A good proxy may be the effect on public discourse [1], which can be measured through newspaper articles and social media posts, for which we can quantify the amount of coverage on the protest concern, and associated sentiment, polarization, and topicality. However, it is difficult to determine whether a protest event has caused a change in public discourse in the following days or weeks: the change may be due to an external factor, or an external factor may have acted as a confounder that caused both the protest as well as the change in public discourse.
 
 Causal inference can help solving this problem. In my thesis I want to focus on a recent technique that uses natural language processing for removing confounders:
-- Propensity score matching: Here we make the assumption that all relevant confounders are themselves manifested within newspaper articles. While this assumption will be imperfect, it is reasonable to assume that factors that newspaper reports cover many relevant trigger events and also roughly represent existing trends in public discourse. Then we can train classifiers to predict the likelihood of both protests and features of public discourse for a given day, and then match days with similar predictions to create something similar to a control-group for days with protest events.[2][3][4]
+
+- **Propensity score matching:** Here we make the assumption that all relevant confounders are themselves manifested within newspaper articles. While this assumption will be imperfect, it is reasonable to assume that factors that newspaper reports cover many relevant trigger events and also roughly represent existing trends in public discourse. Then we can train classifiers to predict the likelihood of both protests and features of public discourse for a given day, and then match days with similar predictions to create something similar to a control-group for days with protest events.[2][3][4]
+
 To evaluate the technique, I want to compare it against more established causal inference techniques, such as:
+
 - **Synthetic control group:** Here we focus on a region where a protest occurs on a given day, and try to model the features of public discourse as a weighted average of features from other regions where no protest occurs on the given day. This weighted average is then a synthetic region that serves as a counterfactual for the case that no protest had occurred in the real region, and can be compared with it.[5][6]
 - **Instrumental variable:** Here we assume that the weather acts as an independent variables that does not have a direct effect on public discourse regarding the protest concern, but may have an indirect effect through the occurrence and size of protest events. The correlation between weather and features of public discourse can then be used to estimate the effect of protest on public discourse.[7][8][9]
 
@@ -49,6 +50,14 @@ This research project would (a) contribute to the solution of a relevant societa
 
 [10] Wiedemann, G., Dollbaum, J. M., Haunss, S., Daphi, P., & Meier, L. D. (2022). A Generalized Approach to Protest Event Detection in German Local News. Proceedings of the Thirteenth Language Resources and Evaluation Conference, 3883–3891. https://aclanthology.org/2022.lrec-1.413
 
-## WIP nhjhj;;otes
+## WIP notes
 
-See [`docs/notes`](docs/notes/)
+See [`docs/notes`](docs/notes/).
+
+## Usage
+
+This is not to be used yet.
+
+## License
+
+(c) David Pomerenke 2023. (For now.)
