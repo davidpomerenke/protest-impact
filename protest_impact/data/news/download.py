@@ -1,9 +1,6 @@
 import os
 import sys
 from datetime import date
-from time import sleep
-from random import shuffle
-from itertools import product
 from multiprocessing import Pool, freeze_support
 
 from dateutil.relativedelta import relativedelta
@@ -146,17 +143,6 @@ if __name__ == "__main__":
         print("Usage: python download.py random")
         print("Usage: python download.py google|mediacloud <website>")
         sys.exit(1)
-    if sys.argv[1] == "random":
-        download_randomly()
-    elif sys.argv[1] == "random_parallel":
-        n = int(sys.argv[2])
-        with Pool(n, initargs=mute) as p:
-            try:
-                p.map(download_randomly, range(n))
-            except KeyboardInterrupt:
-                print("Caught KeyboardInterrupt, terminating workers")
-                p.terminate()
-                p.join()
     elif sys.argv[1] == "parallel":
         n = int(sys.argv[2])
         websites = list(media_ids.keys())
