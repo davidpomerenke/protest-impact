@@ -35,3 +35,11 @@ class NewsItem:
             title=d["title"],
             content="",
         )
+
+    def to_dict(self) -> dict:
+        return {
+            "publish_date": self.date.isoformat(),
+            "url": self.url,
+            "title": self.title,
+            "content": self.content,
+        }

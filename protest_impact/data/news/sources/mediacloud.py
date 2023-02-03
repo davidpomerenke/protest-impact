@@ -5,7 +5,7 @@ from time import sleep
 from dateutil import parser
 from dotenv import load_dotenv
 
-from protest_impact.data.news.config import media_ids
+from protest_impact.data.news.config import newspapers
 from protest_impact.types import NewsItem
 from protest_impact.util import get
 
@@ -27,7 +27,7 @@ def search(
     last_processed_stories_id: int = 0,
     threshold: int = None,
 ) -> NewsItem:
-    media_id = media_ids[newspaper]
+    media_id = newspapers[newspaper]
     end_date_ = end_date or (date + timedelta(days=1))
     results_per_page = 1000
     print(

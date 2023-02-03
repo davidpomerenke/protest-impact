@@ -112,7 +112,7 @@ other = [
     "heise.de",
 ]
 
-media_ids = {
+newspapers = {
     "taz.de": 20001,
     "jungewelt.de": 21854,
     "jungefreiheit.de": 310655,
@@ -176,7 +176,7 @@ incomplete_newspapers = [
 ]
 
 all_newspapers_with_id = {
-    name: media_ids[name]
+    name: newspapers[name]
     for name in sorted(
         set(
             [
@@ -190,7 +190,7 @@ all_newspapers_with_id = {
 }
 
 complete_newspapers_with_id = {
-    name: media_ids[name]
+    name: newspapers[name]
     for name in sorted(
         set(
             [
@@ -222,6 +222,11 @@ filter_words = [
     "feedsportal.com",
     "blog.lvz-online.de",
     "sportschau.de",
+    "content.dnn-online.de",
+    "neu.onetz.de",
+    "wahlzone.mdr.de",
+    "%C3%B",
+    "%C3%A",
 ]
 
 start_year = 2013

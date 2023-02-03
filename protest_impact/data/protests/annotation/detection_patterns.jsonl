@@ -1,0 +1,3 @@
+{"pattern": [{"LOWER": {"REGEX": ".*protest.*|versammlung.*|demonstr.*|kundgebung.*|kampagne.*|soziale bewegung.*|hausbesetzung.*|streik.*|unterschriftensammlung.*|hasskriminalität.*|unruhen.*|aufruhr.*|aufstand.*|boykott.*|riot.*|aktivis.*|widerstand.*|mobilisierung.*|bürgerinitiative.*|bürgerbegehren.*"}}], "label": "relevant"}
+{"pattern": [{"LOWER": {"REGEX": "protestant.*"}}], "label": "irrelevant"}
+{"pattern": [{"LOWER": {"REGEX": "protestant.*"}}], "label": "irrelevant"}

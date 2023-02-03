@@ -44,6 +44,7 @@ def _download_and_save_fulltext(metadata: NewsItem) -> None:
 
 def _download_fulltext(metadata: NewsItem) -> NewsItem | Exception:
     """Downloads and returns the full text of a news article."""
+    sleep(0.2)
     try:
         response = requests.get(metadata.url)
     except Exception as e:
