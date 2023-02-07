@@ -1,6 +1,7 @@
 {
   "card_css": {
-    "font-size": "10pt"
+    "font-size": "10pt",
+    "text-align": "left"
   },
   "global_css": ".prodigy-content {column-count: 2;} .prodigy-container {max-width: 900px;}"
 }

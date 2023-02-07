@@ -53,6 +53,7 @@ def get_protest_article_metadata(
     end_time = time()
     if verbose:
         print(len(result), end_time - start_time)
+    print(len(result))
     if len(result) > 0.9 * num_rows:
         last_processed_stories_id = result[-1]["processed_stories_id"]
         result += get_protest_article_metadata(
