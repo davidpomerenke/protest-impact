@@ -10,8 +10,8 @@ def load_aglpn_dataset():
         data_files={"main": "protest_news_annotated_v1.jsonl"},
     )
     aglpn["main"] = aglpn["main"].filter(lambda x: x["answer"] != "ignore")
-    traindev_test = aglpn["main"].train_test_split(test_size=3 / 8, seed=20230206)
-    train_dev = traindev_test["train"].train_test_split(test_size=1 / 5, seed=20230206)
+    traindev_test = aglpn["main"].train_test_split(test_size=4 / 10, seed=20230206)
+    train_dev = traindev_test["train"].train_test_split(test_size=1 / 6, seed=20230206)
     aglpn = DatasetDict(
         {
             "train": train_dev["train"],
