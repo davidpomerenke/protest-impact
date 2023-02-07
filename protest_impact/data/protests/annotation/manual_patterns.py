@@ -1,3 +1,6 @@
+# copied and adapted from https://gist.github.com/rolisz/1b93e60f5b9a85fb5a5b79913fd0ad4c
+# (c) Roland Szabo 2022
+
 import copy
 from typing import Iterable, List, Optional, Union
 
@@ -55,8 +58,8 @@ def manual(
         "stream": stream,
         "config": {
             "labels": labels,
-            "choice_style": "multiple",
-            "choice_auto_accept": False,
+            "choice_style": "single",
+            "choice_auto_accept": True,
             "exclude_by": "task",
             "auto_count_stream": True,
         },
