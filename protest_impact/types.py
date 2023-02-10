@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
+from typing import Optional
 
 from dateutil import parser
 
@@ -9,7 +10,7 @@ class NewsItem:
     date: date
     url: str
     title: str
-    content: str | None = None
+    content: Optional[str] = None
 
     def __str__(self):
         return f"{self.title}\n\n{self.date.isoformat()}\n\n{self.content}\n\n{self.url}\n\n"

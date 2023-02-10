@@ -28,6 +28,20 @@ local_quality_newspapers = [
     "stuttgarter-zeitung.de",
 ]  # https://www.die-zeitungen.de/aktuelles/news/article/news/qualitaets-ranking-deutscher-zeitungen.html#:~:text=Die%20Zeit%2C%20S%C3%BCddeutsche%20Zeitung%20und,den%20Bl%C3%A4ttern%20beste%20journalistische%20Qualit%C3%A4t.
 
+diverse_national_newspaers = [
+    # Informationen am Abend
+    # Heute Journal
+    # Tagesthemen
+    "taz.de",
+    "fr.de",
+    "sueddeutsche.de",
+    "zeit.de",
+    "spiegel.de",
+    "faz.net",
+    "bild.de",
+    "focus.de",
+]  # cf. Teune et al. 2017
+
 diverse_local_newspapers = [
     "lvz.de",
     "saechsische.de",
