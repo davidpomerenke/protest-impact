@@ -1,4 +1,14 @@
-# Running these notebooks in Google Colab
+# Gradient
+
+```
+!git clone https://<token>@github.com/davidpomerenke/protest-impact-data.git .
+!git pull
+!pip install poetry
+!poetry export -f requirements.txt --output requirements.txt --without-hashes
+!pip install -r requirements.txt
+```
+
+# Colab
 
 Based on https://gist.github.com/DPaletti/da7729c35ba7f9274c3635849608b7bc.
 

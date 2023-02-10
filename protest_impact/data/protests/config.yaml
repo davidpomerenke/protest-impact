@@ -1,0 +1,340 @@
+treatment_keywords:
+  en:
+    - protest*
+    - demo*
+    - rally*
+    - march*
+    - parade
+    - picket
+    - "social movement"
+    - occup*
+    - strik*
+    - petition*
+    - "hate crime"
+    - riot*
+    - unrest*
+    - uprising
+    - rebell*
+    - block*
+    - sit-in
+    - sit-in*
+    - boycott*
+    - activis*
+    - action*
+    - mobili*
+    - "citizens' initiative"
+    - vigil*
+    - "civil disobedience"
+  de:
+    - protest*
+    - demo*
+    - kundgebung*
+    - "soziale bewegung*"
+    - hausbesetz*
+    - streik*
+    - unterschriftensamml*
+    - petition*
+    - hasskriminalität*
+    - unruhen*
+    - aufruhr*
+    - aufstand*
+    - rebell*
+    - block*
+    - sitzblock*
+    - boykott*
+    - riot*
+    - aktivis*
+    - aktion*
+    - mobilisierung*
+    - bürgerinitiative*
+    - bürgerbegehren*
+    - marsch*
+    - aufmarsch*
+    - parade*
+    - mahnwache*
+    - "ziviler ungehorsam"
+
+movement_keywords:
+  climate:
+    treatment:
+      - fridays for future
+      - fridaysforfuture
+      - fridays4future
+      - extinction rebellion
+      - just stop oil
+      - letzte generation
+      - ultima generazione
+      - ende gelände
+      - klimabewegung
+      - klimaaktivis*
+      - klimastreik*
+      - klimaschutz
+      - klimagerechtigkeit
+      - "hambacher forst"
+      - hambi
+      - lütz*
+    effect:
+      topic:
+        - klima
+        - klimawandel
+        - erderwärmung
+        - klimaschutz
+        - klimagerechtigkeit
+      framing:
+        - klimakrise
+        - klimakatastrophe
+        - klimakollaps
+        - klimanotstand
+        - klimagerechtigkeit
+      goal:
+        - klimaneutralität
+        - klimaneutral
+        - klimaziel
+        - klimaschutzpaket
+        - klimaschutzgesetz*
+        - verbindlich
+  racism:
+    treatment:
+      - black lives matter
+      - blacklivesmatter
+      - rassis*
+      - antirassis*
+      - antikolonialis*
+    effect:
+      topic:
+        - rassis*
+        - kolonialis*
+        - schwarz*
+        - "person of colour"
+        - "people of colour"
+        - poc
+        - bipoc
+        - hautfarbe
+        - aussehen
+        - diskriminier*
+        - ungleich*
+      framing: []
+      goal:
+        - antidiskriminierungsgesetz
+        - polizeistudie
+  feminism:
+    treatment:
+      - feminis*
+      - frauenbewegung
+      - frauenstreik
+      - sexis*
+      - equal pay
+      - gleichberechtigung
+      - gleichstellung
+      - geschlechtergerechtigkeit
+    effect:
+      topic:
+        - frau*
+        - frauenrecht*
+        - frauenquote
+        - gleichberechtigung
+        - gender pay gap
+        - geschlechterunterschiede
+      framing: []
+      goal:
+        - quote
+        - frauenquote
+  covid:
+    treatment:
+      - querdenk*
+      - hygienedemo
+    effect:
+      topic:
+        - corona
+        - covid
+        - pandemie
+        - impfp*
+        - mask*
+        - lockdown
+        - quarantäne
+        - kontaktverbot
+        - kontaktbeschränk*
+        - kontaktverbot*
+        - einschränk*
+        - nebenwirkungen
+      framing:
+        - bevormund*
+        - diktat*
+        - freiheit*
+      goal:
+        - "freedom day"
+        - "ende der maßnahmen"
+        - "maßnahmen beenden"
+        - "ende des lockdowns"
+        - "lockdown beenden"
+        - "ende der einschränkungen"
+        - "einschränkungen beenden"
+        - "ende der kontaktbeschränkungen"
+        - "kontaktbeschränkungen beenden"
+  immigration:
+    treatment:
+      - pegida
+      - patriot*
+      - fremdenfeind*
+    effect:
+      topic:
+        - migrant*
+        - flüchtling*
+        - asyl*
+        - einwander*
+        - ausländer*
+      framing:
+        - asyltouris*
+        - sozialtouris*
+        - sozialschmarotz*
+        - schießbefehl
+      goal:
+        - abschieb*
+        - obergrenze
+        - grenzkontrolle
+        - grenzschutz
+        - "grenze* dicht"
+        - "grenze* zu"
+        - "grenze* geschlossen"
+        - "grenze* schließen"
+  labour:
+    treatment:
+      - gewerkschaft*
+      - bahnstreik
+      - flugstreik
+      - arbeitskampf*
+      - gelbwest*
+      - gilets jaunes
+      - bauernprotest*
+    effect:
+      topic:
+        - arbeitsbedingung*
+        - bezahlung
+        - gehalt
+      framing:
+        - "schlechte bezahlung"
+        - "niedriges gehalt"
+        - "niedrige preise"
+      goal:
+        - gehaltserhöhung
+        - tarifvertrag
+  lgbtq:
+    treatment:
+      - csd
+      - "christopher street day"
+      - pride
+    effect:
+      topic:
+        - lgbt*
+        - lsbt*
+        - lesbisch
+        - schwul
+        - bisexuell
+        - trans*
+        - inter*
+        - queer*
+        - pride
+        - divers*
+        - diskriminier*
+        - gleichberechtigung
+        - gleichstellung
+        - homophob*
+        - transphob*
+      framing: []
+      goal:
+        - "ehe für alle"
+        - adoptionsrecht
+  animal rights:
+    treatment:
+      - tierrecht*
+      - tierschutz*
+      - tierschütz*
+      - peta
+    effect:
+      topic:
+        - tierrecht*
+        - tierschutz*
+        - tierversuch*
+        - tierquäl*
+        - massentierhaltung
+      framing:
+        - nichtmenschlich
+      goal:
+        - vergan*
+        - vegetar*
+        - pflanzlich
+        - pflanzenbasiert
+        - "ohne fleisch"
+  right wing:
+    treatment:
+      - rechtsradikal*
+      - rechtsextrem*
+      - rechtsaußen*
+      - reichsbürger*
+      - neonazi*
+      - nazi*
+      - fascist*
+      - fascismus
+      - faschist*
+      - faschis*
+      - nationalis*
+      - nationalsozialis*
+    effect:
+      topic:
+        - deutsch*
+        - national*
+        - patriot*
+      framing: []
+      goal: []
+
+  left wing:
+    - linksextrem*
+    - linksradikal*
+    - linksaußen*
+    - antifa*
+    - sozialis*
+    - kommunis*
+    - marxis*
+    - leninis*
+    - stalinis*
+    - trotskis*
+    - anarchis*
+    - antiimperialis*
+    - antideutsch*
+  anti capitalism:
+    - antikapitalis*
+    - kapitalismuskrit*
+    - occupy
+    - antiglobalis*
+    - globalisierungsgegner*
+    - attac
+    - "stop ttip"
+    - "stop ceta"
+  anti nuclear:
+    - atomkraft
+    - atomenergie
+  environment:
+    - umweltschutz
+    - umweltschütz*
+    - umweltbewegung
+    - umweltaktivis*
+    - naturschutz
+    - naturschütz*
+    - "bund für umwelt und naturschutz"
+    - nabu
+    - greenpeace
+  anti war:
+    - pazifis*
+    - friedensbewegung
+    - kriegsgegner*
+    - ostermarsch
+  s21:
+    - s21
+    - "stuttgart 21"
+    - stuttgart21
+    - montagsdemo
+  international:
+    - israel
+    - palästin*
+    - kurd*
+    - russ*
