@@ -2,7 +2,9 @@ import re
 
 import yaml
 
-with open("config.yaml") as f:
+from protest_impact.util import project_root
+
+with open(project_root / "protest_impact" / "data" / "protests" / "config.yaml") as f:
     config = yaml.load(f)
 
 treatment_keywords = config["treatment_keywords"]
