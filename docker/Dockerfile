@@ -25,7 +25,9 @@ RUN apt-get update --yes && \
     git\
     bash\
     software-properties-common\
-    openssh-server\
+    openssh-server
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt install --yes --no-install-recommends\
     python3.10\
     python3.10-distutils\
     python3.10-venv\
