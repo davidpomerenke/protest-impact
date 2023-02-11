@@ -5,7 +5,7 @@ import yaml
 from protest_impact.util import project_root
 
 with open(project_root / "protest_impact" / "data" / "protests" / "config.yaml") as f:
-    config = yaml.load(f)
+    config = yaml.load(f, Loader=yaml.FullLoader)
 
 treatment_keywords = config["treatment_keywords"]
 
