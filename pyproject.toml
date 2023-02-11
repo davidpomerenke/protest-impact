@@ -12,7 +12,7 @@ readme = "README.md"
 packages = [{include = "protest_impact"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 joblib = "^1.2.0"
 requests = "^2.28.1"
 python-dotenv = "^0.21.0"
@@ -26,7 +26,7 @@ altair = "^4.2.0"
 tqdm = "^4.64.1"
 holidays = "^0.18"
 openpyxl = "^3.0.10"
-statsmodels = {git = "https://github.com/statsmodels/statsmodels.git", rev = "ef9cf3a"}
+statsmodels = "^0.13.5"
 jsonlines = "^3.1.0"
 openai = "^0.26.4"
 aiohttp = "^3.8.3"
@@ -40,7 +40,6 @@ spacy = "^3.5.0"
 mlflow-skinny = "^2.1.1"
 transformers = "^4.26.0"
 torch = "^1.13.1"
-protobuf = "<=3.20"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
