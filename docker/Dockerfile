@@ -35,7 +35,7 @@ RUN apt install --yes --no-install-recommends\
     ln -s /usr/bin/python3.10 /usr/bin/python && \
     rm /usr/bin/python3 && \
     ln -s /usr/bin/python3.10 /usr/bin/python3
-RUN git clone https://$TOKEN@github.com/$REPO
+RUN git clone https://${TOKEN}@github.com/{$REPO} /workspace
 RUN pip install -U jupyterlab ipywidgets jupyter-archive
 RUN jupyter nbextension enable --py widgetsnbextension
 RUN python -m venv /workspace/.venv
