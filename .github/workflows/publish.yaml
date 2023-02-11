@@ -1,0 +1,33 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: docker-build-and-publish
+  cancel-in-progress: true
+
+jobs:
+  publish-inclusify-docker-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build the Docker image
+        run: |
+          docker build . \
+            -t ghcr.io/${{ github.repository }}:latest \
+            -f docker/Dockerfile \
+            --build-arg REPO=${{ github.repository }} \
+            --build-arg TOKEN=${{ github.token }}
+          docker push --all-tags ghcr.io/${{ github.repository }}
