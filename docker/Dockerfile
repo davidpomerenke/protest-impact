@@ -48,4 +48,6 @@ ADD start.sh /
 
 RUN chmod +x /start.sh
 
+WORKDIR /workspace
+
 CMD [ "/start.sh" ]
