@@ -5,7 +5,7 @@
 !git pull
 !pip install poetry
 !poetry export -f requirements.txt --output requirements.txt --without-hashes
-!pip install -r requirements.txt
+!poetry export -f requirements.txt --output requirements.txt --without-hashes
 ```
 
 # Colab
