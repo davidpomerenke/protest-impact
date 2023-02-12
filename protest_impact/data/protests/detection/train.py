@@ -48,7 +48,9 @@ def train_model(model, tokenizer, description, dataset, n_epochs=6):
         else tokenized_datasets["test"]
         if "test" in tokenized_datasets
         else None,
-        compute_metrics=compute_metrics,
+        compute_metrics=compute_metrics
+        if "dev" in tokenized_datasets or "test" in tokenized_datasets
+        else None,
     )
     trainer.train()
     trainer.save_model(model_location)
