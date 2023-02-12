@@ -21,4 +21,5 @@ def load_glpn_dataset():
     glpn = load_dataset("csv", data_files=data_files)
     glpn = glpn.cast_column("labels", ClassLabel(names=["irrelevant", "relevant"]))
     glpn = glpn.rename_column("labels", "label")
+    glpn = glpn.rename_column("excerpt", "text")
     return glpn

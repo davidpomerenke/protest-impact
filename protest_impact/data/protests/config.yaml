@@ -24,15 +24,17 @@ treatment_keywords:
     - mobili*
     - "citizens' initiative"
     - vigil*
+    - "hunger strike"
     - "civil disobedience"
   de:
     - protest*
     - demo*
     - kundgebung*
+    - versamm*
     - "soziale bewegung*"
     - hausbesetz*
     - streik*
-    - unterschriftensamml*
+    - unterschriften*
     - petition*
     - hasskriminalität*
     - unruhen*
@@ -52,6 +54,7 @@ treatment_keywords:
     - aufmarsch*
     - parade*
     - mahnwache*
+    - hungerstreik*
     - "ziviler ungehorsam"
 
 movement_keywords:
@@ -184,6 +187,7 @@ movement_keywords:
         - einwander*
         - ausländer*
       framing:
+        - islamisier*
         - asyltouris*
         - sozialtouris*
         - sozialschmarotz*
@@ -203,8 +207,6 @@ movement_keywords:
       - bahnstreik
       - flugstreik
       - arbeitskampf*
-      - gelbwest*
-      - gilets jaunes
       - bauernprotest*
     effect:
       topic:
@@ -286,7 +288,6 @@ movement_keywords:
         - patriot*
       framing: []
       goal: []
-
   left wing:
     - linksextrem*
     - linksradikal*
@@ -327,7 +328,7 @@ movement_keywords:
     - pazifis*
     - friedensbewegung
     - kriegsgegner*
-    - ostermarsch
+    - ostermarsch*
   s21:
     - s21
     - "stuttgart 21"
@@ -338,3 +339,30 @@ movement_keywords:
     - palästin*
     - kurd*
     - russ*
+    - "hong kong"
+    - hongkong
+    - türk*
+  yellow jackets:
+    movement:
+      - gelbwest*
+      - "gelb* west*"
+      - gilets jaunes
+    topic:
+      - benzinpreis*
+      - spritpreis*
+      - steuer*
+      - rente*
+      - sozialabbau
+      - mindestlohn
+    goal:
+      - steuersenk*
+  solidarity:
+    movement:
+      - unteilbar
+      - "ist bunt"
+  refugees:
+    topic:
+      - missstände
+      - unterkunft
+      - unterkünfte
+      - behinderung

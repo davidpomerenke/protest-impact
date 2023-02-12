@@ -7,7 +7,7 @@ from protest_impact.util import project_root
 def load_aglpn_dataset():
     aglpn = load_dataset(
         str(project_root / "data" / "protest"),
-        data_files={"main": "protest_news_annotated_v1.jsonl"},
+        data_files={"main": "protest_news_shuffled_v2_annotated_v1.jsonl"},
     )
     aglpn["main"] = aglpn["main"].filter(lambda x: x["answer"] != "ignore")
     # fix a stupid mistake during annotation
@@ -22,13 +22,21 @@ def load_aglpn_dataset():
         ),
         with_indices=True,
     )
-    traindev_test = aglpn["main"].train_test_split(test_size=4 / 10, seed=20230206)
-    train_dev = traindev_test["train"].train_test_split(test_size=1 / 6, seed=20230206)
+    train_test = aglpn["main"].train_test_split(test_size=500 / 1150, seed=20230211)
+    train_positive_class = load_dataset(
+        str(project_root / "data" / "protest"),
+        data_files={
+            "main": "protest_news_shuffled_v2_sample_with_positive_predictions_annotated.jsonl"
+        },
+    )
+    train_positive_class["main"] = train_positive_class["main"].map(
+        function=(lambda x: {"label": 1 if x["answer"] == "accept" else 0})
+    )
     aglpn = DatasetDict(
         {
-            "train": train_dev["train"],
-            "dev": train_dev["test"],
-            "test": traindev_test["test"],
+            "train": train_test["train"],
+            "train.positive": train_positive_class["main"],
+            "test": train_test["test"],
         }
     )
     return aglpn
