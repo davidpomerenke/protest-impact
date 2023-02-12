@@ -22,12 +22,11 @@ def kwic(text, n=0):
                 kwic_text += "\n...\n"
             kwic_text += sents[kwic_nr].text_with_ws
     return kwic_text
-
+    
 def kwic_dataset(dataset, n=0):
     return dataset.map(
         lambda x: {
-            "text": x["meta"]["title"]
-            + "\n\n"
+            "text": (x["meta"]["title"] + "\n\n" if x["meta"] is not None else "")
             + kwic("\n".join(list(x["text"].split("\n"))[1:]), n=n)
         }
     )

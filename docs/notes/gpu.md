@@ -2,7 +2,7 @@
 
 ```
 apt-get update
-apt-get install python3.10 python3.10-distutils python3.10-venv python3-pip
+apt-get install -y python3.10 python3.10-distutils python3.10-venv python3-pip
 curl https://bootstrap.pypa.io/get-pip.py | python3.10
 # python3.10 -m venv .venv
 # .venv/bin/pip install poetry

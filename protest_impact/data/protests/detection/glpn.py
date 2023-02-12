@@ -19,7 +19,9 @@ def load_glpn_dataset():
         "test.loc": str(glpn_path / "glpn_test-loc.csv"),
     }
     glpn = load_dataset("csv", data_files=data_files)
-    glpn = glpn.cast_column("labels", ClassLabel(names=["irrelevant", "relevant"]))
+    glpn = glpn.map(
+        function=(lambda x: {"labels": 1 if x["labels"] == "relevant" else 0})
+    )
     glpn = glpn.rename_column("labels", "label")
     glpn = glpn.rename_column("excerpt", "text")
     return glpn

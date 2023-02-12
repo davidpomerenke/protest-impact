@@ -13,7 +13,7 @@ def compute_metrics(eval_pred):
     return metric.compute(predictions=predictions, references=labels)
 
 
-def train_model(model, tokenizer, description, dataset):
+def train_model(model, tokenizer, description, dataset, n_epochs=6):
     model_location = (
         project_root / "models" / "protest_detection" / description / "model"
     )
@@ -30,20 +30,24 @@ def train_model(model, tokenizer, description, dataset):
     training_args = TrainingArguments(
         output_dir=model_location.parent / "checkpoints",
         evaluation_strategy="epoch",
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
+        per_device_train_batch_size=8,
+        per_device_eval_batch_size=8,
         lr_scheduler_type="linear",
         warmup_ratio=0.1,
         learning_rate=5e-6,
         weight_decay=0.2,
-        num_train_epochs=6,
+        num_train_epochs=n_epochs,
         fp16=True,
     )
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_datasets["train"],
-        eval_dataset=tokenized_datasets["dev"],
+        eval_dataset=tokenized_datasets["dev"]
+        if "dev" in tokenized_datasets
+        else tokenized_datasets["test"]
+        if "test" in tokenized_datasets
+        else None,
         compute_metrics=compute_metrics,
     )
     trainer.train()
