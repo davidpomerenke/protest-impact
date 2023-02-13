@@ -1,1 +1,538 @@
-[{"name": "hna", "media_id": 39267}, {"name": "tz.de", "media_id": 143671}, {"name": "merkur-online", "media_id": 39005}, {"name": "Christ & Welt: ZEIT f\u00fcr Glaube, Geist und Gesellschaft", "media_id": 385524}, {"name": "wn.de", "media_id": 145368}, {"name": "Lokales und Nachrichten Ahlen - Westf\u00e4lische Nachrichten ...", "media_id": 385529}, {"name": "augsburger-allgemeine.de", "media_id": 69752}, {"name": "kreiszeitung.de", "media_id": 119705}, {"name": "op-online.de", "media_id": 144975}, {"name": "echo-online.de", "media_id": 258252}, {"name": "Bergstr\u00e4\u00dfer Anzeiger", "media_id": 385410}, {"name": "Schwetzinger Zeitung / Hockenheimer Zeitung", "media_id": 385420}, {"name": "noz.de", "media_id": 70220}, {"name": "mutig - offen - mittendrin -", "media_id": 385539}, {"name": "Delmenhorster Kreisblatt", "media_id": 385439}, {"name": "Hauptsache Heimat. -", "media_id": 385549}, {"name": "AbendBlatt", "media_id": 39164}, {"name": "Bersenbr\u00fccker Kreisblatt", "media_id": 385453}, {"name": "Hier zu Hause -", "media_id": 385545}, {"name": "Region Dillenburg - mittelhessen.de", "media_id": 385412}, {"name": "Lokales - mittelhessen.de", "media_id": 385427}, {"name": "Lokale Nachrichten aus B\u00fcrstadt, Lampertheim, Rhein-Neckar und Hessen - B\u00fcrst\u00e4dter Zeitung", "media_id": 385411}, {"name": "Lokale Nachrichten aus Wiesbaden, Rheingau, Taunus und Hessen - Wiesbadener Kurier", "media_id": 385428}, {"name": "rga-online", "media_id": 38795}, {"name": "nordbayern.de", "media_id": 300747}, {"name": "Oberpfalznetz", "media_id": 656019}, {"name": "Nachrichten aus Amberg - Onetz", "media_id": 385644}, {"name": "Lokale Nachrichten aus Worms, Rhein-Neckar, dem Wonnegau und Rheinland-Pfalz - Wormser Zeitung", "media_id": 385640}, {"name": "page - Solinger Tageblatt", "media_id": 385574}, {"name": "Nachrichten aus Weiden - Onetz", "media_id": 385703}, {"name": "Salzgitter Zeitung - Salzgitter Zeitung", "media_id": 385456}, {"name": "Wolfsburger Nachrichten - Wolfsburger Nachrichten", "media_id": 385468}, {"name": "Lokale Nachrichten aus Lauterbach und dem Vogelsbergkreis - Lauterbacher Anzeiger", "media_id": 385421}, {"name": "braunschweiger-zeitung.de", "media_id": 131441}, {"name": "mittelbayerische.de", "media_id": 346325}, {"name": "nw-news.de", "media_id": 108396}, {"name": "Startseite - M\u00fcnstersche Zeitung", "media_id": 385563}, {"name": "http://www.wz.de/home", "media_id": 385543}, {"name": "freiepresse.de", "media_id": 258653}, {"name": "donaukurier", "media_id": 39572}, {"name": "saarbruecker-zeitung", "media_id": 40889}, {"name": "ikz-online.de", "media_id": 381836}, {"name": "mt.de", "media_id": 332599}, {"name": "http://www.lz.de/", "media_id": 385538}, {"name": "BerlinMorgenpost", "media_id": 40664}, {"name": "abendzeitung-muenchen.de", "media_id": 121272}, {"name": "ruhrnachrichten", "media_id": 41796}, {"name": "mainpost", "media_id": 39517}, {"name": "kn-online", "media_id": 40195}, {"name": "volksfreund", "media_id": 41916}, {"name": "pnn.de", "media_id": 109824}, {"name": "neuepresse.de", "media_id": 118995}, {"name": "lvz-online", "media_id": 38916}, {"name": "Dattelner Morgenpost", "media_id": 385537}, {"name": "Grafschafter Nachrichten", "media_id": 385451}, {"name": "Marler Zeitung", "media_id": 385560}, {"name": "Hertener Allgemeine", "media_id": 385551}, {"name": "Hellweger Anzeiger - Westf\u00e4lische Rundschau", "media_id": 385576}, {"name": "br-online", "media_id": 41321}, {"name": "Radio Plassenburg", "media_id": 385680}, {"name": "pnp", "media_id": 41861}, {"name": "Wolfsburg - WAZ/AZ-online.de", "media_id": 385467}, {"name": "wdr", "media_id": 41700}, {"name": "rhein-zeitung.de", "media_id": 69708}, {"name": "Lokale Nachrichten aus dem Landkreis Kitzingen", "media_id": 385676}, {"name": "Lokale Nachrichten aus dem Landkreis Coburg", "media_id": 385652}, {"name": "Lokale Nachrichten aus dem Landkreis Bad Kissingen", "media_id": 385646}, {"name": "Nachrichten und Informationen aus Bamberg und Franken", "media_id": 385647}, {"name": "Lokale Nachrichten aus dem Landkreis Kulmbach", "media_id": 385679}, {"name": "Waltroper Zeitung", "media_id": 385577}, {"name": "Stimberg Zeitung", "media_id": 385568}, {"name": "Recklingh\u00e4user Zeitung", "media_id": 385570}, {"name": "page | MDR.DE", "media_id": 385588}, {"name": "derwestern", "media_id": 39451}, {"name": "Die Glocke online - Tageszeitung in den Kreisen Warendorf und G\u00fctersloh", "media_id": 385567}, {"name": "Uckermarkkurier.de", "media_id": 385493}, {"name": "Aktuelle Nachrichten aus Aschaffenburg und Umgebung - Main-Echo", "media_id": 385645}, {"name": "Region - idowa", "media_id": 385648}, {"name": "Nachrichten aus Ostbayern - idowa", "media_id": 385698}, {"name": "Aktuelle Nachrichten - D\u00fclmener Zeitung", "media_id": 385540}, {"name": "landeszeitung.de", "media_id": 385449}, {"name": "B\u00f6rsen-Zeitung - Zeitung f\u00fcr die Finanzm\u00e4rkte", "media_id": 385413}, {"name": "shz.de", "media_id": 265072}, {"name": "bz-berlin.de", "media_id": 144263}, {"name": "inS\u00fcdth\u00fcringen.de | Bad Salzungen", "media_id": 385469}, {"name": "Lokale Nachrichten aus Berlin. \u203a Nachrichten aus Berlin: lokal, spannend, aktuell \u203a BERLINER ABENDBLATT", "media_id": 385503}, {"name": "ndr", "media_id": 39681}, {"name": "Start - Allgemeine Zeitung", "media_id": 385536}, {"name": "aachener-zeitung.de", "media_id": 110173}, {"name": "Aachener Nachrichten", "media_id": 385526}, {"name": "weser-kurier.de", "media_id": 119186}, {"name": "mv-online.de", "media_id": 122644}, {"name": "Startseite - EV Online", "media_id": 385544}, {"name": "SauerlandKurier", "media_id": 385569}, {"name": "Soester Anzeiger", "media_id": 385573}, {"name": "come-on.de", "media_id": 379335}, {"name": "wa.de", "media_id": 22514}, {"name": "werra-rundschau.de", "media_id": 282559}, {"name": "nwzonline", "media_id": 40109}, {"name": "prignitzer.de | Nachrichten aus Mecklenburg-Vorpommern und Brandenburg", "media_id": 385494}, {"name": "haz.de", "media_id": 21547}, {"name": "all-in.de", "media_id": 381608}, {"name": "RP", "media_id": 40776}, {"name": "jungewelt.de", "media_id": 21854}, {"name": "Eifel - Zeitung - Ihre Zeitung in der Eifel - Mosel Region", "media_id": 385635}, {"name": "rbb-online.de", "media_id": 143851}, {"name": "general-anzeiger-bonn", "media_id": 42032}, {"name": "Wuppertal", "media_id": 385580}, {"name": "NDZ: Nachrichten & Infos der Neuen Deister-Zeitung", "media_id": 385460}, {"name": "Nachrichten aus F\u00fcssen und Umgebung | all-in.de - das Allg\u00e4u online!", "media_id": 385662}, {"name": "Nachrichten aus Kaufbeuren und Umgebung | all-in.de - das Allg\u00e4u online!", "media_id": 385674}, {"name": "Nachrichten aus Memmingen und Umgebung | all-in.de - das Allg\u00e4u online!", "media_id": 385684}, {"name": "Nachrichten aus Marktoberdorf und Umgebung | all-in.de - das Allg\u00e4u online!", "media_id": 385683}, {"name": "Nachrichten aus Kempten und Umgebung | all-in.de - das Allg\u00e4u online!", "media_id": 385675}, {"name": "Nachrichten aus Buchloe und Umgebung | all-in.de - das Allg\u00e4u online!", "media_id": 385649}, {"name": "tlz", "media_id": 39739}, {"name": "thueringer-allgemeine", "media_id": 40869}, {"name": "otz", "media_id": 38810}, {"name": "radioBERLIN 88,8", "media_id": 385507}, {"name": "nordbayerischer-kurier.de", "media_id": 67330}, {"name": "Frankenpost | Nachrichten aus Oberfranken", "media_id": 385671}, {"name": "Neue Presse Coburg | Nachrichten aus Oberfranken", "media_id": 385653}, {"name": "Flensburger Tageblatt | Nachrichten f\u00fcr Flensburg & Umgebung | shz.de", "media_id": 385716}, {"name": "Lokales (Neu-Ulm)", "media_id": 385689}, {"name": "Startseite / Radio Hamburg", "media_id": 385473}, {"name": "dnn-online", "media_id": 39026}, {"name": "Erlangen - nordbayern.de", "media_id": 385658}, {"name": "Lokale Nachrichten aus Ihrer Region auf marktspiegel.de", "media_id": 385691}, {"name": "Elmshorner Nachrichten | Nachrichten f\u00fcr Elmshorn & Umgebung | shz.de", "media_id": 385714}, {"name": "Ksta", "media_id": 41164}, {"name": "Schwabach - nordbayern.de", "media_id": 385697}, {"name": "Husumer Nachrichten | Nachrichten f\u00fcr Husum & Nordfriesland | shz.de", "media_id": 385717}, {"name": "Krefeld", "media_id": 385555}, {"name": "Lokales (Illertissen)", "media_id": 385672}]
+[
+  {
+    "name": "hna",
+    "media_id": 39267
+  },
+  {
+    "name": "tz.de",
+    "media_id": 143671
+  },
+  {
+    "name": "merkur-online",
+    "media_id": 39005
+  },
+  {
+    "name": "Christ & Welt: ZEIT für Glaube, Geist und Gesellschaft",
+    "media_id": 385524
+  },
+  {
+    "name": "wn.de",
+    "media_id": 145368
+  },
+  {
+    "name": "Lokales und Nachrichten Ahlen - Westfälische Nachrichten ...",
+    "media_id": 385529
+  },
+  {
+    "name": "augsburger-allgemeine.de",
+    "media_id": 69752
+  },
+  {
+    "name": "kreiszeitung.de",
+    "media_id": 119705
+  },
+  {
+    "name": "op-online.de",
+    "media_id": 144975
+  },
+  {
+    "name": "echo-online.de",
+    "media_id": 258252
+  },
+  {
+    "name": "Bergsträßer Anzeiger",
+    "media_id": 385410
+  },
+  {
+    "name": "Schwetzinger Zeitung / Hockenheimer Zeitung",
+    "media_id": 385420
+  },
+  {
+    "name": "noz.de",
+    "media_id": 70220
+  },
+  {
+    "name": "mutig - offen - mittendrin -",
+    "media_id": 385539
+  },
+  {
+    "name": "Delmenhorster Kreisblatt",
+    "media_id": 385439
+  },
+  {
+    "name": "Hauptsache Heimat. -",
+    "media_id": 385549
+  },
+  {
+    "name": "AbendBlatt",
+    "media_id": 39164
+  },
+  {
+    "name": "Bersenbrücker Kreisblatt",
+    "media_id": 385453
+  },
+  {
+    "name": "Hier zu Hause -",
+    "media_id": 385545
+  },
+  {
+    "name": "Region Dillenburg - mittelhessen.de",
+    "media_id": 385412
+  },
+  {
+    "name": "Lokales - mittelhessen.de",
+    "media_id": 385427
+  },
+  {
+    "name": "Lokale Nachrichten aus Bürstadt, Lampertheim, Rhein-Neckar und Hessen - Bürstädter Zeitung",
+    "media_id": 385411
+  },
+  {
+    "name": "Lokale Nachrichten aus Wiesbaden, Rheingau, Taunus und Hessen - Wiesbadener Kurier",
+    "media_id": 385428
+  },
+  {
+    "name": "rga-online",
+    "media_id": 38795
+  },
+  {
+    "name": "nordbayern.de",
+    "media_id": 300747
+  },
+  {
+    "name": "Oberpfalznetz",
+    "media_id": 656019
+  },
+  {
+    "name": "Nachrichten aus Amberg - Onetz",
+    "media_id": 385644
+  },
+  {
+    "name": "Lokale Nachrichten aus Worms, Rhein-Neckar, dem Wonnegau und Rheinland-Pfalz - Wormser Zeitung",
+    "media_id": 385640
+  },
+  {
+    "name": "page - Solinger Tageblatt",
+    "media_id": 385574
+  },
+  {
+    "name": "Nachrichten aus Weiden - Onetz",
+    "media_id": 385703
+  },
+  {
+    "name": "Salzgitter Zeitung - Salzgitter Zeitung",
+    "media_id": 385456
+  },
+  {
+    "name": "Wolfsburger Nachrichten - Wolfsburger Nachrichten",
+    "media_id": 385468
+  },
+  {
+    "name": "Lokale Nachrichten aus Lauterbach und dem Vogelsbergkreis - Lauterbacher Anzeiger",
+    "media_id": 385421
+  },
+  {
+    "name": "braunschweiger-zeitung.de",
+    "media_id": 131441
+  },
+  {
+    "name": "mittelbayerische.de",
+    "media_id": 346325
+  },
+  {
+    "name": "nw-news.de",
+    "media_id": 108396
+  },
+  {
+    "name": "Startseite - Münstersche Zeitung",
+    "media_id": 385563
+  },
+  {
+    "name": "http://www.wz.de/home",
+    "media_id": 385543
+  },
+  {
+    "name": "freiepresse.de",
+    "media_id": 258653
+  },
+  {
+    "name": "donaukurier",
+    "media_id": 39572
+  },
+  {
+    "name": "saarbruecker-zeitung",
+    "media_id": 40889
+  },
+  {
+    "name": "ikz-online.de",
+    "media_id": 381836
+  },
+  {
+    "name": "mt.de",
+    "media_id": 332599
+  },
+  {
+    "name": "http://www.lz.de/",
+    "media_id": 385538
+  },
+  {
+    "name": "BerlinMorgenpost",
+    "media_id": 40664
+  },
+  {
+    "name": "abendzeitung-muenchen.de",
+    "media_id": 121272
+  },
+  {
+    "name": "ruhrnachrichten",
+    "media_id": 41796
+  },
+  {
+    "name": "mainpost",
+    "media_id": 39517
+  },
+  {
+    "name": "kn-online",
+    "media_id": 40195
+  },
+  {
+    "name": "volksfreund",
+    "media_id": 41916
+  },
+  {
+    "name": "pnn.de",
+    "media_id": 109824
+  },
+  {
+    "name": "neuepresse.de",
+    "media_id": 118995
+  },
+  {
+    "name": "lvz-online",
+    "media_id": 38916
+  },
+  {
+    "name": "Dattelner Morgenpost",
+    "media_id": 385537
+  },
+  {
+    "name": "Grafschafter Nachrichten",
+    "media_id": 385451
+  },
+  {
+    "name": "Marler Zeitung",
+    "media_id": 385560
+  },
+  {
+    "name": "Hertener Allgemeine",
+    "media_id": 385551
+  },
+  {
+    "name": "Hellweger Anzeiger - Westfälische Rundschau",
+    "media_id": 385576
+  },
+  {
+    "name": "br-online",
+    "media_id": 41321
+  },
+  {
+    "name": "Radio Plassenburg",
+    "media_id": 385680
+  },
+  {
+    "name": "pnp",
+    "media_id": 41861
+  },
+  {
+    "name": "Wolfsburg - WAZ/AZ-online.de",
+    "media_id": 385467
+  },
+  {
+    "name": "wdr",
+    "media_id": 41700
+  },
+  {
+    "name": "rhein-zeitung.de",
+    "media_id": 69708
+  },
+  {
+    "name": "Lokale Nachrichten aus dem Landkreis Kitzingen",
+    "media_id": 385676
+  },
+  {
+    "name": "Lokale Nachrichten aus dem Landkreis Coburg",
+    "media_id": 385652
+  },
+  {
+    "name": "Lokale Nachrichten aus dem Landkreis Bad Kissingen",
+    "media_id": 385646
+  },
+  {
+    "name": "Nachrichten und Informationen aus Bamberg und Franken",
+    "media_id": 385647
+  },
+  {
+    "name": "Lokale Nachrichten aus dem Landkreis Kulmbach",
+    "media_id": 385679
+  },
+  {
+    "name": "Waltroper Zeitung",
+    "media_id": 385577
+  },
+  {
+    "name": "Stimberg Zeitung",
+    "media_id": 385568
+  },
+  {
+    "name": "Recklinghäuser Zeitung",
+    "media_id": 385570
+  },
+  {
+    "name": "page | MDR.DE",
+    "media_id": 385588
+  },
+  {
+    "name": "derwestern",
+    "media_id": 39451
+  },
+  {
+    "name": "Die Glocke online - Tageszeitung in den Kreisen Warendorf und Gütersloh",
+    "media_id": 385567
+  },
+  {
+    "name": "Uckermarkkurier.de",
+    "media_id": 385493
+  },
+  {
+    "name": "Aktuelle Nachrichten aus Aschaffenburg und Umgebung - Main-Echo",
+    "media_id": 385645
+  },
+  {
+    "name": "Region - idowa",
+    "media_id": 385648
+  },
+  {
+    "name": "Nachrichten aus Ostbayern - idowa",
+    "media_id": 385698
+  },
+  {
+    "name": "Aktuelle Nachrichten - Dülmener Zeitung",
+    "media_id": 385540
+  },
+  {
+    "name": "landeszeitung.de",
+    "media_id": 385449
+  },
+  {
+    "name": "Börsen-Zeitung - Zeitung für die Finanzmärkte",
+    "media_id": 385413
+  },
+  {
+    "name": "shz.de",
+    "media_id": 265072
+  },
+  {
+    "name": "bz-berlin.de",
+    "media_id": 144263
+  },
+  {
+    "name": "inSüdthüringen.de | Bad Salzungen",
+    "media_id": 385469
+  },
+  {
+    "name": "Lokale Nachrichten aus Berlin. › Nachrichten aus Berlin: lokal, spannend, aktuell › BERLINER ABENDBLATT",
+    "media_id": 385503
+  },
+  {
+    "name": "ndr",
+    "media_id": 39681
+  },
+  {
+    "name": "Start - Allgemeine Zeitung",
+    "media_id": 385536
+  },
+  {
+    "name": "aachener-zeitung.de",
+    "media_id": 110173
+  },
+  {
+    "name": "Aachener Nachrichten",
+    "media_id": 385526
+  },
+  {
+    "name": "weser-kurier.de",
+    "media_id": 119186
+  },
+  {
+    "name": "mv-online.de",
+    "media_id": 122644
+  },
+  {
+    "name": "Startseite - EV Online",
+    "media_id": 385544
+  },
+  {
+    "name": "SauerlandKurier",
+    "media_id": 385569
+  },
+  {
+    "name": "Soester Anzeiger",
+    "media_id": 385573
+  },
+  {
+    "name": "come-on.de",
+    "media_id": 379335
+  },
+  {
+    "name": "wa.de",
+    "media_id": 22514
+  },
+  {
+    "name": "werra-rundschau.de",
+    "media_id": 282559
+  },
+  {
+    "name": "nwzonline",
+    "media_id": 40109
+  },
+  {
+    "name": "prignitzer.de | Nachrichten aus Mecklenburg-Vorpommern und Brandenburg",
+    "media_id": 385494
+  },
+  {
+    "name": "haz.de",
+    "media_id": 21547
+  },
+  {
+    "name": "all-in.de",
+    "media_id": 381608
+  },
+  {
+    "name": "RP",
+    "media_id": 40776
+  },
+  {
+    "name": "jungewelt.de",
+    "media_id": 21854
+  },
+  {
+    "name": "Eifel - Zeitung - Ihre Zeitung in der Eifel - Mosel Region",
+    "media_id": 385635
+  },
+  {
+    "name": "rbb-online.de",
+    "media_id": 143851
+  },
+  {
+    "name": "general-anzeiger-bonn",
+    "media_id": 42032
+  },
+  {
+    "name": "Wuppertal",
+    "media_id": 385580
+  },
+  {
+    "name": "NDZ: Nachrichten & Infos der Neuen Deister-Zeitung",
+    "media_id": 385460
+  },
+  {
+    "name": "Nachrichten aus Füssen und Umgebung | all-in.de - das Allgäu online!",
+    "media_id": 385662
+  },
+  {
+    "name": "Nachrichten aus Kaufbeuren und Umgebung | all-in.de - das Allgäu online!",
+    "media_id": 385674
+  },
+  {
+    "name": "Nachrichten aus Memmingen und Umgebung | all-in.de - das Allgäu online!",
+    "media_id": 385684
+  },
+  {
+    "name": "Nachrichten aus Marktoberdorf und Umgebung | all-in.de - das Allgäu online!",
+    "media_id": 385683
+  },
+  {
+    "name": "Nachrichten aus Kempten und Umgebung | all-in.de - das Allgäu online!",
+    "media_id": 385675
+  },
+  {
+    "name": "Nachrichten aus Buchloe und Umgebung | all-in.de - das Allgäu online!",
+    "media_id": 385649
+  },
+  {
+    "name": "tlz",
+    "media_id": 39739
+  },
+  {
+    "name": "thueringer-allgemeine",
+    "media_id": 40869
+  },
+  {
+    "name": "otz",
+    "media_id": 38810
+  },
+  {
+    "name": "radioBERLIN 88,8",
+    "media_id": 385507
+  },
+  {
+    "name": "nordbayerischer-kurier.de",
+    "media_id": 67330
+  },
+  {
+    "name": "Frankenpost | Nachrichten aus Oberfranken",
+    "media_id": 385671
+  },
+  {
+    "name": "Neue Presse Coburg | Nachrichten aus Oberfranken",
+    "media_id": 385653
+  },
+  {
+    "name": "Flensburger Tageblatt | Nachrichten für Flensburg & Umgebung | shz.de",
+    "media_id": 385716
+  },
+  {
+    "name": "Lokales (Neu-Ulm)",
+    "media_id": 385689
+  },
+  {
+    "name": "Startseite / Radio Hamburg",
+    "media_id": 385473
+  },
+  {
+    "name": "dnn-online",
+    "media_id": 39026
+  },
+  {
+    "name": "Erlangen - nordbayern.de",
+    "media_id": 385658
+  },
+  {
+    "name": "Lokale Nachrichten aus Ihrer Region auf marktspiegel.de",
+    "media_id": 385691
+  },
+  {
+    "name": "Elmshorner Nachrichten | Nachrichten für Elmshorn & Umgebung | shz.de",
+    "media_id": 385714
+  },
+  {
+    "name": "Ksta",
+    "media_id": 41164
+  },
+  {
+    "name": "Schwabach - nordbayern.de",
+    "media_id": 385697
+  },
+  {
+    "name": "Husumer Nachrichten | Nachrichten für Husum & Nordfriesland | shz.de",
+    "media_id": 385717
+  },
+  {
+    "name": "Krefeld",
+    "media_id": 385555
+  },
+  {
+    "name": "Lokales (Illertissen)",
+    "media_id": 385672
+  }
+]
