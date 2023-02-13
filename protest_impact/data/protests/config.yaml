@@ -112,6 +112,7 @@ movement_keywords:
       - ungleich*
       - racial profiling
       - polizeigewalt
+      - nsu
     framing:
       - person of colour
       - people of colour
@@ -198,9 +199,15 @@ movement_keywords:
       - grenze* schließen
   labour:
     movement:
+      - ver.di
+      - ig metall
+      - ig-metall
       - gewerkschaft*
+      - warnstreik
       - bahnstreik
       - flugstreik
+      - taxi-streik
+      - post-streik
       - arbeitskampf*
       - bauernprotest*
     topic:
@@ -225,17 +232,20 @@ movement_keywords:
       - lesbisch
       - schwul
       - bisexuell
-      - trans*
-      - inter*
+      - transgender
+      - trans-*
+      - intersex*
       - queer*
       - pride
-      - divers*
+      - diversit*
       - diskriminier*
-      - gleichberechtigung
-      - gleichstellung
       - homophob*
       - transphob*
+    framing:
+      - gender*
     goal:
+      - gleichberechtigung
+      - gleichstellung
       - ehe für alle
       - homo-ehe
       - adoptionsrecht
@@ -264,6 +274,7 @@ movement_keywords:
       - rechtsradikal*
       - rechtsextrem*
       - rechtsaußen*
+      - rechtspopulis*
       - reichsbürger*
       - neonazi*
       - nazi*
@@ -274,9 +285,8 @@ movement_keywords:
       - nationalis*
       - nationalsozialis*
     topic:
-      - deutsch*
-      - national*
       - patriot*
+      - volk
     framing: []
     goal: []
   left wing:
@@ -307,6 +317,9 @@ movement_keywords:
     topic:
       - kapitalis*
       - globalisier*
+      - g7
+      - g8
+      - g20
   anti nuclear:
     topic:
       - atomkraft
@@ -340,7 +353,10 @@ movement_keywords:
       - ostermarsch*
     topic:
       - krieg
+      - rüstung*
+      - aufrüstung*
     goal:
+      - absrüstung*
       - frieden
       - friedensverhandlung*
   s21:
@@ -377,31 +393,65 @@ movement_keywords:
     movement:
       - unteilbar
       - ist bunt
+      - bunt statt braun
   refugees:
     topic:
       - missstände
       - unterkunft
       - unterkünfte
       - behinderung
+  football:
+    topic:
+      - fußball*
+  bikes:
+    topic:
+      - radweg*
+      - fahrrad*
+  motorbike:
+    topic:
+      - motorrad*
+  wind energy:
+    topic:
+      - windenergie
+      - windkraft
+      - windrad*
+      - windräder
   international:
     topic:
-      - israel
-      - palästin*
-      - kurd*
-      - russ*
+      - armeni*
+      - britisch*
+      - ecuador
+      - frankreich
+      - französisch*
+      - großbrit*
       - hong kong
       - hongkong
+      - indones*
+      - irak*
+      - iran*
+      - israel
+      - katal*
+      - kongo
+      - kurd*
+      - palästin*
+      - polen
+      - poln*
+      - russ*
+      - spani*
+      - thail*
+      - tschad
       - türk*
-  political-parties:
-    movement:
-      - cdu
-      - spd
-      - grüne
-      - fdp
-      - linke
-      - afd
-      - csu
-      - npd
-      - mlpd
-      - piraten
-      - klimaliste
+      - usa
+      - vereinigte* königreich*
+      - vereinigte* staaten
+      - brasil*
+      - belarus*
+      - kirgis*
+      - belgi*
+      - kolumbi*
+      - alger*
+      - myanmar
+      - rumäni*
+      - serbi*
+      - malaysi*
+      - chin*

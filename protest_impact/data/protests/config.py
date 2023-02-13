@@ -8,7 +8,9 @@ with open(project_root / "protest_impact" / "data" / "protests" / "config.yaml")
     config = yaml.load(f, Loader=yaml.FullLoader)
 
 treatment_keywords = config["treatment_keywords"]
+movement_keywords = config["movement_keywords"]
 
+# TODO add quotation marks
 search_string = " OR ".join(treatment_keywords["de"])
 
 _search_regex = re.sub(r"\*", ".*", search_string)
