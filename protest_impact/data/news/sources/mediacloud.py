@@ -82,3 +82,19 @@ def search(
         # print(f"last_processed_stories_id: {last_processed_stories_id}")
         results += search(query, date, end_date, newspaper, last_processed_stories_id)
     return list(set(results))
+
+
+def get_article_counts(media_id):
+    response = get(
+        "https://api.mediacloud.org/api/v2/stories_public/count/",
+        params={
+            "q": f"media_id:({media_id})",
+            "split": True,
+            "split_period": "day",
+            "key": environ["MEDIACLOUD_API_KEY"],
+        },
+        headers={"Accept": "application/json"},
+    )
+    result = response.json()
+    return result
+    return result["counts"]
