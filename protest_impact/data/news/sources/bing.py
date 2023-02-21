@@ -1,6 +1,7 @@
 from datetime import date
 from os import environ
 from time import sleep
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -16,7 +17,7 @@ load_dotenv()
 
 
 def search(
-    query: str | None, date: date, site: str = None, offset: int = 0
+    query: Optional[str], date: date, site: str = None, offset: int = 0
 ) -> NewsItem:
     results_per_page = 100
     query = query or ""

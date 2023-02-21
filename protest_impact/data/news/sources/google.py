@@ -3,6 +3,7 @@ from itertools import chain
 from math import ceil
 from os import environ
 from time import sleep
+from typing import Optional
 
 import requests
 from dateutil import parser
@@ -20,7 +21,7 @@ load_dotenv()
 
 
 def search(
-    query: str | None,
+    query: Optional[str],
     date: date,
     end_date: date = None,
     newspaper: str = None,
