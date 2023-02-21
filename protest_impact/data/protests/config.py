@@ -11,7 +11,9 @@ treatment_keywords = config["treatment_keywords"]
 movement_keywords = config["movement_keywords"]
 
 # TODO add quotation marks
-search_string = " OR ".join(treatment_keywords["de"])
+search_string = " OR ".join(
+    f'"{a}"' if len(a.split()) > 1 else a for a in treatment_keywords["de"]
+)
 
 _search_regex = re.sub(r"\*", ".*", search_string)
 _search_regex = re.sub(r" OR ", "|", _search_regex)

@@ -31,11 +31,11 @@ def search(
 ) -> NewsItem:
     end_date_ = end_date or date
     if corpora is None:
-        all_corpora = load_dereko_corpora()
-        corpora = [
-            all_corpora[date.year] for date in range(date.year, end_date_.year + 1)
-        ]
-    corpora = [sigle.upper() + str(date.year)[-2:] for sigle in corpora]  # TODO
+        corpora_data = load_dereko_corpora()
+        corpora = []
+        for year in range(date.year, end_date_.year + 1):
+            sigles = corpora_data[year]
+            corpora += [sigle.upper() + str(year)[-2:] for sigle in sigles]
     results_per_page = 100
     if len(corpora) == 0:
         return []
@@ -49,14 +49,15 @@ def search(
         },
         params={
             "q": query,
-            "ql": "poliqarp",
-            "context": "500-token,500-token",  # more tokens are not possible
-            "cq": f"({corpora_query}) & {date_query}",
+            "ql": "cosmas2",
+            # "context": "500-token,500-token",  # more tokens are not possible
+            # "cq": f"{date_query}",
             "page": 1,
         },
     )
     res.raise_for_status()
     json = res.json()
+    return json
     return [
         NewsItem(
             date=date,

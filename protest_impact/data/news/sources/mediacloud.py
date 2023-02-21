@@ -85,6 +85,18 @@ def search(
 
 
 def get_article_counts(media_id):
+    print(
+        get._get_argument_hash(
+            "https://api.mediacloud.org/api/v2/stories_public/count/",
+            params={
+                "q": f"media_id:({media_id})",
+                "split": True,
+                "split_period": "day",
+                "key": environ["MEDIACLOUD_API_KEY"],
+            },
+            headers={"Accept": "application/json"},
+        )
+    )
     response = get(
         "https://api.mediacloud.org/api/v2/stories_public/count/",
         params={
@@ -98,3 +110,16 @@ def get_article_counts(media_id):
     result = response.json()
     return result
     return result["counts"]
+
+
+def get_profile():
+    from requests import get
+
+    response = get(
+        "https://api.mediacloud.org/api/v2/auth/profile",
+        params={
+            "key": environ["MEDIACLOUD_API_KEY"],
+        },
+    )
+    result = response.json()
+    return result

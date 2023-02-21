@@ -1,60 +1,57 @@
 treatment_keywords:
   en:
-    - protest*
-    - demo*
-    - rally*
-    - march*
+    - protest
+    - demo
+    - rally
+    - march
     - parade
     - picket
     - social movement
     - occup*
-    - strik*
-    - petition*
+    - strike
+    - petition
     - hate crime
-    - riot*
-    - unrest*
+    - riot
+    - unrest
     - uprising
-    - rebell*
+    - rebel*
     - block*
     - sit-in
-    - sit-in*
-    - boycott*
+    - boycott
     - activis*
-    - action*
-    - mobili*
     - citizens' initiative
-    - vigil*
+    - vigil
     - hunger strike
     - civil disobedience
   de:
     - protest*
-    - demo*
-    - kundgebung*
+    - demo
+    - demonstr*
+    - kundgebung
     - versamm*
-    - soziale bewegung*
+    - soziale bewegung
     - hausbesetz*
     - streik*
     - unterschriften*
-    - petition*
-    - hasskriminalität*
-    - unruhen*
-    - aufruhr*
-    - aufstand*
+    - petition
+    - hasskriminalität
+    - unruhen
+    - aufruhr
+    - aufstand
     - rebell*
-    - block*
+    - blockade
+    - blockier*
     - sitzblock*
     - boykott*
-    - riot*
+    - riot
     - aktivis*
-    - aktion*
-    - mobilisierung*
-    - bürgerinitiative*
-    - bürgerbegehren*
-    - marsch*
-    - aufmarsch*
-    - parade*
-    - mahnwache*
-    - hungerstreik*
+    - bürgerinitiative
+    - bürgerbegehren
+    - marsch
+    - aufmarsch
+    - parade
+    - mahnwache
+    - hungerstreik
     - ziviler ungehorsam
 
 movement_keywords:
