@@ -12,7 +12,7 @@ The ultimate goal of protest is a change in policy, which is hard to quantify. A
 
 Causal inference can help solving this problem. In my thesis I want to focus on a recent technique that uses natural language processing for removing confounders:
 
-- **Propensity score matching:** Here we make the assumption that all relevant confounders are themselves manifested within newspaper articles. While this assumption will be imperfect, it is reasonable to assume that factors that newspaper reports cover many relevant trigger events and also roughly represent existing trends in public discourse. Then we can train classifiers to predict the likelihood of both protests and features of public discourse for a given day, and then match days with similar predictions to create something similar to a control-group for days with protest events.[2][3][4]
+- **Propensity score matching:** Here we make the assumption that all relevant confounders are themselves manifested within newspaper articles. While this assumption will be imperfect, it is reasonable to assume that newspaper reports cover many relevant trigger events and also roughly represent existing trends in public discourse. Then we can train classifiers to predict the likelihood of both protests and features of public discourse for a given day, and then match days with similar predictions to create something similar to a control-group for days with protest events.[2][3][4]
 
 To evaluate the technique, I want to compare it against more established causal inference techniques, such as:
 
