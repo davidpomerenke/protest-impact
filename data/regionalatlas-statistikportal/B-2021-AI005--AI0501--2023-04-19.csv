@@ -1,0 +1,19 @@
+;Zweitstimmenanteil CDU/CSU, Bundestagswahl (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;22
+02;Hamburg;15.4
+03;Niedersachsen;24.2
+04;Bremen;17.2
+05;Nordrhein-Westfalen;26
+06;Hessen;22.8
+07;Rheinland-Pfalz;24.7
+08;Baden-Württemberg;24.8
+09;Bayern;31.7
+10;Saarland;23.6
+11;Berlin;15.9
+12;Brandenburg;15.3
+13;Mecklenburg-Vorpommern;17.4
+14;Sachsen;17.2
+15;Sachsen-Anhalt;21
+16;Thüringen;16.9

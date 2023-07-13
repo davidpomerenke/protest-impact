@@ -1,0 +1,27 @@
+#### The German Protest Reports dataset
+
+@wiedemannGeneralizedApproachProtest2022 show how to detect protest events in newspaper articles. They employ the [`gelectra-large`](https://huggingface.co/deepset/gelectra-large) model, a transformer model that is fine-tuned on German texts of various genres. Their dataset consists of almost 4000 newspaper articles from 4 German cities, namely Leipzig, Dresden, Stuttgart, and Bremen, from between 2009 and 2016. I replicate their results and obtain F1-scores of 0.93 for in-distribution and 0.76 for out-of-distribution classification, which is almost identical to the authors' results. I try out some alternative approaches on their data: Simple machine learning models based on TFIDF-features; finetuning the more recent multilingual FlanT5 model; and using GPT 3.0 in a zero-shot setting. None of the alternatives perform closely to the `gelectra-large` model (see @tbl-glpn-alternative-methods for metrics).
+
+\begingroup
+\scriptsize\selectfont
+
+| Model    | id F1 | ood F1 |
+|----------|------:|-------:|
+| XG-Boost | 0.87  | 0.60   |
+| FlanT5   | 0.75  | 0.30   |
+| GPT3     | 0.81  | 0.65   |
+| gElectra | 0.93  | 0.76   |
+
+: Results for using alternative classification methods on the GLPN dataset, for in-distribution (id) and out-of-distribution (ood) prediction. {#tbl-glpn-alternative-methods}
+
+\endgroup
+
+In order to obtain protest events from a broader geographic spectrum, I retrieve metadata of online newspaper articles from MediaCloud (see @sec-mediacloud) for a query containing protest-related keywords.^[The query is based on the query used by Wiedemann, and reads: _'protest* OR demo OR demonstr* OR kundgebung OR versamm* OR "soziale bewegung" OR hausbesetz* OR streik* OR unterschriften* OR petition OR hasskriminalität OR unruhen OR aufruhr OR aufstand OR rebell* OR blockade OR blockier* OR sitzblock* OR boykott* OR riot OR aktivis* OR bürgerinitiative OR bürgerbegehren OR marsch OR aufmarsch OR parade OR mahnwache OR hungerstreik OR "ziviler ungehorsam"'_] From the obtained metadata, I scrape full-texts where possible. Special care is taken of website that appear scrapeable but contain only gibberish, by observing the distribution of letters.
+
+{{< embed ../protest_impact/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-ts >}}
+
+I label the texts myself using [Prodigy](https://prodi.gy/). For the positive class, I require that the article is a report about (potentially among other topics) a recent past protest event, and that basic details including the place and the protest concern are given. The other articles are mostly about completely different topics (such as "protest" but not in the political sense, or "demonstration" in the sense of showing something, "blockade" in a physical context, or the "protest-ant" church); or they mention protests in the context of an op-ed or an interview, where the concreteness and recency of the events is often not given.
+
+{{< embed ../protest_impact/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-sources >}}
+
+In a first labeling phase, I annotate 650 random articles for training and 500 random articles for evaluation. I train the model and use 500 articles that are predicted positive and label them as well and add them to the training data, in order to combat class imbalance. Training the `gelectra-large` model with the overall 1150 training samples and according to the hyperparameters suggested by Wiedemann, I finally obtain an in-distribution F1-score of 0.78 (precision=0.81, recall=0.75). Then, I use this model to predict the relevance of all the other scraped articles that contain protest-related keywords. Only 11% are relevant, resulting in 20,879 articles of which the (relatively good) model believes that they describe protest events.

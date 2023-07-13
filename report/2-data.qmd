@@ -1,0 +1,79 @@
+---
+include-in-header:
+  text: |
+    \usepackage[l3]{csvsimple}
+    \usepackage{booktabs}
+---
+
+## Data
+
+### Protest events
+
+often bias: failing protests are not visible and not included
+
+The primary data source for research on protests are newspaper articles. [@hutterProtestEventAnalysis2014] give a historical and systematic overview and highlight the problem that this source is biased. They describe how several definitions for protest event analysis (PEA) and the broader political claim analysis (PCA), as well as associated coding practices have helped to formalize the (manual) data extraction process, such that results have become more valid and comparable. Automatic coding practices have allowed the broadening of the scope of analyses, while methodical concerns tend to have suffered. [@wiedemannGeneralizedApproachProtest2022] demonstrate how the use of transformer models can now reliably take over the classification of relevant protest articles. They achieve an F1-score of 94% using on a homogeneous train-test split (data from the same newspaper and timespan), and 75% for training and testing on different newspaper sources. The automatic coding of more fine-grained coding units is an open research problem, which may eventually be solved en passant by applying more advanced large language models.
+
+The second source for protest events are police archives. This source tends to be dismissed by the literature as "biased", uninformative about the motives and organizers, uncomparable across regions, often unavailable or unobtainable, and restricted to only registered demonstrations [@hutterProtestEventAnalysis2014; @ProtestlandschaftDeutschland; wiedemannGeneralizedApproachProtest2022]. This criticism appears to me valid but overgeneralized, and there may well be regions where the advantages prevail over the problems. Especially for our goal of impact estimation, the avoidance of selection biases that are associated with newspaper articles [@hutterProtestEventAnalysis2014; @jamesozdenLiteratureReviewProtest2022] is a strong argument for using data from police and demonstration authorities.
+
+#### Existing protest datasets
+
+##### The German ACLED dataset
+
+__ACLED__ may not include all protests. Especially, climate protests from Baden-Württemberg seem to be lacking. Therefore, regions may be selected as control regions even though there actually was a protest as well. This would lead to underestimations.
+
+- ACLED may not include all protests. Especially, climate protests from Baden-Württemberg seem to be lacking. Therefore, regions may be selected as control regions even though there actually was a protest as well. This would lead to underestimations.
+
+
+##### Other data sources
+
+Protestlandschaft D, GDELT, PolDem, ProDat, ...: see Obsidian
+
+
+- Mediacloud, etc.: See Obsidian
+
+official data: @kanolRightWingExtremistMobilization2021
+
+<!-- #### The German Protest Registrations dataset -->
+
+{{< include 2-2-gpreg.qmd >}}
+
+<!-- #### The German Protest Reports dataset -->
+
+{{< include 2-3-gprep.qmd >}}
+
+### Public discourse
+
+This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query. This could be expanded in two dimensions:
+
+- __Using more interesting metrics__, such as how prominent the keywords are within each article, and what other words they cooccur with most, and what sentiments they are accompanied by. Another approach would be the use of topic models to create topics in an unsupervised manner, and observe how their prevalence shifts in the face of protests. All of these techniques require full-text data. For newspaper articles, full-text data is in principle available, but very hard to obtain (see @sec-mediacloud-sec-mediacloud-fulltexts, @sec-dereko-fulltexts).
+- __Using other types of discourse__, such as Twitter data (@kratzkeMonthlySamplesGerman2023: a sample of full texts from Germany on a daily basis 2019-2022), [Google Trends](https://trends.google.com/) data (search query counts on a weekly and regional basis starting from 2005), or parliamentary speech (@abramiGermanParliamentaryCorpus2022: speeches from regional German parliaments from the nineties until 2021).
+
+#### Online newspapers {#sec-mediacloud}
+
+##### Full-text availability {#sec-mediacloud-fulltexts}
+
+Only metadata is contained in the Mediacloud service (see below), and the full texts need to be scraped from the links given there. The problem is that some newspapers undertake measures to prevent scraping, or to slow it down immensely, such that a _complete_ collection of full texts is illusionary. Focusing on full texts from a small set of newspapers, such as "newspapers of record", may be a more feasible route for future research.
+
+#### Print newspapers
+
+xyz
+
+##### Full-text availability {#sec-dereko-fulltexts}
+
+Large extracts around the query keywords are available for download, but this requires scraping the user interface and is complicated and slow. Obtaining daily word counts is much faster.
+
+#### Press releases
+
+> My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive (retrieved e.g., from <https://www.lexisnexis.com/> or any of the partner sites). @gruberLexisNexisTools2023
+
+### Instruments
+
+#### Weather
+
+Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
+
+#### Pandemic restrictions
+
+{{< embed ../protest_impact/instrumental_variables/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
+
+Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.

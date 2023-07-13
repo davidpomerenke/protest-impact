@@ -1,0 +1,317 @@
+## Modeling and overview of methods
+
+Here I give an overview of the causal model that I generally assume. Then I give an overview of the different causal methods used in this project, how they exploit the causal model, and what additional assumptions they make. Since _time series methods_ may be used in various contexts, I also briefly introduce their structure and show how they can be applied to various machine learning problems that arise as part of the causal methods.
+
+We can group the variables from the dataset described in (section XYZ) into 4 causal categories,[^multivariate] and add another category for variables that we do not know but that might be relevant:
+
+- Known confounders __X__:
+  - Date
+  - Region
+    - represented as a dummy variable
+    - represented using 28 sociodemographic indicators: voting behavior, average female income, ...
+  - Climate: smoothed 10-year averages of min/max/avg temperature, air pressure, precipitation, snowfall, wind speed, and peak gust.
+  - Protest concern
+  - Protest organization
+- Treatment __W__, relating to protests by the given protest organization, on the given date, in the given region:
+  - Dummy variable whether there is a protest event
+  - Count of protest events
+  - Total number of protesters
+- Outcome __Y__:
+  - Number of articles published in the following week ...
+    - ... about protest events (regarding the given protest concern), in online newspapers
+    - ... about the given protest concern, in online newspapers
+    - ... about protest events (regarding the given protest concern), in print newspapers
+    - ... about the given protest concern, in print newspapers
+  - Additional information regarding newspaper coverage
+    - ... in numeric form
+    - ... in unstructured form as texts [^unstructured]
+- Instruments __Z__:
+  - Weather: min/max/avg temperature, air pressure, precipitation, snowfall, wind speed, and peak gust; with the seasonal climate components removed, respectively.
+  - Covid restrictions: stringency index and movement variables for 6 location types.
+- Unknown confounders __U__:
+  - __?__
+
+[^multivariate]: Each of the causal variables consists of multiple variables from the dataset, which introduces some complexity. We can first assume that each causal variable is univariate, and that the treatment is binary (_whether or not there is a protest event_). In section XYZ, I explain how we can extend this to the multivariate case.
+
+[^unstructured]: It will not be possible to measure the effect on something unstructured in any straightforward way. But since I assume that __Y__ can itself be a confounder for future days, we can use the unstructured information to train NLP classifiers to reduce confounding. Since this information plays the same causal role as the other outcomes, I include it in __Y__ rather than __X__, even though I do not intend to measure the effect on it.
+
+We can draw a graph that shows the causal relations between the 5 categories:
+
+```{dot}
+// | label: fig-causal-graph-simple
+// | fig-cap: Simple causal graph showing the structure of the research problem, ignoring the time-series aspect. I want to determine the effect of the treatment __W__ on the outcome __Y__, and there are known confounders __X__, but also unknown confounders __U__ that influence both treatment and outcome and thus complicate the matter. Instrumental variables __Z__ may help, because they only affect the outcome via their effect on the treatment.
+// | fig-width: 200px
+// | fig-height: 150px
+// | column: body
+digraph D {
+  rankdir=LR
+  {X, U} -> {W} -> {Y}
+  {X, U} -> {Y}
+  {Z} -> {W}
+}
+```
+
+The core of the model is the relation $W \rightarrow Y$ that I want to investigate. However, there are multiple problems of increasing difficulty:
+
+1. The outcome __Y__ is affected not only by the treatment but also by the covariates __X__. This is a pretty common situation, even in randomized controlled experiments, and we can approach it, for example, by using regression to control for the covariates.
+2. Not only the outcome __Y__, but also the treatment __W__ is affected by the covariates __X__, which makes them _confounders_. This is a common feature of observational studies. We can use methods based on the _propensity score_ (the probability of receiving the treatment) to approach this problem, as long as we know all relevant confounders.
+3. There are likely unknown confounders __U__. We are dealing with a sociological situation where a lot of variables could potentially be relevant. For example, external events like elections, legislative processes, or conferences could play a big role. Or the current mindset and stress level of journalists could play a role. Or many other things, that we may not even think of. Even though we cannot list all of these variables, there are alternative approaches:
+   1. Assuming that the unknown confounders affect all regions similarly, we can make cross-region comparisons, for example, by using the __*synthetic control*__ method.
+   2. We can leverage __*instrumental variables*__ __Z__, for which we assume that they do not affect the outcome __Y__ directly, and trace their effect on __Y__ via the treatment __W__.
+   3. We can assume that certain texts such as press releases may cover many relevant unknown confounders, and learn __*propensity scores from texts*__, without needing to specify the confounders explicitly.
+
+### Overview of causal methods
+
+Here I give a conceptual overview of the 3 mentioned methods that are potentially suitable for dealing with unknown confounders. Their exact assumptions and limitations will be discussed in their respective chapters.
+
+In the context of protest event analysis, the most commonly used methods are: observational analysis; the instrumental variable method using rainfall as an instrument; and _difference in differences_, which is conceptually similar to the synthetic control method^[TODO: compare better.]. To my best knowledge, the synthetic control method and propensity score methods with text have not previously been applied to protest event analysis.
+
+#### Naive
+
+```{dot}
+// | label: fig-causal-graph-obs
+// | fig-cap: Causal graph for observational analysis.
+// | fig-width: 100px
+// | fig-height: 100px
+// | column: margin
+digraph D {
+  {W,X} -> {Y} [color=blue]
+}
+```
+
+The observational approach is not a causal method, but is used for comparison with the causal methods. It neglects most of the causal model and only regards the direct relationship between treatment and outcome, possibly controlling for covariates, but neglecting their role as confounders. The result is called the _prima facie_ causal effect. It suffers from _selection bias_, because the treatment is not randomized but the treatment assignment process is not taken into account by the model.
+
+#### Instrumental variable
+
+```{dot}
+// | label: fig-causal-graph-iv
+// | fig-cap: Causal graph for the instrumental variable method.
+// | fig-width: 150px
+// | fig-height: 150px
+// | column: margin
+digraph D {
+  {W} -> {Y}
+  {Z} -> {W} [color=blue]
+  {X} -> {W, Y}
+}
+```
+
+This method utilizes one or more instrumental variables, that affect the treatment but do not directly affect the outcome, not via other paths and not even via confounding. This is especially true for approximately random variables, such as the weather or, more specifically.^[The seasonal component of the weather may correlate with many other seasonal variables, and the regional component may correlate with many other regional variables. But we can remove these components and end up with a specification of the weather that fulfills the criteria for an instrumental variable.]
+
+In the simplest case, we can compare the effect of __Z__ on __W__ with the effect of __Z__ on __Y__ to obtain the desired estimate for the effect of __W__ on __Y__. We can also apply _two-stage_ approaches to first isolate the part of __W__ that is caused by __Z__, and then estimate its impact on __Y__.
+
+Thanks to instrumental variables, we can legitimately ignore the unknown confounders, which is really nice. A requirement is always that the instrument is sufficiently strong, that is, that it has a strong effect on the treatment __W__.
+
+#### Synthetic control
+
+```{dot}
+// | label: fig-causal-graph-synth
+// | fig-cap: Causal graph for the synthetic control method.
+// | fig-width: 200px
+// | fig-height: 250px
+// | column: margin
+digraph D {
+  {X, U} -> {W} -> {Y}
+  {X, U} -> {Y}
+  {date} -> {X} [style=dotted, color=blue]
+  {date} -> {U} [style=dotted, color=blue, label="uniquely\ndetermines"]
+}
+```
+
+The underlying assumption for the synthetic control method is that the unknown confounders affect the different regions uniformly: On any given day, the impact of the confounders is the same for all regions. This assumption is plausible especially for confounders coming from global and national politics and events; it is violated by regional confounders, but maybe they are not so important and we can live with it.
+
+Under this assumption, we can perform matching based on the date: To estimate the impact of a protest group in one region on a given date, we find other regions where no such event has taken place, and compare the effect.
+
+The synthetic control method goes a bit further and also takes the effect of known differences between the regions into account. From all the available control regions, it constructs a _synthetic region_. The synthetic region interpolates between the control regions such that the interpolated region is as close as possible to the treatment region in some respect. This interpolation can be performed in terms of sociodemographic similarity, or in terms of maximizing the predictive accuracy of the outcome variable, based on past observations.^[This is a bit of a simplification, the details are explained in section XYZ.]
+
+#### Propensity scores
+
+```{dot}
+// | label: fig-causal-graph-prop
+// | fig-cap: Causal graph for propensity score methods.
+// | fig-width: 100px
+// | fig-height: 150px
+// | column: margin
+digraph D {
+  {W} -> {Y}
+  {X} -> {W} [color=blue]
+  {X} -> {Y}
+}
+```
+
+Propensity score methods estimate the probability (propensity) of receiving the treatment. There are various strategies for eliminating selection bias with the use of propensity scores, notably propensity score matching, propensity score stratification, inverse propensity weighting. Double machine learning estimators such as causal forests help with estimating heterogenous treatment effects.
+
+Propensity score methods still suffer from _omitted variable bias_ if there are unknown confounders. This can be mitigated by learning propensity scores from less structured big data such as texts, using classification models from natural language processing. The advantage of doing so is that the unknown confounders need not be pre-specified. The assumption is that the texts need to contain all of the unknown confounders, and in some detectable form. While this will never completely be the case (and cannot be verified anyway), we can hope that it at least substantially reduces the bias.
+
+### (Time-series modelling)
+
+```{dot}
+// | label: fig-causal-graph-time-series
+// | fig-cap: Version of the causal graph (causal-graph-simple) from a time series perspective. The variables of each day are influenced by the variables from the previous days in the same region. We can model that by including all variables from one day as potential confounders for the following day.
+// | fig-width: 200px
+// | fig-height: 400px
+// | column: margin
+
+digraph D {
+  rankdir=LR
+  compound=true
+
+  U0 [label="U"]
+  W0 [label="W"]
+  X0 [label="X"]
+  Y0 [label="Y"]
+  Z0 [label="Z"]
+
+  U1 [label="U"]
+  W1 [label="W"]
+  X1 [label="X"]
+  Y1 [label="Y"]
+  Z1 [label="Z"]
+
+  U2 [label="U"]
+  W2 [label="W"]
+  X2 [label="X"]
+  Y2 [label="Y"]
+  Z2 [label="Z"]
+
+  subgraph cluster_0 {
+    label="Day -2"
+    {X0, U0} -> {W0} -> {Y0}
+    {X0, U0} -> {Y0}
+    {Z0} -> {W0}
+    dummy_0 [shape=point style=invis constraint=false]
+  }
+  subgraph cluster_1 {
+    label="Day -1"
+    {X1, U1} -> {W1} -> {Y1}
+    {X1, U1} -> {Y1}
+    {Z1} -> {W1}
+    dummy_1 [shape=point style=invis constraint=false]
+  }
+  subgraph cluster_2 {
+    label="Day 0"
+    {X2, U2} -> {W2} -> {Y2}
+    {X2, U2} -> {Y2}
+    {Z2} -> {W2}
+    dummy_2 [shape=point style=invis constraint=false]
+  }
+  dummy_0 -> X1 [ltail=cluster_0 style=dotted label="include\nvariables" constraint=false]
+  dummy_1 -> X2 [ltail=cluster_1 style=dotted label="include\nvariables" constraint=False]
+}
+```
+
+Our variables on one day may also be influenced by the same set of variables from the previous day. On the one hand, this makes modeling more complicated. On the other hand, it is an advantage, because we have the data from the previous days already in the dataset, and using them can help reduce the amount of unknown confounding. Specifically, I consider all variables from the previous day as potential confounders for the current day. Variables from multiple days earlier may still be relevant, but less so, so it will be acceptable to make a cutoff at some point. We can restrict the previous variables to those from the same region, or we can also include previous variables from other regions where it seems useful.
+
+In time-series models, be it for forecasting or classification, the model usually consumes 3 types of variables:
+
+- __Historic variables:__ Variables that are only available for past dates but not for the date of the prediction. This is especially true for the target variable; since it should be predicted, it should not be present in the training data.
+- __Future variables:__ Variables whose values are available for past dates as well as the date of the prediction.
+- __Static variables:__ These are time-independent.
+
+#### Naive
+
+Predict __Y__ using:
+
+- __W__ as future variable (the historic values are technically part of __X__)
+- __X__ as future and static variables
+  - including __Y__ as historic variable
+
+Interpret the resulting coefficient for __W__ as prima facie causal effect.
+
+#### Instrumental variable
+
+(First stage.) Predict __W__ using:
+
+- __Z__ as future variable (the historic values are technically part of __X__)
+- __X__ as future and static variables
+  - including __Y__ as historic variable
+  - including __W__ as historic variable
+
+Use the estimates $\hat W$ for the second stage.
+
+(Second stage.) Predict __Y__ using:
+
+- $\hat W$ as static variable
+- __X__ as future and static variables
+  - including __Y__ as historic variable
+  - including __W__ as historic variable
+
+Interpret the resulting coefficient for __W__ causally.
+
+#### Synthetic control
+
+Predict __Y__ using:
+
+- __Y__ from the control regions as future variables
+- __X__ (from the same region) as future variables (static variables can be dropped)
+  - including __Y__ (from the same region) as historic variable
+  - including __W__ (from the same region) as historic variable
+
+Alternatively, predict __Y__ using:
+
+- __X__ from the same region as future and static variables (the latter to enable transfer learning)
+  - including __Y__ as historic variable
+  - including __W__ as historic variable
+
+Interpret __Y__ - $\hat Y$ as causal effect.
+
+#### Propensity scores
+
+Predict __W__ using:
+
+- __X__ as future and static variables
+  - including __Y__ as historic variable
+  - including __W__ as historic variable
+
+Then use the estimates $\hat W$ (or the residuals) with a propensity-score based method to obtain causal estimates.
+
+For double machine learning, also predict __Y__ using:
+
+- __X__ as future and static variables
+  - including __Y__ as historic variable
+  - including __W__ as historic variable
+
+Use the residuals and regress them on the residuals of __W__ to obtain the causal estimate.
+
+#### Summary
+
+Using subscripts $\scriptsize f, h, s$ to denote future, historic and static variables, we can summarize the time series prediction problems:
+
+::: {.column-page-right}
+
+Predict __Y__ using:
+
+- $X_{f,s}, Y_h, W_f \rightarrow$ Observational analysis.
+- $X_{f,s}, Y_h, W_h$, use estimates $\rightarrow$ Counterfactual for synthetic control (version 2)
+- $X_{f,s}, Y_h, W_h$, use residuals $\rightarrow$  Second step of double maching learning.
+- $X_{f,s}, Y_h, W_h, \hat W_s \rightarrow$  Second stage of the instrumental variable method.
+- $X_{f,s}, Y_h, W_h$, and for control regions $Y_f \rightarrow$
+- Counterfactual for synthetic control (version 1)
+
+Predict __W__ using:
+
+- $X_{f,s}, Y_h, W_h \rightarrow$ Propensity scores.
+- $X_{f,s}, Y_h, W_h, Z_f \rightarrow$ First stage of the instrumental variable method.
+
+:::
+
+<!-- ### Dealing with multivariate treatments and outcomes -->
+
+W
+
+- has to be multidimensional:
+  - either (#radical, #moderate) <- preferable
+  - or (#protesters, is_radical)
+- in the case of IV, ignore the radical protests, or ignore the distinction, to avoid complexities
+
+first assume binary treatment (whether or not protest)
+
+for moderate vs radical use only protest days and make same model
+
+for moderate-size use only (purely) moderate protest days
+
+
+<!-- ### Alternative models -->
+
+- with time-varying treatment
+- with multiple treatments

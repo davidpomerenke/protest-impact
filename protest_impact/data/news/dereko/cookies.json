@@ -1,0 +1,32 @@
+[
+  {
+    "name": "JSID_RUN",
+    "value": "1218335B69692AEA4DBB067E2FFCEE80.main",
+    "domain": "cosmas2.ids-mannheim.de",
+    "path": "/cosmas2-web",
+    "expires": -1,
+    "httpOnly": true,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_pk_id.14.07ef",
+    "value": "b5cbcbcfc5c73e1c.1689005043.",
+    "domain": "cosmas2.ids-mannheim.de",
+    "path": "/",
+    "expires": 1722960243,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "_pk_ses.14.07ef",
+    "value": "1",
+    "domain": "cosmas2.ids-mannheim.de",
+    "path": "/",
+    "expires": 1689006843,
+    "httpOnly": false,
+    "secure": false,
+    "sameSite": "Lax"
+  }
+]

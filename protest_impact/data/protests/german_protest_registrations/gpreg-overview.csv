@@ -1,0 +1,14 @@
+region,city,2015,2016,2017,2018,2019,2020,2021,2022,registrations,observations,incl?,capital,kpop
+Baden-Württemberg,Karlsruhe,0,0,0,0,0,0,490,467,True,False,False,False,283799
+Bayern,München,0,0,0,1145,1170,1364,1983,1169,True,False,True,True,1260391
+Berlin,Berlin,0,0,0,4290,5405,5890,6207,6442,True,True,True,True,3426354
+Brandenburg,Potsdam,0,0,0,0,214,238,287,326,True,False,True,True,182112
+Bremen,Bremen,0,0,0,0,654,631,623,721,False,False,False,True,546501
+Hessen,Wiesbaden,0,0,0,0,159,235,304,256,True,False,True,True,278609
+Nordrhein-Westfalen,Köln,0,0,0,1037,0,0,0,1551,True,False,False,False,963395
+Nordrhein-Westfalen,Wuppertal,0,0,0,0,0,0,0,209,True,False,False,False,360797
+Rheinland-Pfalz,Mainz,0,0,0,255,248,305,312,411,True,False,True,True,217123
+Sachsen,Dresden,0,0,0,0,0,164,292,405,True,False,True,True,556227
+Sachsen-Anhalt,Magdeburg,215,167,135,175,222,312,411,435,True,True,True,True,235775
+Schleswig-Holstein,Kiel,0,0,0,0,0,0,272,341,True,False,False,True,246601
+Thüringen,Erfurt,0,0,0,0,305,285,331,351,False,False,False,True,213692

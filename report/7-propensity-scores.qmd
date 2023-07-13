@@ -1,0 +1,15 @@
+## Causal analysis via propensity score matching (TODO)
+
+### Propensity scores from time series data
+
+### Propensity scores from press release texts
+
+cite Wager
+
+Predicting propensity scores from text: cite causalNLP overviews
+
+### Causal methods using propensity scores
+
+#### Matching, stratification, and inverse weighting
+
+#### Double machine learning (causal forests)

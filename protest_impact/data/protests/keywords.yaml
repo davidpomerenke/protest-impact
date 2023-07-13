@@ -1,0 +1,528 @@
+treatment_keywords:
+  en:
+    - protest
+    - demo
+    - rally
+    - march
+    - parade
+    - picket
+    - social movement
+    - occup*
+    - strike
+    - petition
+    - hate crime
+    - riot
+    - unrest
+    - uprising
+    - rebel*
+    - block*
+    - sit-in
+    - boycott
+    - activis*
+    - citizens' initiative
+    - vigil
+    - hunger strike
+    - civil disobedience
+  de:
+    - \*protest*
+    - \*demo
+    - \*demonstr*
+    - \*kundgebung
+    - \*versamm*
+    - soziale bewegung
+    - hausbesetz*
+    - \*streik*
+    - unterschriften*
+    - petition
+    - hasskriminalität
+    - \*unruhen
+    - \*aufruhr
+    - \*aufstand
+    - \*rebell*
+    - \*blockade
+    - \*blockier*
+    - sitzblock*
+    - \*boykott*
+    - riot
+    - \*aktivis*
+    - bürgerinitiative
+    - bürgerbegehren
+    - \*marsch
+    - \*aufmarsch
+    - \*parade
+    - mahnwache
+    - hungerstreik
+    - ziviler ungehorsam
+
+movement_keywords:
+  climate:
+    organizations:
+      fff:
+        - klimastreik*
+        - klimamontag
+        - fff
+        - fridays for future
+        - friday for future
+        - fridays 4 future
+        - friday 4 future
+        - scientists for future
+        - scientists 4 future
+        - parents for future
+        - parents 4 future
+      xr:
+        - extinction rebellion
+        - xr
+      jso:
+        - just stop oil
+      alg:
+        - letzte generation
+        - aufstand der letzten generation
+        - last generation
+        - ultima generazione
+        - klimakleb*
+      eg:
+        - ende gelände
+        - ende gelaende
+        - ende gelande
+      ef:
+        - end fossil
+      gp:
+        - greenpeace
+      kl:
+        - klimaliste
+      ka:
+        - klimaafterwork
+    movement:
+      - klimabewegung
+      - klimaaktivis*
+    topic:
+      - klimawandel
+      - klimaerwärmung
+      - erderwärmung
+      - klimaschutz
+      - klimagerechtigkeit
+      - klimapolitik
+      - klimaneutral*
+      - hambacher forst
+      - hambi
+      - lützerath
+      - lützi
+    framing:
+      - klimakrise
+      - klimakatastrophe
+      - klimakollaps
+      - klimanotstand
+      - klimagerechtigkeit
+    goal:
+      - klimaneutral*
+      - klimaziel*
+      - klimaschutzpaket
+      - klimaschutzgesetz
+      - klimaschutzmaßnahmen
+      - klimaschutzabkommen
+      - klimaschutzprogramm
+      - kohleausstieg
+    subsidiary_goal:
+      - erneuerbare energie*
+      - bürgerrat
+      - bürgerräte
+      - gesellschaftsrat
+      - gesellschaftsräte
+      - tempolimit
+      - tempo 100
+      - 9-euro-ticket
+      - neun-euro-ticket
+  animal rights:
+    organizations:
+      peta:
+        - peta
+      ass:
+        - albert schweitzer stiftung
+    movement:
+      - tierrecht*
+      - tierschutz*
+      - tierschütz*
+    topic:
+      - tierrecht*
+      - tierschutz*
+      - tierversuch*
+      - tierquäl*
+      - massentierhaltung
+    framing:
+      - nichtmenschlich
+    goal:
+      - vegan*
+      - vegetar*
+      - pflanzlich
+      - pflanzenbasiert
+      - ohne fleisch
+  environment:
+    organizations:
+      bund:
+        - bund für umwelt und naturschutz
+      nabu:
+        - nabu
+      gp:
+        - greenpeace
+    movement:
+      - umweltschütz*
+      - umweltbewegung
+      - umweltaktivis*
+      - naturschütz*
+    topic:
+      - umweltschutz
+      - naturschutz
+      - bedrohte* art*
+      - bedrohte* tierart*
+      - bedrohte* pflanzenart*
+      - umweltverschmutzung
+      - luftverschmutzung
+      - wasserverschmutzung
+  bikes:
+    organizations:
+      adfc:
+        - adfc
+      cm:
+        - critical mass
+        - kidical mass
+    topic:
+      - radweg*
+      - fahrrad*
+  racism:
+    movement:
+      - black lives matter
+      - blacklivesmatter
+      - antirassis*
+      - antikolonialis*
+    topic:
+      - rassis*
+      - kolonialis*
+      - hautfarbe
+      - aussehen
+      - diskriminier*
+      - ungleich*
+      - racial profiling
+      - polizeigewalt
+      - nsu
+    framing:
+      - person of colour
+      - people of colour
+      - poc
+      - bipoc
+    goal:
+      - antidiskriminierungsgesetz
+      - polizeistudie
+  feminism:
+    movement:
+      - frauenverband
+      - courage
+      - one billion rising
+      - feminis*
+      - frauenbewegung
+      - frauenstreik
+    topic:
+      - sexis*
+      - equal pay
+      - gleichberechtigung
+      - gleichstellung
+      - geschlechtergerechtigkeit
+      - frau*
+      - frauenrecht*
+      - frauenquote
+      - gleichberechtigung
+      - gender pay gap
+      - geschlechterunterschiede
+    goal:
+      - quote
+      - frauenquote
+  covid:
+    movement:
+      - querdenk*
+      - hygienedemo
+      - impfgegner
+    topic:
+      - impf*
+      - mask*
+      - lockdown
+      - quarantäne
+      - kontaktbeschränk*
+      - kontaktverbot*
+      - einschränk*
+      - nebenwirkung*
+    framing:
+      - bevormund*
+      - diktat*
+      - freiheit*
+      - unverhältnismäßig
+    goal:
+      - freedom day
+      - ende der maßnahmen
+      - maßnahmen beenden
+      - ende des lockdowns
+      - lockdown beenden
+      - ende der einschränkungen
+      - einschränkungen beenden
+      - ende der kontaktbeschränkungen
+      - kontaktbeschränkungen beenden
+  anti-immigration:
+    movement:
+      - pegida
+      - patriot*
+      - fremdenfeind*
+    topic:
+      - migrant*
+      - flüchtling*
+      - asyl*
+      - einwander*
+      - ausländer*
+    framing:
+      - islamisier*
+      - asyltouris*
+      - sozialtouris*
+      - sozialschmarotz*
+    goal:
+      - abschieb*
+      - obergrenze
+      - grenzkontrolle
+      - grenzschutz
+      - grenze* dicht
+      - grenze* zu
+      - grenze* geschlossen
+      - grenze* schließen
+  labour:
+    movement:
+      - ver.di
+      - ig metall
+      - ig-metall
+      - igm
+      - dgb
+      - deutsche* gewerkschaftsbund
+      - gew
+      - gewerkschaft*
+      - warnstreik
+      - bahnstreik
+      - flugstreik
+      - taxi-streik
+      - post-streik
+      - arbeitskampf*
+      - bauernprotest*
+    topic:
+      - arbeitsbedingung*
+      - bezahlung
+      - gehalt
+      - tarifvertrag
+    framing:
+      - schlechte bezahlung
+      - niedriges gehalt
+      - niedrige preise
+    goal:
+      - gehaltserhöhung
+  lgbtq:
+    movement:
+      - csd
+      - christopher street day
+      - pride
+    topic:
+      - lgbt*
+      - lsbt*
+      - lesbisch
+      - schwul
+      - bisexuell
+      - transgender
+      - trans-*
+      - intersex*
+      - queer*
+      - pride
+      - diversit*
+      - diskriminier*
+      - homophob*
+      - transphob*
+    framing:
+      - gender*
+    goal:
+      - gleichberechtigung
+      - gleichstellung
+      - ehe für alle
+      - homo-ehe
+      - adoptionsrecht
+  right wing:
+    movement:
+      - rechtsradikal*
+      - rechtsextrem*
+      - rechtsaußen*
+      - rechtspopulis*
+      - reichsbürger*
+      - neonazi*
+      - nazi*
+      - fascist*
+      - fascismus
+      - faschist*
+      - faschis*
+      - nationalis*
+      - nationalsozialis*
+    topic:
+      - patriot*
+      - volk
+    framing: []
+    goal: []
+  left wing:
+    movement:
+      - mlpd
+      - rebell
+      - linksextrem*
+      - linksradikal*
+      - linksaußen*
+      - antifa*
+      - sozialis*
+      - kommunis*
+      - marxis*
+      - leninis*
+      - stalinis*
+      - trotskis*
+      - anarchis*
+      - antiimperialis*
+      - antideutsch*
+  anti capitalism:
+    movement:
+      - antikapitalis*
+      - kapitalismuskrit*
+      - occupy
+      - antiglobalis*
+      - globalisierungsgegner*
+      - attac
+      - stop ttip
+      - stop ceta
+    topic:
+      - kapitalis*
+      - globalisier*
+      - g7
+      - g8
+      - g20
+  anti nuclear:
+    topic:
+      - atomkraft
+      - atomenergie
+      - kernenergie
+      - kernkraft
+      - nuklear*
+  anti-war:
+    movement:
+      - pazifis*
+      - friedensbewegung
+      - kriegsgegner*
+      - ostermarsch*
+    topic:
+      - krieg
+      - rüstung*
+      - aufrüstung*
+    goal:
+      - absrüstung*
+      - frieden
+      - friedensverhandlung*
+  s21:
+    movement:
+      - parkschützer*
+      - montagsdemo*
+    topic:
+      - s21
+      - stuttgart 21
+      - stuttgart21
+      - tiefbahnhof
+    goal:
+      - s21 stop*
+      - stop* s21
+      - kopfbahnhof21
+      - kopfbahnhof 21
+      - volksentscheid
+      - bürgerentscheid
+  yellow vests:
+    movement:
+      - gelbwest*
+      - gelb* west*
+      - gilets jaunes
+    topic:
+      - benzinpreis*
+      - spritpreis*
+      - steuer*
+      - rente*
+      - sozialabbau
+      - mindestlohn
+    goal:
+      - steuersenk*
+  solidarity:
+    movement:
+      - unteilbar
+      - ist bunt
+      - bunt statt braun
+      - omas gegen rechts
+      - unteilbar
+    topic:
+      - solidarität
+      - toleranz
+  refugees:
+    topic:
+      - missstände
+      - unterkunft
+      - unterkünfte
+      - behinderung
+  immigration:
+    movement:
+      - seebrücke
+    topic:
+      - seenotrettung
+    framing:
+      - bewegungsfreiheit
+      - abschottung*
+      - sichere* hafen
+      - sichere* häfen
+  football:
+    topic:
+      - fußball*
+  motorbike:
+    topic:
+      - motorrad*
+  wind energy:
+    topic:
+      - windenergie
+      - windkraft
+      - windrad*
+      - windräder
+  international:
+    topic:
+      - armeni*
+      - britisch*
+      - ecuador
+      - frankreich
+      - französisch*
+      - großbrit*
+      - hong kong
+      - hongkong
+      - indones*
+      - irak*
+      - iran*
+      - israel
+      - katal*
+      - kongo
+      - kurd*
+      - palästin*
+      - polen
+      - poln*
+      - russ*
+      - spani*
+      - thail*
+      - tschad
+      - türk*
+      - usa
+      - vereinigte* königreich*
+      - vereinigte* staaten
+      - brasil*
+      - belarus*
+      - kirgis*
+      - belgi*
+      - kolumbi*
+      - alger*
+      - myanmar
+      - rumäni*
+      - serbi*
+      - malaysi*
+      - chin*

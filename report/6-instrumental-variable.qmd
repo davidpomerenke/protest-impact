@@ -1,0 +1,159 @@
+## Causal analysis via instrumental variables
+
+```{dot}
+// | fig-width: 150px
+// | fig-height: 150px
+// | column: margin
+digraph D {
+  {W} -> {Y}
+  {Z} -> {W} [color=blue]
+  {X} -> {W, Y}
+}
+```
+
+The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. As is also exploited in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.
+
+There are three conditions that make a variable __Z__ a valid instrument [@dingFirstCourseCausal2023, p. 279]:
+
+1. __Z__ should be random or almost random, so we can be sure that it is independent from hidden confounders.
+2. __Z__ should change the distribution of the treatment __W__.
+3. __Z__ should not directly influence __W__.
+
+@dingFirstCourseCausal2023, p. 285ff. gives an overview over the three common instrumental variable methods: _indirect least squares_, _two-stage least-squares_, and _weak IV_:
+
+In the special case of a linear model with a single instrumental variable and a single treatment, we can use _indirect least squares_ as a causal method. This entails using linear regressions to obtain coefficient $\beta_0$ for the effect of the instrument __Z__ on the treatment __W__, and the coefficient $\beta_1$ for the effect of the instrument __Z__ on the outcome __Y__. Since the effect on the outcome is supposed to flow entirely via the treatment, the ratio $\beta_1/\beta_0$ reveals the causal effect of __W__ on __Y__.
+
+For linear models with more complicated settings, we can use the _two-stage least squares_ method. It is based on two ordinary least-squares regressions:
+
+- 1. stage: Regress __W__ on __Z__ using.
+- 2. stage: Regress __Y__ on the fitted values $\hat W$.
+
+For the single-instrument single-treatment case, the results will be numerically identical with the indirect least squares approach. An advantage is that two-stage least squares allows for the calculation of standard errors.
+
+Another method that is more robust to weak instruments is the _Weak IV_ estimator.
+
+Causal forests for instrumental variables provide a more flexible model than linear regression, and allow for the estimation of heterogenous treatment effects [@bargagli-stoffiHeterogeneousCausalEffects2021].
+
+### Weather as an instrument
+
+#### Validity of weather as an instrument
+
+While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing.
+
+Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data, specifically from the respective capital of the region. This is a potential weakness that will be addressed later.
+
+{{< embed ../protest_impact/instrumental_variables/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
+
+Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
+
+##### Indirect paths
+
+- @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
+- @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables, and only affect the exogenous climate variables.
+
+##### Spatial interdependence
+
+##### Seasonality
+
+(see mostly later)
+
+##### Detecting invalid instruments
+
+#### The impact of the weather on protests
+
+For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information.
+
+##### Precipitation
+
+I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
+\endgroup
+
+Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them.
+
+##### Other weather variables
+
+##### Principal components
+
+#### Making the weather more random
+
+Describe the problem and show the impact on the BLM movement data. Explain that _controlling_ can help a lot here, or rather that IV is a nice addition to controlling.
+
+##### Separating short-term and long-term weather components
+
+An additional concern that has been identified and adjusted for by some previous studies (see @sec-weatherlit) is that weather contains a non-random component that is correlated both temporally with annual seasonality (which may be linked, for example, to media attention cycles, and many other variables), and geographically with places with generally nice or bad weather (which may be linked, for example, to economic indicators, or also to previous protest activity). This is in violation of condition (1.) on valid instruments from above. Therefore I try to split each weather variable into a long-term non-random variable and a short-term almost-random variable.
+
+I follow @negroWhichSideAre2019 in using 10-year averages for each day of the year, additionally smoothing them. I find a $\pm 14$-day window using Bayesian smoothing to deliver more satisfactory results, that is, smoother climate variables, than the $\pm 3$-day moving average applied by the authors. Using this as a long-term variable, I construct the short-term variable by subtracting the long-term variable from the original weather weather variable. Results for the short-term weather variables are displayed in @fig-weather-time-series-2.
+
+{{< embed ../protest_impact/instrumental_variables/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series-2 >}}
+
+The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which is likely attributable to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument.
+
+__Aside: First-stage validity in previous work__
+
+To underline the problems that I encounter, I apply my method to a case study from the literature, where an instrumental variables approach using the weather to instrument protest size has been successfully conducted. I choose the _Black Lives Matter_ movement in 2020 in the United States, which has recently received much scholarly attention and has been studied independently by both @kleinteeselinkWeatherProtestEffect2021 and @carenBlackLivesMatter2023, employing a similar methodical setting which may have been inspired by @wasowAgendaSeedingHow2020.
+
+I use rainfall ... and protests from the ACLED dataset.
+
+I only investigate the first stage.
+
+Fig: Placebo test for monthly average. Conclusion: separate climate and weather!
+
+##### Leveraging the gap between pre-registered and observed protest size
+
+Predicting the change for all Berlin data:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/changes.ipynb#tbl-change-regression-all >}}
+\endgroup
+
+Placebo:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/changes.ipynb#fig-change-regression-placebo >}}
+\endgroup
+
+First stage for the climate protests, reasonable:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/changes.ipynb#tbl-change-regression-climate-reasonable >}}
+\endgroup
+
+and more suitable for 2-stage:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/changes.ipynb#tbl-change-regression-climate-useful >}}
+\endgroup
+
+and aggregated:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/changes.ipynb#tbl-change-regression-climate-useful-aggregated >}}
+\endgroup
+
+And results for the 2nd stage (the actually interesting thing):
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../protest_impact/instrumental_variables/changes.ipynb#tbl-change-liml-climate >}}
+\endgroup
+
+### Pandemic restrictions as an instrument
+
+The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
+
+#### Validity of restrictions as an instrument
+
+I see mainly 3 objections against using such variables as instruments, yet I am uncertain how much they really matter:
+
+1. Just like the weather, the spread of the coronavirus is to some extent a natural event. It is, however, to some extent controlled by the behaviour of humans, and especially the restrictions due to COVID-19 have a large political component. I worry especially about geographical confounding: Restrictions in Germany have in large part been up to the regional legislators and governments, and perhaps those governing parties whose climate policy causes outrage tend to impose especially strict (or loose) COVID-19 restrictions for one reason or another.
+2. Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally correlated with political processes and with media attention cycles.
+3. There is an obvious direct impact of COVID-19 in that stricter restrictions may correlate with an intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for, except for protests whose concern is also focused on the pandemic. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics.

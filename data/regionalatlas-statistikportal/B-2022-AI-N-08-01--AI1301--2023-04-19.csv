@@ -1,0 +1,19 @@
+;Pkw-Bestand je 1.000 EW am 01.01.;
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;592.5
+02;Hamburg;439
+03;Niedersachsen;611.6
+04;Bremen;442.5
+05;Nordrhein-Westfalen;581.5
+06;Hessen;605.8
+07;Rheinland-Pfalz;633.8
+08;Baden-Württemberg;614.7
+09;Bayern;624.5
+10;Saarland;659.9
+11;Berlin;337.7
+12;Brandenburg;578.7
+13;Mecklenburg-Vorpommern;547.1
+14;Sachsen;539.9
+15;Sachsen-Anhalt;563.4
+16;Thüringen;566.4

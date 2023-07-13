@@ -1,0 +1,51 @@
+---
+include-in-header:
+  text: |
+    \usepackage[l3]{csvsimple}
+    \usepackage{booktabs}
+---
+
+#### The German Protest Registrations dataset
+
+Protest statistics are often recorded by public authorities, either when organizers register a future demonstrations, or when the police reports about a past demonstration. Registering a demonstration is a common requirement for exercising the right to protest in European countries, however this requirement is only fulfilled by moderate protests, while more radical protests may purposefully ignore it and are thus not listed in such records. Often the estimated number of expected protesters is also recorded, but it is of course not reliable, and reliability may vary between different protest organizers. Police estimates of past demonstrations should be more reliable and consistent, however with the possibility for systematic bias, such as generally downplaying the number of participants, or specifically downplaying the number of participants for protests that are critical of the government or the police themselves.
+
+Official documents, including protest statistics, can be obtained via _Freedom of Information_ laws. These exist in more than 100 countries and allow anyone to obtain public documents [@FreedomInformationLaws2023]. The specific requirements, exceptions, and costs vary greatly. In Germany, freedom of information exists on the federal level; but many authorities belong to the regional level, where the extent of freedom of information rights varies greatly [@InformationsfreiheitDeutschlandTransparenzranking]; and municipal authorities are not always covered by regional freedom of information laws, sometimes filling the gap with their own legislation.
+
+Access to public documents has been democratized via platforms that streamline the process of sending requests, escalating the process to oversight authorities or courts if necessary, and making communication and obtained documents available to the public. The [Alaveteli](http://alaveteli.org/) network provides software and hosts such platforms in more than 30 countries across the world. Some independent platforms also exist, such as [Öffentlichkeitsgestz.ch](https://www.oeffentlichkeitsgesetz.ch/) in Switzerland, and _FragDenStaat_ [in Austria](https://fragdenstaat.at/) and [in Germany](https://fragdenstaat.de/). These open the possibility of obtaining official protest data at scale.
+
+__Collection.__ I send 40 freedom of information requests to German demonstration authorities (depending on the region these are either part of the municipal administrations or of the police) and their supervisory bodies concerning protest data in 31 cities. These cities comprise the political capitals of all 16 regions in Germany, the 17 largest cities by population size, as well as some smaller cities for regions where the request in the regional capital is unsuccessful. 4 requests are not answered, 3 are rejected, 11 state that they do not possess such data, 2 have to be withdrawn due to demanded payments of multiple hundreds of euros, and 20 are been partially or completely successful. This yields 17 table documents with various amounts of information. The requests and responses including the original data files can be found at [FragDenStaat](https://fragdenstaat.de/anfragen/?q=demonstration+csv&first_after=2022-12-01&first_before=2023-07-31).
+
+__Cleaning.__ I ignore one of the datasets (Augsburg) because I cannot convert the delivered PDF back to a table, two of them (Saarbrücken and Freiburg) because the data is too unstructured or requires too much cleaning, and one (Duisburg) because the data is delivered very late. The remaining 13 data tables are cleaned manually. One common problem is that the tables specify events that have a duration of multiple days, in some cases even multiple months. Out of concern for a simple data structure, as well as doubt whether these demonstrations really lasted so long, I reduce their duration to the single day when they start.
+
+__Dataset__. The resulting dataset contains 49,800 events from 13 cities. For 11 cities the ex-ante number of expected participants are given, and for 2 of them (Berlin and Magdeburg) the ex-post extimates by the police are also included. For all cities the topic of the protest is given in, presumably as specified by the organizers themselves; and for 4 cities the name of the organizing group is also known. Various additional details such as exact specifications of location, time and duration, and distinctions between protest marches and pickets are available for some of the cities but not in any systematic manner. Further statistics about the dataset can be seen in table tbl-official-overview.
+
+:::{.column-page}
+\begingroup
+\scriptsize\selectfont
+\csvautobooktabular[separator=semicolon,respect sharp=true]{/Users/david/Repositories/protest-impact/protest_impact/data/protests/german_protest_registrations/gpreg-overview-pretty.csv}
+\endgroup
+:::
+
+Table: Official overview. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available.
+
+<!--
+```{python}
+# | label: tbl-official-overview
+# | tbl-cap: Official overview. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available.
+# | tbl-colwidths: [20,20,20,20,20,20,10,10,10,10,10,10,10,10]
+# | column: page
+# | echo: false
+
+from IPython.display import display, Markdown
+import pandas as pd
+
+f = "official-overview.csv"
+# table = pd.read_csv(f, sep=";").to_markdown(index=False)
+# Markdown(table)
+```
+-->
+
+
+Placeholder
+
+{{< embed ../protest_impact/data/protests/german_protest_registrations/data_map.ipynb#data-official-map >}}

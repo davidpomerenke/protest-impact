@@ -1,0 +1,17 @@
+### Placebo tests for instrumental variables
+
+To further strengthen the evidence that the _precipitation_ variable has a significant impact on protest occurrence and size, I perform placebo tests where I try to predict protest occurrence and size not from the weather of the respective day, but from other days before and after the protest. I expect:
+
+a. The weather after the protest should not have any effect on the treatment. For very few days after the protest there might still be a correlation because the weather on one day is correlated with the weather on the next day. This correlation should rapidly decline over the course of a few days and permanently go down to $0$.
+b. For days before the protest, I expect a similar amount of correlation. In addition, I expect some small causal effects, because organizers and attendees may decide a few days before the protest whether it should take place or whether they want to attend, and might be influenced in their decision by the current weather, and not only the weather forecast; and even the weather forecast depends not only on the actual weather on the day, but substantially on the weather a few days earlier. In addition, the previous weather may have an impact on previous protests, which may in turn have an impact on the protest on the current date. Therefore I expect coefficients and significances before the protest date to also shrink to 0 in the long term, but on a much slower timescale, say, multiple days or weeks.
+c. I expect these declines both before and after the protest dates to be smooth.
+d. In similar manner to the coefficients of the relevant variables, I expect the overall predictive power of the regression (adjusted $Rˆ2$ / f-statistic) to continuously decline before and after the protest date, and much faster after the protest.
+e. When performing regression with only the instruments and no control variables, I expect the predictive power to decline to 0 in both directions.
+
+{{< embed ../protest_impact/instrumental_variables/notebooks/05-31-instrumental-again.ipynb#fig-first-stage-time-series >}}
+
+@fig-first-stage-time-series and @fig-fstat show the results of the two time series of placebo tests.
+
+{{< embed ../protest_impact/instrumental_variables/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
+
+It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day.

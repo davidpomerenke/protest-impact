@@ -1,0 +1,34 @@
+## Causal analysis via synthetic control
+
+This is location-based matching
+
+Alternative: @MatrixProfileStumpy for time-based matching. But: would assume that confounders are time-invariant, not plausible; or that they are fully caught somehow by the time series, also not too plausible.
+
+cite Abadie, Cunningham
+
+### Selecting control regions based on the distance
+
+- reverse and effect
+
+### Selecting control regions based on sociodemographics
+
+Variables
+
+Methods:
+- correlation
+- linear regression
+- PC regression
+- PLS regression
+- NMF regression
+
+visualize "maps of Germany" based on first 2 components
+
+select n_components based on cross-validation
+
+### Selecting control regions based on high predictive quality
+
+### Bias from incomplete protest data
+
+#### Difficulties with small protest events
+
+#### Difficulties with large protest events

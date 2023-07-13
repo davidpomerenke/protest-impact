@@ -1,0 +1,26 @@
+;Zweitstimmenanteil GRÜNE, Bundestagswahl (%);
+;;
+;Zeichenerklärung;
+2222222222;nichts vorhanden, genau 0;
+5555555555;Zahlenwert unbekannt oder geheim zu halten;
+6666666666;Tabellenfach gesperrt, da Aussage nicht sinnvoll;
+2222222222;keine Angabe, da Zahlenwert nicht sicher genug;
+8888888888;Angabe fällt später an;
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;18.3
+02;Hamburg;24.9
+03;Niedersachsen;16.1
+04;Bremen;20.9
+05;Nordrhein-Westfalen;16.1
+06;Hessen;15.8
+07;Rheinland-Pfalz;12.6
+08;Baden-Württemberg;17.2
+09;Bayern;14.1
+10;Saarland;0
+11;Berlin;22.4
+12;Brandenburg;9
+13;Mecklenburg-Vorpommern;7.8
+14;Sachsen;8.6
+15;Sachsen-Anhalt;6.5
+16;Thüringen;6.6
