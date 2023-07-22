@@ -1,7 +1,7 @@
 import pandas as pd
 
-from src import project_root
 from src.cache import cache
+from src.paths import interim_data
 
 
 @cache
@@ -12,8 +12,7 @@ def load_german_protest_registrations() -> pd.DataFrame:
     """
 
     df = pd.read_csv(
-        project_root
-        / "protest_impact/data/protests/german_protest_registrations/all-protests.csv",
+        interim_data / "german_protest_registrations/all-protests.csv",
         parse_dates=["Datum"],
     )
     df = df.rename(

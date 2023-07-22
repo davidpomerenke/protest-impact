@@ -148,7 +148,7 @@ __Cleaning.__ I ignore one of the datasets (Augsburg) because I cannot convert t
 
 __Dataset__. The resulting dataset contains 49,800 events from 13 cities. For 11 cities the ex-ante number of expected participants are given, and for 2 of them (Berlin and Magdeburg) the ex-post extimates by the police are also included. For all cities the topic of the protest is given in, presumably as specified by the organizers themselves; and for 4 cities the name of the organizing group is also known. Various additional details such as exact specifications of location, time and duration, and distinctions between protest marches and pickets are available for some of the cities but not in any systematic manner. Further statistics about the dataset can be seen in table tbl-official-overview.
 
-{{< embed ../protest_impact/data/protests/german_protest_registrations/data_map.ipynb#data-official-map >}}
+{{< embed ../src/data/protests/german_protest_registrations/data_map.ipynb#data-official-map >}}
 
 
 #### The German Protest Reports dataset
@@ -175,11 +175,11 @@ I replicate their results and obtain F1-scores of 0.93 for in-distribution and 0
 
 In order to obtain protest events from a broader geographic spectrum, I retrieve metadata of online newspaper articles from MediaCloud (see @sec-mediacloud) for a query containing protest-related keywords.^[The query is based on the query used by Wiedemann, and reads: _'protest* OR demo OR demonstr* OR kundgebung OR versamm* OR "soziale bewegung" OR hausbesetz* OR streik* OR unterschriften* OR petition OR hasskriminalität OR unruhen OR aufruhr OR aufstand OR rebell* OR blockade OR blockier* OR sitzblock* OR boykott* OR riot OR aktivis* OR bürgerinitiative OR bürgerbegehren OR marsch OR aufmarsch OR parade OR mahnwache OR hungerstreik OR "ziviler ungehorsam"'_] From the obtained metadata, I scrape full-texts where possible. Special care is taken of website that appear scrapeable but contain only gibberish, by observing the distribution of letters.
 
-{{< embed ../protest_impact/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-ts >}}
+{{< embed ../src/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-ts >}}
 
 I label the texts myself using [Prodigy](https://prodi.gy/). For the positive class, I require that the article is a report about (potentially among other topics) a recent past protest event, and that basic details including the place and the protest concern are given. The other articles are mostly about completely different topics (such as "protest" but not in the political sense, or "demonstration" in the sense of showing something, "blockade" in a physical context, or the "protest-ant" church); or they mention protests in the context of an op-ed or an interview, where the concreteness and recency of the events is often not given.
 
-{{< embed ../protest_impact/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-sources >}}
+{{< embed ../src/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-sources >}}
 
 In a first labeling phase, I annotate 650 random articles for training and 500 random articles for evaluation. I train the model and use 500 articles that are predicted positive and label them as well and add them to the training data, in order to combat class imbalance. Training the `gelectra-large` model with the overall 1150 training samples and according to the hyperparameters suggested by Wiedemann, I finally obtain an in-distribution F1-score of 0.78 (precision=0.81, recall=0.75). Then, I use this model to predict the relevance of all the other scraped articles that contain protest-related keywords. Only 11% are relevant, resulting in 20,879 articles of which the (relatively good) model believes that they describe protest events.
 
@@ -216,12 +216,12 @@ Large extracts around the query keywords are available for download, but this re
 
 #### Weather
 
-{{< embed ../protest_impact/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
+{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
 
 #### Pandemic restrictions
 
-{{< embed ../protest_impact/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
+{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
 
 Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.

@@ -1,11 +1,6 @@
 from pathlib import Path
 
-import joblib
-
-from src.types import NewsItem
-from src.util.html import website_name
-
-_root = Path(__file__).parent.parent.parent
+_root = Path(__file__).parent.parent
 
 external_data = _root / "data" / "external"
 interim_data = _root / "data" / "interim"

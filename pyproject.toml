@@ -9,7 +9,7 @@ description = ""
 authors = ["David Pomerenke <davidpomerenke@mailbox.org>"]
 license = "GPL-3.0-or-later"
 readme = "README.md"
-packages = [{include = "protest_impact"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
@@ -72,6 +72,6 @@ line-profiler = {extras = ["ipython"], version = "^4.0.3"}
 profile = "black"
 
 [tool.pytest.ini_options]
-python_files = "protest_impact/**/*.py"
+python_files = "src/**/*.py"
 python_functions = "test_*"
-addopts = "--ignore=protest_impact/data/news/mediacloud/scraping --ignore=protest_impact/data/protests/german_protest_reports --ignore=protest_impact/synthetic_control --ignore=protest_impact/instrumental_variable"
+addopts = "--ignore=src/data/news/mediacloud/scraping --ignore=src/data/protests/german_protest_reports --ignore=src/models/synthetic_control --ignore=src/models/instrumental_variable"

@@ -1,16 +1,6 @@
 from functools import partial
 
-from src.paths import (
-    external_data,
-    figures,
-    interim_data,
-    models,
-    processed_data,
-    raw_data,
-    tables,
-)
-from src.util.cache import cache, get_cached
-
+# HELPER FUNCTIONS
 
 def kill_umlauts_without_mercy(s: str) -> str:
     # pointless bloodshedding

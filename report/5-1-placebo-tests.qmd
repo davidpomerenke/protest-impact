@@ -8,10 +8,10 @@ c. I expect these declines both before and after the protest dates to be smooth.
 d. In similar manner to the coefficients of the relevant variables, I expect the overall predictive power of the regression (adjusted $Rˆ2$ / f-statistic) to continuously decline before and after the protest date, and much faster after the protest.
 e. When performing regression with only the instruments and no control variables, I expect the predictive power to decline to 0 in both directions.
 
-{{< embed ../protest_impact/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-first-stage-time-series >}}
+{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-first-stage-time-series >}}
 
 @fig-first-stage-time-series and @fig-fstat show the results of the two time series of placebo tests.
 
-{{< embed ../protest_impact/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
+{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
 
 It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day.

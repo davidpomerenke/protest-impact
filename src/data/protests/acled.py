@@ -3,8 +3,8 @@ import re
 import pandas as pd
 from number_parser import parse_number
 
-from src import project_root
 from src.cache import cache
+from src.paths import external_data
 
 
 def get_size_v1(acled_string: str) -> int | None:
@@ -110,14 +110,20 @@ def parse_number_string(s: str) -> int | None:
         return parsed
 
 
+def clean_city_name(city: str):
+    # clean versions like "Berlin - Mitte", "Hamburg - Inner City", "Berlin - Berlin Mitte"
+    return city.split(" - ")[0]
+
+
+
 fn = "2020-01-01-2023-06-30-Europe-Austria-Germany-Switzerland.csv"
 
 
 @cache
 def load_acled_protests(
-    all_columns=False, file=project_root / "data/acled" / fn
+    all_columns=False, file=external_data / "acled" / fn
 ) -> pd.DataFrame:
-    df = pd.read_csv(project_root / "datasets" / file, parse_dates=["event_date"])
+    df = pd.read_csv(file, parse_dates=["event_date"])
     df = df[df["event_type"] == "Protests"]
     df = df.rename(
         columns={
@@ -151,8 +157,3 @@ def load_acled_protests(
         df["size_post"] = df["notes"].apply(get_size_v1)
     df["location"] = df["location"].apply(clean_city_name)
     return df
-
-
-def clean_city_name(city: str):
-    # clean versions like "Berlin - Mitte", "Hamburg - Inner City", "Berlin - Berlin Mitte"
-    return city.split(" - ")[0]
