@@ -1,7 +1,6 @@
 # create a pipeline
 import optuna
 import pandas as pd
-from protest_impact.data.protests.detection.glpn import load_glpn_dataset
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression, RidgeClassifier
@@ -12,6 +11,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
+
+from src.data.protests.detection.glpn import load_glpn_dataset
 
 # use hyperparameter optimization to find the best parameters
 # compare bow and tfidf for feature extraction

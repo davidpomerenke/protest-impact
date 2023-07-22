@@ -1,11 +1,9 @@
 import pandas as pd
 
-# from protest_impact.data.news.dereko.dereko import (
+# from src.data.news.dereko.dereko import (
 #     get_scraped_regional_count_df as dereko_get_scraped_regional_count_df,
 # )
-from protest_impact.data.news.mediacloud.word_counts import (
-    counts_for_region as mediacloud,
-)
+from src.data.news.mediacloud.word_counts import counts_for_region as mediacloud
 
 
 def counts_for_region(

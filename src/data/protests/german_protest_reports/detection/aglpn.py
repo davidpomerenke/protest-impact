@@ -1,5 +1,6 @@
 from datasets import ClassLabel, DatasetDict, load_dataset
-from protest_impact.util import project_root
+
+from src import project_root
 
 # AGLPN = another german local protest news dataset? 😵‍💫
 

@@ -3,7 +3,6 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from protest_impact.util import project_root
 
 # from neuralforecast.losses.pytorch import RMSE, MSE
 from pygam import LinearGAM, f, s
@@ -18,6 +17,8 @@ from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import mean_squared_error
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MinMaxScaler
+
+from src import project_root
 
 
 class GAM(BaseEstimator, RegressorMixin):

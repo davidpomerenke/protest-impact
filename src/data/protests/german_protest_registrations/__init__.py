@@ -1,5 +1,7 @@
 import pandas as pd
-from protest_impact.util import cache, project_root
+
+from src import project_root
+from src.cache import cache
 
 
 @cache

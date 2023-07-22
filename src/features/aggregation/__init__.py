@@ -6,17 +6,18 @@ from darts import TimeSeries
 from darts.utils.timeseries_generation import generate_index
 from munch import Munch
 from protest_impact import end, start
-from protest_impact.data import german_regions
-from protest_impact.data.news import counts_for_region
-from protest_impact.data.protests import load_climate_protests_with_labels
-from protest_impact.data.protests.keywords import climate_queries
-from protest_impact.data.weather import (
+
+from src.cache import cache
+from src.data import german_regions
+from src.data.news import counts_for_region
+from src.data.protests import load_climate_protests_with_labels
+from src.data.protests.keywords import climate_queries
+from src.data.weather import (
     get_weather_history,
     impute_weather_history,
     interpolate_weather_histories,
 )
-from protest_impact.time_series.holidays import get_holidays
-from protest_impact.util import cache
+from src.features.time_series.holidays import get_holidays
 
 
 @cache

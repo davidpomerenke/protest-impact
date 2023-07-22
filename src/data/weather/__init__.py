@@ -4,10 +4,11 @@ import numpy as np
 import pandas as pd
 from geopy.geocoders import Nominatim
 from meteostat import Daily, Monthly, Point
-from protest_impact.util import cache
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
+
+from src.cache import cache
 
 geolocator = Nominatim(user_agent="protest-impact")
 Daily.cache_dir = ".cache/meteostat"

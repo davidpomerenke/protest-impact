@@ -7,18 +7,17 @@ import pandas as pd
 from joblib import Memory, Parallel, delayed
 from joblib.hashing import hash
 from munch import Munch, munchify
-from protest_impact.data.news.dereko.dereko import get_scraped_entries
-from protest_impact.data.protests import (
+from tqdm.auto import tqdm
+
+from src import project_root
+from src.cache import cache
+from src.data.news.dereko.dereko import get_scraped_entries
+from src.data.protests import (
     aggregate_protests,
     get_climate_protests,
     get_climate_queries,
 )
-from protest_impact.synthetic_control import (
-    filter_regions,
-    get_regional_counts_for_protest,
-)
-from protest_impact.util import cache, project_root
-from tqdm.auto import tqdm
+from src.models.synthetic_control import filter_regions, get_regional_counts_for_protest
 
 SEED = 20230429
 rng = np.random.default_rng(SEED)

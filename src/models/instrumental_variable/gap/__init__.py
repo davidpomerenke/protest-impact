@@ -9,12 +9,13 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from joblib import Parallel, delayed
-from protest_impact.data.protests import load_official_protests
-from protest_impact.data.weather import get_weather_history
-from protest_impact.util import cache
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm.auto import tqdm
+
+from src.cache import cache
+from src.data.protests import load_official_protests
+from src.data.weather import get_weather_history
 
 
 @cache

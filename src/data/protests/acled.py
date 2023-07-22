@@ -2,7 +2,9 @@ import re
 
 import pandas as pd
 from number_parser import parse_number
-from protest_impact.util import cache, project_root
+
+from src import project_root
+from src.cache import cache
 
 
 def get_size_v1(acled_string: str) -> int | None:

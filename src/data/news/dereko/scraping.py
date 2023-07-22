@@ -7,8 +7,9 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from playwright.async_api import Browser, BrowserContext, Page, async_playwright
-from protest_impact.data.protests.keywords import climate_queries
-from protest_impact.util import project_root
+
+from src import project_root
+from src.data.protests.keywords import climate_queries
 
 load_dotenv()
 

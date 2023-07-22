@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-from protest_impact.data import german_regions
+
+from src.data import german_regions
 
 
 def get_placebo_events(

@@ -10,11 +10,14 @@ import pandas as pd
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
-from protest_impact.data.news.mediacloud.mediacloud import search as mediacloud_search
-from protest_impact.data.news.scraping import download_fulltext
-from protest_impact.data.news.sources.google import search as google_search
-from protest_impact.data.protests.config import search_string
-from protest_impact.data.protests.keywords import (
+from tqdm import tqdm
+
+from src import fulltext_path, project_root, website_name
+from src.data.news.mediacloud.mediacloud import search as mediacloud_search
+from src.data.news.scraping import download_fulltext
+from src.data.news.sources.google import search as google_search
+from src.data.protests.config import search_string
+from src.data.protests.keywords import (
     all_newspapers_with_id,
     complete_newspapers_with_id,
     end_year,
@@ -22,10 +25,8 @@ from protest_impact.data.protests.keywords import (
     newspapers,
     start_year,
 )
-from protest_impact.types import NewsItem
-from protest_impact.util import fulltext_path, project_root, website_name
-from protest_impact.util.cache import get_cached
-from tqdm import tqdm
+from src.types import NewsItem
+from src.util.cache import get_cached
 
 load_dotenv()
 

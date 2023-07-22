@@ -1,18 +1,19 @@
 import numpy as np
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from protest_impact.data import german_regions
-from protest_impact.data.news import get_regional_count_df
-from protest_impact.data.news.coverage_filter import filter_protests
-from protest_impact.data.news.dereko.dereko import get_scraped_entries
-from protest_impact.data.protests import get_climate_protests, get_climate_queries
-from protest_impact.data.protests.random import get_random_events
-from protest_impact.synthetic_control.models import AutoRegressor
-from protest_impact.synthetic_control.util import train_test_split
-from protest_impact.util import cache
-from protest_impact.util.functools import function_name
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from tqdm.auto import tqdm
+
+from src.cache import cache
+from src.data import german_regions
+from src.data.news import get_regional_count_df
+from src.data.news.coverage_filter import filter_protests
+from src.data.news.dereko.dereko import get_scraped_entries
+from src.data.protests import get_climate_protests, get_climate_queries
+from src.data.protests.random import get_random_events
+from src.models.synthetic_control.models import AutoRegressor
+from src.models.synthetic_control.util import train_test_split
+from src.util.functools import function_name
 
 
 @cache(ignore=["query_func", "dereko_entries"])

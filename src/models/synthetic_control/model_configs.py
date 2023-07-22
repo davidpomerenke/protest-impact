@@ -1,6 +1,9 @@
 from functools import partial
 
-from protest_impact.synthetic_control.models import (
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.linear_model import Lasso, LinearRegression, Ridge
+
+from src.models.synthetic_control.models import (
     GAM,
     AutoRegressor,
     BayesianStructuralTimeSeries,
@@ -9,8 +12,6 @@ from protest_impact.synthetic_control.models import (
     NeuralEstimator,
     SociodemographicWeightsEstimator,
 )
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
-from sklearn.linear_model import Lasso, LinearRegression, Ridge
 
 
 def get_model(config):

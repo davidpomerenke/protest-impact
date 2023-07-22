@@ -9,16 +9,18 @@ from linearmodels import IV2SLS, IVGMM, IVLIML
 from linearmodels.iv.model import _IVModelBase
 from linearmodels.iv.results import IVResults
 from munch import Munch
-from protest_impact.data.news import get_regional_count_df
-from protest_impact.data.protests import (
+from sklearn.ensemble import RandomForestRegressor
+
+from src import project_root
+from src.cache import cache
+from src.data.news import get_regional_count_df
+from src.data.protests import (
     aggregate_protests,
     get_climate_protests,
     get_climate_queries,
 )
-from protest_impact.data.weather import get_longterm_weather, get_weather
-from protest_impact.instrumental_variables.auto import AutoRandomForestRegressor
-from protest_impact.util import cache, project_root
-from sklearn.ensemble import RandomForestRegressor
+from src.data.weather import get_longterm_weather, get_weather
+from src.models.instrumental_variables.auto import AutoRandomForestRegressor
 
 
 @cache

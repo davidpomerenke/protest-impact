@@ -1,7 +1,8 @@
 import evaluate
 import numpy as np
-from protest_impact.util import project_root
 from transformers import AutoModelForSequenceClassification, Trainer, TrainingArguments
+
+from src import project_root
 
 metric = evaluate.load("f1")
 

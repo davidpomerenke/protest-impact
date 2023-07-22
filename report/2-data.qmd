@@ -11,11 +11,11 @@ import statsmodels.api as sm
 from matplotlib_inline.backend_inline import set_matplotlib_formats
 from tqdm.notebook import tqdm
 
-from protest_impact.util import cache, project_root
+from src.cache import cache
 
 set_matplotlib_formats("svg")
 
-from protest_impact.data.protests import (
+from src.data.protests import (
     load_climate_protests_with_labels,
     load_protests,
 )
@@ -79,7 +79,7 @@ Alternative existing sources of German or international protest data comprise [P
 # | column: margin
 # | echo: false
 
-from protest_impact.data.protests.keywords import abbreviations
+from src.data.protests.keywords import abbreviations
 from IPython.display import Markdown
 
 df = climate_protests.copy()

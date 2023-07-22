@@ -2,7 +2,8 @@ import re
 from itertools import chain
 
 import yaml
-from protest_impact.util import project_root
+
+from src import project_root
 
 abbreviations = dict(
     FFF="Fridays for Future",

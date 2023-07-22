@@ -1,9 +1,10 @@
 import spacy
-from protest_impact.data.protests.config import search_regex
+
+from src.data.protests.config import search_regex
 
 
 def kwic(text, n=0):
-    from protest_impact.data.news.aglpn.nlp import nlp
+    from src.data.news.aglpn.nlp import nlp
 
     sents = list(nlp(text).sents)
     kwics_nrs = set()

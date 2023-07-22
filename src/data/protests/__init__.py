@@ -1,11 +1,13 @@
 import numpy as np
 import pandas as pd
-from protest_impact.data.protests.acled import load_acled_protests
-from protest_impact.data.protests.german_protest_registrations import (
+
+from src import kill_umlauts_without_mercy, project_root
+from src.cache import cache
+from src.data.protests.acled import load_acled_protests
+from src.data.protests.german_protest_registrations import (
     load_german_protest_registrations,
 )
-from protest_impact.data.protests.keywords import all_keywords, movement_keywords
-from protest_impact.util import cache, kill_umlauts_without_mercy, project_root
+from src.data.protests.keywords import all_keywords, movement_keywords
 
 
 @cache

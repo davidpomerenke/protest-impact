@@ -1,5 +1,6 @@
 import pandas as pd
-from protest_impact.util import project_root
+
+from src import project_root
 
 
 def load_mobility():

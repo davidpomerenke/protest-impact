@@ -5,9 +5,10 @@ from time import sleep
 from urllib.parse import quote
 
 import requests
-from protest_impact.types import NewsItem
-from protest_impact.util import fulltext_path, html2text
 from tqdm import tqdm
+
+from src import fulltext_path, html2text
+from src.types import NewsItem
 
 
 def get_fulltext(metadata: NewsItem) -> NewsItem:
