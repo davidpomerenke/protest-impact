@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from src.time_series import LagDict, TimeSeriesRegressor
-from src.util.statsmodels import SMLinearRegression
+from src.cache import cache
+from src.features.time_series import LagDict, TimeSeriesRegressor
+from src.models.statsmodels import SMLinearRegression
 
 
 def shift_df(df: pd.DataFrame, y_cols: list[str], shift: int) -> pd.DataFrame:
@@ -13,7 +14,7 @@ def shift_df(df: pd.DataFrame, y_cols: list[str], shift: int) -> pd.DataFrame:
     df_ = df_.dropna()
     return df_
 
-
+@cache
 def lagged_impact(
     dfs: list[pd.DataFrame],
     y_cols: list[str],

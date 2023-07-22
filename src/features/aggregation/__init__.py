@@ -5,8 +5,9 @@ import pandas as pd
 from darts import TimeSeries
 from darts.utils.timeseries_generation import generate_index
 from munch import Munch
-from protest_impact import end, start
+from tqdm.auto import tqdm
 
+from src import end, start
 from src.cache import cache
 from src.data import german_regions
 from src.data.news import counts_for_region
@@ -177,8 +178,8 @@ def naive_one_region(
 
 
 def naive_all_regions(source: str = "acled"):
-    data = [naive_one_region(region["name"], source) for region in german_regions]
-    dfs, vars = zip(*[d for d in data if d is not None])
+    data = [naive_one_region(region["name"], source) for region in tqdm(german_regions)]
+    dfs, vars = zip(*[(d, v) for d, v in data if d is not None])
     vars = vars[0]
     for df in dfs:
         df[vars.y] = df[vars.y] / df[vars.y].mean()

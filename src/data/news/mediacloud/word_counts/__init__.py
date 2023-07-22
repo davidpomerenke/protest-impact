@@ -5,9 +5,9 @@ from os import environ
 import pandas as pd
 from dotenv import load_dotenv
 
-from src import get_cached, kill_umlauts_without_mercy, project_root
+from src import kill_umlauts_without_mercy
+from src.cache import get_cached
 from src.data.news.mediacloud.newspaper_collections import region_tags
-from src.util import cache
 
 """
 Documentation:
