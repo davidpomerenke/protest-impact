@@ -1,0 +1,19 @@
+;Elterngeldbezug Vater (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;29.4
+02;Hamburg;37.3
+03;Niedersachsen;31.9
+04;Bremen;26.1
+05;Nordrhein-Westfalen;26.8
+06;Hessen;32.5
+07;Rheinland-Pfalz;29.4
+08;Baden-Württemberg;38.6
+09;Bayern;41.7
+10;Saarland;23
+11;Berlin;37.5
+12;Brandenburg;36.1
+13;Mecklenburg-Vorpommern;27.7
+14;Sachsen;44.2
+15;Sachsen-Anhalt;27.9
+16;Thüringen;40.5

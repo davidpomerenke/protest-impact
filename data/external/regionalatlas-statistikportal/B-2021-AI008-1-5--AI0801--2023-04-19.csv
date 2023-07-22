@@ -1,0 +1,19 @@
+;Arbeitslosenquote (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;5.6
+02;Hamburg;7.5
+03;Niedersachsen;5.5
+04;Bremen;10.7
+05;Nordrhein-Westfalen;7.3
+06;Hessen;5.2
+07;Rheinland-Pfalz;5
+08;Baden-Württemberg;3.9
+09;Bayern;3.5
+10;Saarland;6.8
+11;Berlin;9.8
+12;Brandenburg;5.9
+13;Mecklenburg-Vorpommern;7.6
+14;Sachsen;5.9
+15;Sachsen-Anhalt;7.3
+16;Thüringen;5.6

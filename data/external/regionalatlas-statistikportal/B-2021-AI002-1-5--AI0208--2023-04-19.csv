@@ -1,0 +1,19 @@
+;Anteil der ausländischen Bevölkerung  an der Gesamtbevölkerung (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;8.9
+02;Hamburg;17.3
+03;Niedersachsen;10.3
+04;Bremen;19.3
+05;Nordrhein-Westfalen;14.2
+06;Hessen;17.1
+07;Rheinland-Pfalz;12.2
+08;Baden-Württemberg;16.4
+09;Bayern;14.1
+10;Saarland;12.3
+11;Berlin;20.2
+12;Brandenburg;5.5
+13;Mecklenburg-Vorpommern;5
+14;Sachsen;5.7
+15;Sachsen-Anhalt;5.7
+16;Thüringen;5.8

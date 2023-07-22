@@ -1,0 +1,19 @@
+;BIP je Erwerbstätigen (EUR);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;69056
+02;Hamburg;91289
+03;Niedersachsen;73206
+04;Bremen;74544
+05;Nordrhein-Westfalen;72555
+06;Hessen;81555
+07;Rheinland-Pfalz;70897
+08;Baden-Württemberg;80072
+09;Bayern;81331
+10;Saarland;64924
+11;Berlin;74742
+12;Brandenburg;67215
+13;Mecklenburg-Vorpommern;61999
+14;Sachsen;62042
+15;Sachsen-Anhalt;63855
+16;Thüringen;60802

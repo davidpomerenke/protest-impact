@@ -1,0 +1,19 @@
+;Haushalte mit Kindern (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;31.8
+02;Hamburg;25.5
+03;Niedersachsen;34.4
+04;Bremen;25.8
+05;Nordrhein-Westfalen;32.1
+06;Hessen;34.2
+07;Rheinland-Pfalz;36.1
+08;Baden-Württemberg;35.4
+09;Bayern;35.5
+10;Saarland;34.3
+11;Berlin;24.1
+12;Brandenburg;31.8
+13;Mecklenburg-Vorpommern;30.1
+14;Sachsen;28.2
+15;Sachsen-Anhalt;29.8
+16;Thüringen;32.7

@@ -1,0 +1,19 @@
+;Armutsgefährdungsquote (Bundesmedian) (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;15.6
+02;Hamburg;17.5
+03;Niedersachsen;18.3
+04;Bremen;28.2
+05;Nordrhein-Westfalen;19.2
+06;Hessen;18.5
+07;Rheinland-Pfalz;17
+08;Baden-Württemberg;14.1
+09;Bayern;12.8
+10;Saarland;17.6
+11;Berlin;20.1
+12;Brandenburg;14.8
+13;Mecklenburg-Vorpommern;18.3
+14;Sachsen;17
+15;Sachsen-Anhalt;19.2
+16;Thüringen;19

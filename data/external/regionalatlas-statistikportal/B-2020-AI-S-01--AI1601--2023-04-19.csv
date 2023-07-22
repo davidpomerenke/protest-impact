@@ -1,0 +1,19 @@
+;Verfügbares Einkommen je EW (EUR);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;24236
+02;Hamburg;25285
+03;Niedersachsen;22877
+04;Bremen;22037
+05;Nordrhein-Westfalen;23201
+06;Hessen;24454
+07;Rheinland-Pfalz;23559
+08;Baden-Württemberg;25513
+09;Bayern;25930
+10;Saarland;21838
+11;Berlin;21745
+12;Brandenburg;22252
+13;Mecklenburg-Vorpommern;21162
+14;Sachsen;21538
+15;Sachsen-Anhalt;21095
+16;Thüringen;20945

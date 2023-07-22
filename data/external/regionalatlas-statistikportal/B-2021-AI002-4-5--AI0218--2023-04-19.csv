@@ -1,0 +1,19 @@
+;Durchschnittsalter der Bevölkerung;
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;45.6
+02;Hamburg;42.1
+03;Niedersachsen;44.8
+04;Bremen;43.6
+05;Nordrhein-Westfalen;44.3
+06;Hessen;44.1
+07;Rheinland-Pfalz;45
+08;Baden-Württemberg;43.8
+09;Bayern;44.1
+10;Saarland;46.5
+11;Berlin;42.6
+12;Brandenburg;47.3
+13;Mecklenburg-Vorpommern;47.5
+14;Sachsen;46.9
+15;Sachsen-Anhalt;48.1
+16;Thüringen;47.6

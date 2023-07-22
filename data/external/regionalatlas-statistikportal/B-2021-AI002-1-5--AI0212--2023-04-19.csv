@@ -1,0 +1,19 @@
+;Wanderungssaldo je 10.000 EW;
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;78.9
+02;Hamburg;-0.4
+03;Niedersachsen;61.3
+04;Bremen;-30.4
+05;Nordrhein-Westfalen;25.6
+06;Hessen;21.6
+07;Rheinland-Pfalz;50.5
+08;Baden-Württemberg;26.9
+09;Bayern;40.1
+10;Saarland;45.2
+11;Berlin;44.2
+12;Brandenburg;100
+13;Mecklenburg-Vorpommern;81
+14;Sachsen;46.5
+15;Sachsen-Anhalt;45.9
+16;Thüringen;40.1

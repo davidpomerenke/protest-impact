@@ -1,0 +1,19 @@
+;Anteil Personen mit MHG 60 Jahre und älter (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;5.9
+02;Hamburg;14.3
+03;Niedersachsen;8.3
+04;Bremen;13
+05;Nordrhein-Westfalen;13
+06;Hessen;13.2
+07;Rheinland-Pfalz;9.4
+08;Baden-Württemberg;15.3
+09;Bayern;11
+10;Saarland;8.3
+11;Berlin;11.1
+12;Brandenburg;2.4
+13;Mecklenburg-Vorpommern;2.1
+14;Sachsen;1.9
+15;Sachsen-Anhalt;1.8
+16;Thüringen;1.6

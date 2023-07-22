@@ -1,0 +1,19 @@
+;Anteil Personen mit MHG 0 bis 19 Jahre (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;16.4
+02;Hamburg;39.8
+03;Niedersachsen;23.4
+04;Bremen;39.7
+05;Nordrhein-Westfalen;33.2
+06;Hessen;33.9
+07;Rheinland-Pfalz;26.9
+08;Baden-Württemberg;31.8
+09;Bayern;24.7
+10;Saarland;23.7
+11;Berlin;38
+12;Brandenburg;8
+13;Mecklenburg-Vorpommern;6.4
+14;Sachsen;7.9
+15;Sachsen-Anhalt;7
+16;Thüringen;6.1

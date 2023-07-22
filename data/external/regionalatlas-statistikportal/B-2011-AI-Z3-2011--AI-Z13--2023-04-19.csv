@@ -1,0 +1,19 @@
+;Anteil Einpersonenhaushalte (%);
+;;
+schluessel;regionaleinheit;wert
+01;Schleswig-Holstein;36.1
+02;Hamburg;46.6
+03;Niedersachsen;34.8
+04;Bremen;45.1
+05;Nordrhein-Westfalen;37.8
+06;Hessen;36.2
+07;Rheinland-Pfalz;33.2
+08;Baden-Württemberg;34.9
+09;Bayern;36.1
+10;Saarland;35.2
+11;Berlin;49.1
+12;Brandenburg;34.5
+13;Mecklenburg-Vorpommern;37.5
+14;Sachsen;39.1
+15;Sachsen-Anhalt;37.1
+16;Thüringen;35.7
