@@ -8,7 +8,6 @@ reference-location: margin
 citation-location: margin
 format:
   pdf:
-    title: "WIP: Do climate protests lead to more attention to the climate crisis?"
     number-sections: true
     colorlinks: true
     mainfont: "Lato Light"

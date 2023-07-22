@@ -42,11 +42,11 @@ There are multiple potential proxies for policy decisions: Election outcomes, pu
 
 Within public discourse, there is a gradual tradeoff of media that is close to the legislative process, and media that is close to current affairs such as protest events. Parliamentary debate accompanies legislation and contains also the opinion of opposition parties on the laws. Parliamentary questions have fewer impact on policy, but may reveal what politicians are concerned about. Political debates outside the parliament, such as talk shows on television, may be even more responsive to current affairs. National newspapers and magazines drive political discourse forward in smaller steps, and are in turn influenced by the reports and discussions emerging from local newspapers. They report on real-world events, and on press agency releases, and on issues that are reported and discussed by Twitter users.
 
-![Observable layers of public discourse. Adapted from a graphic from Stewart Brand [via @branderLayeredProtocols2022].](img/discourse-layering.png){.column-margin #fig-wheel}
+![Observable layers of public discourse. Adapted from a graphic from Stewart Brand [via @branderLayeredProtocols2022].](figures/discourse-layering.png){.column-margin #fig-wheel}
 
 The end of this ladder of discourse -- compare figure @fig-wheel -- is very remote from having influence on policy; but it has the benefit that data is available on a much grander scale and frequency, which facilitates big data analyses (see figure @fig-lamppost).
 
-!["Looking under the lamppost" by [Sketchplanations](https://sketchplanations.com/) (CC-BY-NC)](img/lamppost.png){.column-margin #fig-lamppost}
+!["Looking under the lamppost" by [Sketchplanations](https://sketchplanations.com/) (CC-BY-NC)](figures/lamppost.png){.column-margin #fig-lamppost}
 
 I use public discourse, specifically newspapers, as a proxy for policy decisions. They are suitable for data analysis because data is available for every single day and also on a regional level, and the amount of data is sufficiently large such that trends in word and article counts are relatively smooth. I assume that attention in newspaper coverage has an indirect long-term effect on policy outcomes, where more attention leads -- other things being equal -- to more effective policies.
 

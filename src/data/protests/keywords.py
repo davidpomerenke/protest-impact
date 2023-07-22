@@ -1,9 +1,8 @@
-import re
 from itertools import chain
 
 import yaml
 
-from src import project_root
+from src.paths import _root
 
 abbreviations = dict(
     FFF="Fridays for Future",
@@ -16,7 +15,7 @@ abbreviations = dict(
     OTHER_CLIMATE_ORG="Other",
 )
 
-with open(project_root / "protest_impact" / "data" / "protests" / "keywords.yaml") as f:
+with open(_root / "src/data/protests/keywords.yaml") as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
 
 treatment_keywords = config["treatment_keywords"]

@@ -3,7 +3,7 @@
 :::{.column-page}
 \begingroup
 \scriptsize\selectfont
-\csvautobooktabular[separator=semicolon,respect sharp=true]{/Users/david/Repositories/protest-impact/src/data/protests/german_protest_registrations/gpreg-overview-pretty.csv}
+\csvautobooktabular[separator=semicolon,respect sharp=true]{/Users/david/Repositories/protest-impact/report/tables/gpreg-overview-pretty.csv}
 \endgroup
 :::
 

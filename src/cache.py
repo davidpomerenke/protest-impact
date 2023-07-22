@@ -1,9 +1,9 @@
 import requests
 from joblib import Memory
 
-from src.paths import project_root
+from src.paths import _root
 
-memory = Memory(project_root / ".cache", verbose=0)
+memory = Memory(_root / ".cache", verbose=0)
 cache = memory.cache
 
 

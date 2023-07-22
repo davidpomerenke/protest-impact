@@ -42,7 +42,7 @@ While the previous literature has mostly focused on rainfall, I consider all wea
 
 Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data, specifically from the respective capital of the region. This is a potential weakness that will be addressed later.
 
-{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
 
@@ -69,7 +69,7 @@ I make two separate regressions, one with protest occurrence, and one with prote
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
 \endgroup
 
 Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them.
@@ -88,7 +88,7 @@ An additional concern that has been identified and adjusted for by some previous
 
 I follow @negroWhichSideAre2019 in using 10-year averages for each day of the year, additionally smoothing them. I find a $\pm 14$-day window using Bayesian smoothing to deliver more satisfactory results, that is, smoother climate variables, than the $\pm 3$-day moving average applied by the authors. Using this as a long-term variable, I construct the short-term variable by subtracting the long-term variable from the original weather weather variable. Results for the short-term weather variables are displayed in @fig-weather-time-series-2.
 
-{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series-2 >}}
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series-2 >}}
 
 The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which is likely attributable to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument.
 
@@ -108,42 +108,42 @@ Predicting the change for all Berlin data:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/gap/gap.ipynb#tbl-change-regression-all >}}
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-all >}}
 \endgroup
 
 Placebo:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/gap/gap.ipynb#fig-change-regression-placebo >}}
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#fig-change-regression-placebo >}}
 \endgroup
 
 First stage for the climate protests, reasonable:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-reasonable >}}
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-reasonable >}}
 \endgroup
 
 and more suitable for 2-stage:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful >}}
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful >}}
 \endgroup
 
 and aggregated:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful-aggregated >}}
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful-aggregated >}}
 \endgroup
 
 And results for the 2nd stage (the actually interesting thing):
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
 \endgroup
 
 ### Pandemic restrictions as an instrument

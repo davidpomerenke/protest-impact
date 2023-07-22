@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from src import kill_umlauts_without_mercy, project_root
+from src import kill_umlauts_without_mercy
 from src.cache import cache
 from src.data.protests.acled import load_acled_protests
 from src.data.protests.german_protest_registrations import (

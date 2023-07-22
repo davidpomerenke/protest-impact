@@ -4,14 +4,8 @@
 # | echo: false
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-import seaborn as sns
-import statsmodels.api as sm
 from matplotlib_inline.backend_inline import set_matplotlib_formats
-from tqdm.notebook import tqdm
-
-from src.cache import cache
 
 set_matplotlib_formats("svg")
 
@@ -98,8 +92,7 @@ df["GPRep"] = "?"
 df = df.sort_values("actor")
 df = df.set_index("actor")
 df.index.name = None
-df1 = df
-Markdown(df.to_markdown()+"*hello* __world__")
+Markdown(df.to_markdown())
 ```
 \endgroup
 
@@ -216,12 +209,12 @@ Large extracts around the query keywords are available for download, but this re
 
 #### Weather
 
-{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
 
 #### Pandemic restrictions
 
-{{< embed ../src/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
 
 Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.

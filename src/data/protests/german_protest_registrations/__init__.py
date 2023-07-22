@@ -12,7 +12,7 @@ def load_german_protest_registrations() -> pd.DataFrame:
     """
 
     df = pd.read_csv(
-        interim_data / "german_protest_registrations/all-protests.csv",
+        interim_data / "german-protest-registrations/all-protests.csv",
         parse_dates=["Datum"],
     )
     df = df.rename(
