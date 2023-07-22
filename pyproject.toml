@@ -1,0 +1,77 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "protest_impact"
+version = "0.1.0"
+description = ""
+authors = ["David Pomerenke <davidpomerenke@mailbox.org>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+packages = [{include = "protest_impact"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+joblib = "^1.2.0"
+requests = "^2.28.1"
+python-dotenv = "^0.21.0"
+faker = "^15.3.4"
+pandas = "^1.5.2"
+seaborn = "^0.12.1"
+readability-lxml = "^0.8.1"
+html2text = "^2020.1.16"
+python-dateutil = "^2.8.2"
+altair = "^4.2.0"
+tqdm = "^4.64.1"
+holidays = "^0.18"
+openpyxl = "^3.0.10"
+statsmodels = "^0.13.5"
+jsonlines = "^3.1.0"
+openai = "^0.26.4"
+aiohttp = "^3.8.3"
+datasets = "^2.9.0"
+evaluate = "^0.4.0"
+scikit-learn = "^1.2.1"
+optuna = "^3.1.0"
+optuna-dashboard = "^0.8.1"
+spacy = "^3.5.0"
+transformers = "^4.26.0"
+torch = "^1.13.1"
+pyperclip = "^1.8.2"
+striprtf = "^0.0.22"
+dateparser = "^1.1.7"
+number-parser = "^0.3.0"
+pytest-playwright = "^0.3.1"
+causalpy = "^0.0.10"
+skforecast = "^0.7.0"
+numpy = "^1.24.2"
+pygam = "^0.9.0"
+geopy = "^2.3.0"
+odfpy = "^1.4.1"
+xlrd = "^2.0.1"
+munch = "^2.5.0"
+meteostat = "^1.6.5"
+linearmodels = "^4.31"
+geopandas = "^0.13.2"
+darts = "^0.24.0"
+beautifulsoup4 = "^4.12.2"
+ephem = "^4.1.4"
+tabulate = "^0.9.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.0"
+jupyter = "^1.0.0"
+ipykernel = "^6.19.2"
+pre-commit = "^2.20.0"
+black = {extras = ["jupyter"], version = "^22.12.0"}
+ipywidgets = ">=7.0 <8.0"
+line-profiler = {extras = ["ipython"], version = "^4.0.3"}
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+python_files = "protest_impact/**/*.py"
+python_functions = "test_*"
+addopts = "--ignore=protest_impact/data/news/mediacloud/scraping --ignore=protest_impact/data/protests/german_protest_reports --ignore=protest_impact/synthetic_control --ignore=protest_impact/instrumental_variable"

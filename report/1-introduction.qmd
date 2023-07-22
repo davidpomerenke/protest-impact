@@ -1,0 +1,144 @@
+<!-- ## Abstracti
+
+In the face of (Western) governmental failure to appropriately address global heating, protests appear as an effective course of action. But how does one make an effective protest, and especially not one that is counterproductive to its cause / runs counter/contrary to its cause? I investigate the impact of protest events on the number of published articles relating to the climate crisis in regional and national newspapers, as a proxy for political focus/salience/attention. In order to remove the impact of confounders such as political discourse itself or external events, I employ and compare three causal inference techniques: synthetic control regions, instrumental variables, and doubly robust regression with propensity scores. Focusing on Germany, one of the worst polluters with a rich landscape of climate protest movements, I find that XYZ.
+
+Further keywords: Computational social science, protest event analysis, agenda setting. -->
+
+## Introduction and background
+
+This master thesis aims to find out whether, and to what extent, climate protests succeed in bringing more attention to the climate crisis, as measured by the amount of newspaper coverage that they and their topic receives. While I focus on climate protests in Germany, the methods that I use, and also a large part of the data sources that I use, are also transferable to other protest movements, not only those concerning the climate.
+
+Since this is a thesis in artificial intelligence, I focus on applying, evaluating, and comparing multiple causal inference methods, that all try to answer the research question from different assumptions and methodical perspectives.
+
+### Motivation
+
+Citizens in democracies have an interest in understanding the effectiveness of protest movements, and which factors make them effective.
+
+Protests play a _crucial role_ in democracies, complementing the sometimes insufficient institutional participation. Large protest movements are known to have brought about progress that we nowadays take as indispensable, especially in the areas of civil rights and women's rights.
+
+Yet, the different forms of protest have always caused and do still cause _controversy_: Are they an appropriate means to achieve their respective goal? Should they be less radical, or perhaps more so, in order to effectively achieve that goal? There are three levels on which such questions may be of interest.
+
+1.  The __general public__ wants to know what to think of protests. Especially persons who support the goal of the protest may wish to know whether they should endorse the protest; or oppose it and advocate for alternative means to achieve that goal. Opponents of the goal may wish to denounce the protest not only on the content-level, but also by claiming that the protest is an inappropriate way to achieve that goal. Supporters may then wish to prove them wrong by referring to evidence that proves the potential effectiveness of protesting.
+
+    Making a scientific investigation in this context is a bit weird, because the result may just perpetuate existing beliefs. If one finds that protests are effective, this may increase their support and thereby make them more effective; while a negative statement may weaken their result and their effectiveness. At the same time, any scientific result may be impacted in large part by the prevailing beliefs about the effectiveness of protest. Research on this topic should therefore at least make sure that it does not implicitly aim to increase or decrease the support for protests, and should keep in mind that existing beliefs may be an important factor impacting the effectiveness of protests.
+
+2.  __Protest supporters__ want to know which organizations they should support. Grassroots movements depend on funding, be it from individuals, from intermediary funds, or from philanthropists. These parties want to invest their donations efficiently, and can often choose from a pool of organizations that aim at similar goals with differing methods. The question of cost-effectiveness arises, and while cost is easy to count, effectiveness is very hard to estimate. Existing organizations use proxy measures including the number of press articles about the protest movement^[TODO: cite Zeit on CEF], which may not be ideal. Besides comparing different organizations, donors may also wish to compare protests with alternative methods such as lobbyism or individual action.
+
+3.  __Protest organizations__ themselves want to know how they can best achieve their goals. They regularly plan new activities and need to decide on strategical points, such as:
+    -  Who do they want to address? (e. g., politicians, businesses, or the media)
+    -  How radical should they be? (e. g., whether they should respect the boundaries of public goodwill, of the law, or of nonviolence)
+    -  How much time should they invest into recruiting and marketing activities?
+    -  How much attention should they pay to symbolicism, and to an integral appearance?
+    -  What time periods should they choose? (e. g., whether to go along with external events and media attention waves, or to complement them)
+    -  What places and what timing works best?
+
+Answering these questions involves looking not only at the _impact_ of protests, but also at the _impact factors_. Here I do not study impact factors in detail, but I do compare the impacts of various climate protest movements, which may allow some inferences about strategy; and may enable further research about impact factors.
+
+__Newspaper coverage as an impact measure__
+
+Defining the kind of impact that I want to measure is notoriously hard, especially when a quantitative measure is required. Protesters aim for policy change, which is manifested in the passing of laws and in other government actions. These actions tend to be textified and publicly available, but cannot be interpreted easily. Counting how often certain terms such as "emissions reduction" are contained in law will hardly give a measure of the intended or actual effect of the law. In a climate policy context, there is the advantage that climate goals often contain quantitative emission caps or can be converted to such; but there is the problem that such goals are not always kept. Moreover, triggers such as protests typically only have a delayed effect on policy decisions, and an even more delayed effect on measurable policy outcomes such as emissions reductions, which makes it extremely hard to trace causal relationships.
+
+There are multiple potential proxies for policy decisions: Election outcomes, public opinion measured by polling, and features of various levels of public discourse.
+
+Within public discourse, there is a gradual tradeoff of media that is close to the legislative process, and media that is close to current affairs such as protest events. Parliamentary debate accompanies legislation and contains also the opinion of opposition parties on the laws. Parliamentary questions have fewer impact on policy, but may reveal what politicians are concerned about. Political debates outside the parliament, such as talk shows on television, may be even more responsive to current affairs. National newspapers and magazines drive political discourse forward in smaller steps, and are in turn influenced by the reports and discussions emerging from local newspapers. They report on real-world events, and on press agency releases, and on issues that are reported and discussed by Twitter users.
+
+![Observable layers of public discourse. Adapted from a graphic from Stewart Brand [via @branderLayeredProtocols2022].](img/discourse-layering.png){.column-margin #fig-wheel}
+
+The end of this ladder of discourse -- compare figure @fig-wheel -- is very remote from having influence on policy; but it has the benefit that data is available on a much grander scale and frequency, which facilitates big data analyses (see figure @fig-lamppost).
+
+!["Looking under the lamppost" by [Sketchplanations](https://sketchplanations.com/) (CC-BY-NC)](img/lamppost.png){.column-margin #fig-lamppost}
+
+I use public discourse, specifically newspapers, as a proxy for policy decisions. They are suitable for data analysis because data is available for every single day and also on a regional level, and the amount of data is sufficiently large such that trends in word and article counts are relatively smooth. I assume that attention in newspaper coverage has an indirect long-term effect on policy outcomes, where more attention leads -- other things being equal -- to more effective policies.
+
+### Problem statement and research questions
+
+I assume that public discourse, specifically the coverage of the climate crisis in newspapers, is a rough proxy for policy outcomes
+in the long term.^[This is discussed in section TODO: XXX.] Therefore I want to estimate the impact that protest events have on newspaper coverage^[The specific dimensions are defined in section TODO: XXX.] of the climate crisis.
+
+This poses the problem of confounding, that is, common causes of both newspaper attention and protest events: If, for example, extreme weather leads to more newspaper coverage on the one hand, and makes people more prone to protest, then it may seem as if the protest leads to more newspaper coverage, but it may not actually be the case. Other candidates for confounders include prior newspaper coverage and prior protest events themselves, as well as external events such as climate conferences, or the passing of laws. Due to these confounders, naively looking at the relationship between protests and discourse would give a biased impression, and causal inference techniques are required.
+
+I want to compare multiple causal methods and see what they can tell us about the impact of protests. My research questions are:
+
+1. Can the causal methods -- instrumental variable, synthetic control, and propensity score methods -- be applied to study the impact of protest events on newspaper attention? What limitations apply, and what problems occur? Are the estimates consistent, and how do they differ from each other and from simple regression estimates?
+
+2. What is the _Conditional Average Treatment Effect on the Treated_[^CATT] (CATT) of protest events on newspaper coverage, depending on the protest group that organized the protest?
+
+[^CATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. Since different protest groups organize very different protests, I do not study the overall ATT, but the ATT conditional on the protest group (CATT).
+
+### Ethical concerns
+
+Research on the effectiveness of protests comes with significant risks of abuse, specifically that strategic knowledge can be abused. Protests are an important part of democracy because they bring attention to the genuine demands of dissatisfied indivudals. With such _grassroot_ protests we associate an element of spontaneity[^strategy], an emotional identification of the protesters and their demands, and perhaps even an irrational component to accept great individual discomfort for an uncertain and distant outcome. But there is also the phenomenon of _astroturfing_[^astroturf], where the cause is not one of concerned individuals but one of the profit-maximization of corporations or the foreign policy of interventionalist nation states. There is high concern that astroturfed movements may make use of the tools that are developed for the support, or even just for the scientific analysis, of grassroot movements. Astroturfed movements may have more capacity and a stronger emphasis on strategy. Therefore they may use these tools more effectively than grassroots movements. Partial remedy may come from the following:
+
+  - Astroturfed movements may be harder to create and sustain than grassroots movements, so by numbers the absolute strategic advantage from such tools may be larger for grassroots movements. This is, however, completely speculative.
+  - Scientific analysis may also help to uncover astroturfing attempts. However, research on protest effectiveness is not automatically applicable to detecting astroturfing, and separate research efforts are necessary.
+
+[^strategy]: This may be too romantic a view of protest movements. Historically impactful protests such as the civil rights movement in the US have been thoroughly strategic [@englerThisUprisingHow2016].
+
+[^astroturf]: _Astroturf_ refers to a synthetic grass carpeting product, in contrast to natural grassroots. It metaphorically designates a disguised sponsored campaign, in contrast to an organic and self-organized _grassroots_ movement [@Astroturfing2023].
+
+Research on the effectiveness of protests has scientific and practical benefits, and there is an urgency behind many protest causes that may make it desirable to make them more effective. But these benefits must be carefully balanced against the risk of abuse.
+
+### The impact of protesting
+
+Research into the impact of protest movements has recently been spearheaded by a series of literature reviews and expert interviews by Ozden and Glover. In the context of effective altruism, they aim to assess how effective protest movements are as a means for political change, and what factors determine their success. In their literature review on protest outcomes [@jamesozdenLiteratureReviewProtest2022; @jamesozdenProtestOutcomesFinal2022], they conclude that _causal inferences on protest outcomes are generally challenging to draw due to confounding, and it is even harder to determine the long-term effect_. They warn that the average effect size of protests is likely over-estimated in the existing literature, due to selection bias on the level of media coverage, researcher interest, and statistical significance (publication bias). Based on their review, they estimate that protest movements (consisting of many single protest events) may raise salience and support for the issue by 2-10%, and may influence voting behavior by 1-6 percentage points. The influence on public discourse may be high in certain cases, and in the case of the Black Lives Matter movement may have amplified coverage by a factor of 10.
+
+In interviews with researchers, @jamesozdenExpertInterviewsProtest2022 establish that while there is much research on protest outcomes, the causal connections between protests and their outcomes are an underexplored research area (Robyn Gulliver); that a causal link between protests and certain outcomes is plausible, but hard to attribute to any specific protest group (Ruud Wouters); and that causal effects are typically only measurable only on a local level due to the lack of a control group at the national level. More generally, protest outcomes may be subject to confounding, and the causal arrow between protests and increased concern may point in either direction. The interviews with researchers, as well as interviews with UK policymakers [@jamesozdenPolicymakerInterviewsProtest2022], suggest that the causal effect of protest on policy is strongly if not completely mediated by public opinion.
+
+In a follow-up, [@samgloverLiteratureReviewProtest2022; @jamesozdenWhatMakesProtest2023] review the factors that causally affect the success of protest movements. They attribute a high importance to the number of participants, and to the nonviolent nature of the protest, as well as a favourable sociopolitical context, including media coverage. A moderate effect is attributed to the diversity and the unity of the movement. They also look at the so-called _radical flank effect_, a theory that moderate movements benefit from the simultaneous presence of a more radical movement for the same issue. Their review finds moderate effects from a radical flank, but only if the radical flank is also nonviolent.
+
+<!-- #### The effect of radicality
+
+spiritual vs strategic nonviolence: cite Engler
+
+radicality: cite Huet-Vaughn, maybe Teixeira, perhaps Bonasera?
+
+radical flank effect: cite Ozden, Malm -->
+
+#### The effect on public discourse
+
+
+cite Teune, Wasow, maybe Repke
+
+@barrieDoesProtestInfluence: time series effects on tweets by uk mps, recent and very nice (not strictly causal, but really plausible; or could perhaps consider it a discontinuity design)
+
+### Causal methods for determining the impact of protests
+
+cite Ozden
+
+cite Wasow
+
+effects on policy and laws: cite Bernardi, Hutter 2018, Walgrave, Agnone, ...
+
+- Instrumental variables?: application: cite Wasow, Huet-Vaughn
+
+__Causes of protests__
+
+cite Seitz
+
+#### Instrumental variables {#sec-weatherlit}
+
+Among the protest effects literature that employs causal methods, the instrumental variable method is the most commonly used method. Usually, rainfall over a period ranging from one day up to one month is used to estimate the effect of protests during that timeframe on a later outcome, where a direct influence of the weather is very unlikely. With the exception of @huet-vaughnQuietRiotCausal2013, all previous literature has a setting where they look at a fixed timeframe and compare effects across regional units. @huet-vaughnQuietRiotCausal2013 has a methodical approach that is more similar to mine, looking at a larger dataset where events are scattered across regions and also across time
+
+@collinsEconomicAftermath1960s2007 use rainfall and local political structure as instruments to investigate the effect of riot severity on the later development of property values. They use rainfall in the month following the assassination of Martin Luther King, during which many protests occurred across the US, as an instrumental variable.
+
+@madestamPoliticalProtestsMatter2013 use rainfall as an instrumental variable to measure the effect of Tea Party rallies on votes for the Republican Party in the US. They use rainfall on a single important day of Tea Party rallies across counties in the US to measure the effect of additional protesters on Republican Party vote share half a year later, finding that an additional protester leads to way more additional votes than just a single one. They also measure the effect on newspaper coverage of the Tea Party, and find increased attention especially during later important Tea Party events. They operationalize rainfall as a dummy variable of whether there were at least 0.1 inches (2.5 mm) of rainfall.
+
+@huet-vaughnQuietRiotCausal2013 investigate the effect of protest violence on protest "success" across 15 years of single (potentially multi-day) protest events in France, using precipitation and temperature as instrumental variables. They operationalize precipitation as a dummy variable representing whether there was some precipitation during any day of a series of protest days, and temperature as a dummy variable about whether the maximum temperature during these days falls in the range of 60-75° Fahrenheit (16-24° Celsius), which is derived from studies about the effect of temperature on disorderly conduct.
+
+@negroWhichSideAre2019 are interested in the effect of the size of LGBTQ protests on the presence of "movement-affiliated organizations". They use two instrumental variables, the first one measuring whether the precipitation on the protest date exceeds 2.5 mm (as per @madestamPoliticalProtestsMatter2013), and the second one being the average rainfall in the last 10 years on the $\pm3$-day window around the protest date.^[In my opinion this is a good idea but it should be labeled as a control, not as an instrument. See the next section for discussion.] They find the first instrument to have a statistically significant effect on the protest size ($p<0.01$), but not the second one ($p\geq 0.05$).
+
+@wasowAgendaSeedingHow2020 use rainfall in the month following the murder of Martin Luther King to estimate the effect of violent protests on the vote share of the Democratic Party in the US in the elections half a year later. They operationalize rainfall as "average rainfall in millimeters from weather stations within a 50 mile radius of the county center." Using two-stage least-squares regression, they find a significant shift in vote share in predominantly white counties due to protests in the first week after the assassination. They also apply placebo tests using rainfall from the week before the assassination, and from the remainder of the month after the assassination (containing only 5% of the protests from that month), and do not find significant effects for either of them, which strengthens their result.
+
+@kleinteeselinkWeatherProtestEffect2021 use rainfall as an instrument to determine the effect of the _Black Lives Matter_ protests on votes for the Democratic Party in the US. They use rainfall from the two weeks following the murder of George Floyd by the police to measure the effect of the per-county number of total protest attendees during this time window on the election half a year later. (A very similar setting as above.) They use a linear variable to operationalize rainfall. They use the "probability of rain" to control for "general climatic conditions that may correlate with voting-relevant characteristics such as the average age, income, and ethnic composition of a county." The operationalization and motivation for this are a bit unclear.^[However, I find it plausible that the rain forecast may be relevant because the organizers may decide already a few days in advance of the protest whether or not it should take place, and for this decision they cannot rely on the actual weather but merely on the forecast.] Moreover they stress the importance of taking spatial depencies into account, and solve the problem using a spatial weighting matrix. They use demographic control variables (racial composition and median age) as well as economic control variables (median income and unemployment rate) for all regression steps. Placebo tests for first-stage linear regression show that the coefficients for the effect of weather on protest attendance is much lower for time windows before the protests took place, but still highly statistically significant.
+
+@carenBlackLivesMatter2023 use multiple weather variables, also to estimate the effect of the _Black Lives Matter_ protests on votes for the Democratic Party in the US. They operationalize days with _bad weather_ as days with either a maximum temperature above 90° Fahrenheit (32° Celsius), more than 0.1 inches (2.5 mm) of precipitation, or a wind speed of more than 10 mph (16 km/h). As their instrument they use the number of days with bad weather during the month that followed the murder of George Floyd by the police. Their treatment is _protest intensity_, which they define as the logarithm[^More accurately, they use the inverse hyperbolic sine.] of the cumulative protest size, divided by the population size of the county. They use a large list of sociodemographic and political variables on the county level as control variables for all regression steps.
+
+Other literature uses instruments that are less clearly random, such as whether the protest took place on a Friday, its distance to focal points, the commute time in the city where the protest takes place, or even sociological variables concerning the political structure and efficiency. Arguing that such instruments are valid requires solid expert knowledge (and perhaps insider knowledge), and such instruments are therefore less suitable for a data-driven analysis as I envision it here. (Even the weather variable is not completely free from such problems, unfortunately, as is discussed in the next section.)
+
+### The German climate protest movement
+
+<!-- Germany is one of the worst emitters ... -->
+
+There has been little climate protest in Germany until 2018, with the exception of established environmental NGOs such as Greenpeace, and the activist formation _Ende Gelände_ (established 2015) that stages protests directly in coal mining areas. In the end of 2018, the climate movement has taken off with the founding of both the activist organization _Extinction Rebellion_ and the broad students' movement _Fridays for Future_. Since 2022 the activist formation _Letzte Generation_ is making the headlines. The smaller _End Fossil Occupy_ movement has started occupying universities mostly in 2023.
+
+The movements pursue different strategies, resulting in different public reactions. Fridays for Future organizes legal protest marches, mostly on Friday. They have been criticized for breaking the rules, and even

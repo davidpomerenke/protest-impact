@@ -1,0 +1,17 @@
+## Causal analysis via propensity score matching (TODO)
+
+For example, @bundeskriminalamtbkaLagebildLetzteGeneration2023 hypothesize that "Die Fallzahlen unterliegen einem „wellenartigen“ Verlauf, welcher sich vornehmlich durch (das Ausbleiben von) Großveranstaltungen im gleichen Kontext erklären lässt."
+
+### Propensity scores from time series data
+
+### Propensity scores from press release texts
+
+cite Wager
+
+Predicting propensity scores from text: cite causalNLP overviews
+
+### Causal methods using propensity scores
+
+#### Matching, stratification, and inverse weighting
+
+#### Double machine learning (causal forests)

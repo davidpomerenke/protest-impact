@@ -1,0 +1,1 @@
+prodigy textcat.manual_patterns protest_news_positive ../../../../data/protest/protest_news_shuffled_v2_sample_with_positive_predictions.jsonl blank:de --label relevant,irrelevant --patterns detection_patterns.jsonl -F ./manual_patterns.py

@@ -1,0 +1,23 @@
+#### Overview table
+
+:::{.column-page}
+
+\begin{tabular}{l| c c c c}
+& Regression & Instr. var. & Synth. contr. & Prop. score \\
+\hline
+Instrumenting & & \bullet &  &  \\
+Controlling & \bullet & (\bullet) & (\bullet) & (\bullet) \\
+Balancing &  &  & \bullet & \bullet \\
+\hline
+Time series & \bullet & (\bullet) & (\bullet) & \bullet \\
+Regions &  &  & \bullet &  \\
+Weather &  & \bullet &  &  \\
+Texts &  &  &  & (\bullet) \\
+\hline
+Confounders? & $\checkmark^1$ & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^4$ \\
+Hidden conf.? &  & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^{4,5}$ \\
+\end{tabular}
+
+Core assumptions: (1) Linearity; (2) Valid instrument; (3) No regional confounding; (4) Overlap; (5) Hidden confounding is captured by text. (All of these assumptions are more nuanced and discussed in the respective chapters.)
+
+:::

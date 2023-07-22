@@ -1,0 +1,227 @@
+## Data
+
+```{python}
+# | echo: false
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import statsmodels.api as sm
+from matplotlib_inline.backend_inline import set_matplotlib_formats
+from tqdm.notebook import tqdm
+
+from protest_impact.util import cache, project_root
+
+set_matplotlib_formats("svg")
+
+from protest_impact.data.protests import (
+    load_climate_protests_with_labels,
+    load_protests,
+)
+
+query = "date.dt.year in [2020, 2021, 2022] & country == 'Germany'"
+protests = load_protests().query(query)
+climate_protests = load_climate_protests_with_labels().query(query)
+```
+
+### Protest events
+
+There are generally two source types for protest events:
+
+1. __Newspaper articles__ are primarily used in the existing literature. [@hutterProtestEventAnalysis2014] give a historical and systematic overview and highlight the problem that this source is biased. They describe how several definitions for protest event analysis (PEA) and the broader political claim analysis (PCA), as well as associated coding practices have helped to formalize the (manual) data extraction process, such that results have become more valid and comparable.
+
+2. __Police archives.__ The literature dismisses this source type as "biased", uninformative about the motives and organizers, uncomparable across regions, often unavailable or unobtainable, and because it is restricted to only registered demonstrations (Hutter 2014; @ProtestlandschaftDeutschland; @wiedemannGeneralizedApproachProtest2022). This criticism appears to me valid but overgeneralized, and there may well be regions where the advantages prevail over the problems. Especially for the goal of impact estimation, the avoidance of selection biases that are associated with newspaper articles [Hutter 2014; @jamesozdenLiteratureReviewProtest2022] is a strong argument for using data from police and demonstration authorities.
+
+```{python}
+# | label: fig-protest-history
+# | fig-cap: History of the number of protest events in Germany per week.
+# | column: page
+# | echo: false
+
+df = climate_protests.copy()
+df = (
+    df.groupby(["date", "source"])["actor"]
+    .count()
+    .unstack()
+    .fillna(0)
+    .astype(int)
+    .reset_index()
+)
+df = df.set_index("date")
+df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg"))
+df = df.resample("1W").sum()
+df.plot(
+    figsize=(14, 1.5),
+    title="Number of climate protests in Germany per week",
+    linewidth=1,
+    ylabel="#protests",
+)
+plt.show()
+```
+
+#### ACLED and other existing protest datasets
+
+My main data source for protest events is the [_Armed Conflict Location and Event Dataset_](https://acleddata.com/) (ACLED; @raleighIntroducingACLEDArmed2010a). ACLED is a grand effort that keeps track not only of violent conflicts and riots, but also of ordinary protest events. The data is human-curated based on newspaper reports, and contains coded information on dates, locations, actor groups, police interventions, and more, as well as a short free-text summary for each event, containing an estimate of the size as per the newspaper data source. Data for Germany is available starting from 2020 and is continuously updated. For the period from 2020-2022, it contains 13235 protest events, 1314 of which are organized by climate protest groups or mention the climate in their description.
+
+<!-- For the period from 2020-2022, it contains `{python} len(protests.query("source == 'acled'"))` protest events, `{python} len(climate_protests.query("source == 'acled'"))` of which are organized by climate protest groups or mention the climate in their description. -->
+
+Alternative existing sources of German or international protest data comprise [ProDat](https://www.wzb.eu/de/forschung/beendete-forschungsprogramme/zivilgesellschaft-und-politische-mobilisierung/projekte/prodat-dokumentation-und-analyse-von-protestereignissen-in-der-bundesrepublik)^[See also [Protestlandschaft Deutschland](https://protestdata.eu/methods). for additional data and interactive visualizations], [PolDem](https://poldem.eui.eu/download/protest-events/), the [Mass Mobilization Project](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HTTWYL), and the event database [GDELT](https://www.gdeltproject.org/). They do not cover recent years or are not very complete, and therefore inferior to ACLED for my purposes.
+
+#### The German Protest Registrations dataset
+
+
+\begingroup
+\scriptsize\selectfont
+```{python}
+# | label: tbl-protest-groups
+# | tbl-cap: Number of protest events 2020-2022 by protest group in the different data sources.
+# | column: margin
+# | echo: false
+
+from protest_impact.data.protests.keywords import abbreviations
+from IPython.display import Markdown
+
+df = climate_protests.copy()
+df = (
+    df.groupby(["actor", "source"])["date"]
+    .count()
+    .unstack()
+    .rename_axis(None, axis=1)
+    .fillna(0)
+    .astype(int)
+    .reset_index()
+)
+df["actor"] = df["actor"].apply(lambda x: abbreviations[x])
+df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg"))
+df["GPRep"] = "?"
+df = df.sort_values("actor")
+df = df.set_index("actor")
+df.index.name = None
+df1 = df
+Markdown(df.to_markdown()+"*hello* __world__")
+```
+\endgroup
+
+Protest statistics are often recorded by public authorities, either when organizers register a future demonstrations, or when the police reports about a past demonstration. Registering a demonstration is a common requirement for exercising the right to protest in European countries, however this requirement is only fulfilled by moderate protests, while more radical protests may purposefully ignore it and are thus not listed in such records. Often the estimated number of expected protesters is also recorded, but it is of course not reliable, and reliability may vary between different protest organizers. Police estimates of past demonstrations should be more reliable and consistent, however with the possibility for systematic bias, such as generally downplaying the number of participants, or specifically downplaying the number of participants for protests that are critical of the government or the police themselves.
+
+\begingroup
+\scriptsize\selectfont
+```{python}
+# | label: tbl-protest-most-common
+# | tbl-cap: Number of protest events for the five most busy climate protest days 2020-2022. Future work might explore the impact of celestial events (such as the equinoxes) on protest activity.
+# | column: margin
+# | echo: false
+
+df = climate_protests.copy()
+df = (
+    df.groupby(["date", "source"])["notes"]
+    .count()
+    .unstack()
+    .fillna(0)
+    .astype(int)
+    .reset_index()
+)
+df = df.set_index("date")
+df["mean"] = (df["acled"] + df["gpreg"]) / 2
+df = df.sort_values("mean", ascending=False)
+df = df.drop(columns=["mean"])
+df = df.head(5).sort_values("date")
+df = df.reset_index()
+df["date"] = df["date"].dt.strftime("%Y-%m-%d")
+df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg"))
+df = df.set_index("date")
+df.index.name = None
+df = df.rename_axis(None, axis=1)
+df["GPRep"] = "?"
+Markdown(df.to_markdown())
+```
+\endgroup
+
+Official documents, including protest statistics, can be obtained via _Freedom of Information_ laws. These exist in more than 100 countries and allow anyone to obtain public documents [@FreedomInformationLaws2023]. The specific requirements, exceptions, and costs vary greatly. In Germany, freedom of information exists on the federal level; but many authorities belong to the regional level, where the extent of freedom of information rights varies greatly [@InformationsfreiheitDeutschlandTransparenzranking]; and municipal authorities are not always covered by regional freedom of information laws, sometimes filling the gap with their own legislation.
+
+Access to public documents has been democratized via platforms that streamline the process of sending requests, escalating the process to oversight authorities or courts if necessary, and making communication and obtained documents available to the public. The [Alaveteli](http://alaveteli.org/) network provides software and hosts such platforms in more than 30 countries across the world. Some independent platforms also exist, such as [Öffentlichkeitsgestz.ch](https://www.oeffentlichkeitsgesetz.ch/) in Switzerland, and _FragDenStaat_ [in Austria](https://fragdenstaat.at/) and [in Germany](https://fragdenstaat.de/). These open the possibility of obtaining official protest data at scale.
+
+__Collection.__ I send 40 freedom of information requests to German demonstration authorities (depending on the region these are either part of the municipal administrations or of the police) and their supervisory bodies concerning protest data in 31 cities. These cities comprise the political capitals of all 16 regions in Germany, the 17 largest cities by population size, as well as some smaller cities for regions where the request in the regional capital is unsuccessful. 4 requests are not answered, 3 are rejected, 11 state that they do not possess such data, 2 have to be withdrawn due to demanded payments of multiple hundreds of euros, and 20 are been partially or completely successful. This yields 17 table documents with various amounts of information. The requests and responses including the original data files can be found at [FragDenStaat](https://fragdenstaat.de/anfragen/?q=demonstration+csv&first_after=2022-12-01&first_before=2023-07-31).
+
+__Cleaning.__ I ignore one of the datasets (Augsburg) because I cannot convert the delivered PDF back to a table, two of them (Saarbrücken and Freiburg) because the data is too unstructured or requires too much cleaning, and one (Duisburg) because the data is delivered very late. The remaining 13 data tables are cleaned manually. One common problem is that the tables specify events that have a duration of multiple days, in some cases even multiple months. Out of concern for a simple data structure, as well as doubt whether these demonstrations really lasted so long, I reduce their duration to the single day when they start.
+
+__Dataset__. The resulting dataset contains 49,800 events from 13 cities. For 11 cities the ex-ante number of expected participants are given, and for 2 of them (Berlin and Magdeburg) the ex-post extimates by the police are also included. For all cities the topic of the protest is given in, presumably as specified by the organizers themselves; and for 4 cities the name of the organizing group is also known. Various additional details such as exact specifications of location, time and duration, and distinctions between protest marches and pickets are available for some of the cities but not in any systematic manner. Further statistics about the dataset can be seen in table tbl-official-overview.
+
+{{< embed ../protest_impact/data/protests/german_protest_registrations/data_map.ipynb#data-official-map >}}
+
+
+#### The German Protest Reports dataset
+
+[@wiedemannGeneralizedApproachProtest2022] demonstrate how the use of transformer models can now reliably take over the classification of relevant protest articles. They achieve an F1-score of 94% using on a homogeneous train-test split (data from the same newspaper and timespan), and 75% for training and testing on different newspaper sources. The automatic coding of more fine-grained coding units is an open research problem, which may eventually be solved en passant by applying more advanced large language models.
+
+@wiedemannGeneralizedApproachProtest2022 show how to detect protest events in newspaper articles. They employ the [`gelectra-large`](https://huggingface.co/deepset/gelectra-large) model, a transformer model that is fine-tuned on German texts of various genres. Their dataset consists of almost 4000 newspaper articles from 4 German cities, namely Leipzig, Dresden, Stuttgart, and Bremen, from between 2009 and 2016.
+
+I replicate their results and obtain F1-scores of 0.93 for in-distribution and 0.76 for out-of-distribution classification, which is almost identical to the authors' results. I try out some alternative approaches on their data: Simple machine learning models based on TFIDF-features; finetuning the more recent multilingual FlanT5 model; and using GPT 3.0 in a zero-shot setting. None of the alternatives perform closely to the `gelectra-large` model (see @tbl-glpn-alternative-methods for metrics).
+
+\begingroup
+\small\selectfont
+
+| Model    | id F1 | ood F1 |
+|----------|------:|-------:|
+| XG-Boost | 0.87  | 0.60   |
+| FlanT5   | 0.75  | 0.30   |
+| GPT3     | 0.81  | 0.65   |
+| gElectra | 0.93  | 0.76   |
+
+: Results for using alternative classification methods on the GLPN dataset, for in-distribution (id) and out-of-distribution (ood) prediction. {#tbl-glpn-alternative-methods .column-margin}
+
+\endgroup
+
+In order to obtain protest events from a broader geographic spectrum, I retrieve metadata of online newspaper articles from MediaCloud (see @sec-mediacloud) for a query containing protest-related keywords.^[The query is based on the query used by Wiedemann, and reads: _'protest* OR demo OR demonstr* OR kundgebung OR versamm* OR "soziale bewegung" OR hausbesetz* OR streik* OR unterschriften* OR petition OR hasskriminalität OR unruhen OR aufruhr OR aufstand OR rebell* OR blockade OR blockier* OR sitzblock* OR boykott* OR riot OR aktivis* OR bürgerinitiative OR bürgerbegehren OR marsch OR aufmarsch OR parade OR mahnwache OR hungerstreik OR "ziviler ungehorsam"'_] From the obtained metadata, I scrape full-texts where possible. Special care is taken of website that appear scrapeable but contain only gibberish, by observing the distribution of letters.
+
+{{< embed ../protest_impact/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-ts >}}
+
+I label the texts myself using [Prodigy](https://prodi.gy/). For the positive class, I require that the article is a report about (potentially among other topics) a recent past protest event, and that basic details including the place and the protest concern are given. The other articles are mostly about completely different topics (such as "protest" but not in the political sense, or "demonstration" in the sense of showing something, "blockade" in a physical context, or the "protest-ant" church); or they mention protests in the context of an op-ed or an interview, where the concreteness and recency of the events is often not given.
+
+{{< embed ../protest_impact/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-sources >}}
+
+In a first labeling phase, I annotate 650 random articles for training and 500 random articles for evaluation. I train the model and use 500 articles that are predicted positive and label them as well and add them to the training data, in order to combat class imbalance. Training the `gelectra-large` model with the overall 1150 training samples and according to the hyperparameters suggested by Wiedemann, I finally obtain an in-distribution F1-score of 0.78 (precision=0.81, recall=0.75). Then, I use this model to predict the relevance of all the other scraped articles that contain protest-related keywords. Only 11% are relevant, resulting in 20,879 articles of which the (relatively good) model believes that they describe protest events.
+
+\begingroup
+\color{Red}TODO: Extraction of dates, locations, protest groups.
+\endgroup
+
+### Public discourse
+
+This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query. This could be expanded in two dimensions:
+
+- __Using more interesting metrics__, such as how prominent the keywords are within each article, and what other words they cooccur with most, and what sentiments they are accompanied by. Another approach would be the use of topic models to create topics in an unsupervised manner, and observe how their prevalence shifts in the face of protests. All of these techniques require full-text data. For newspaper articles, full-text data is in principle available, but very hard to obtain (see @sec-mediacloud-fulltexts, @sec-dereko-fulltexts).
+- __Using other types of discourse__, such as Twitter data (@kratzkeMonthlySamplesGerman2023: a sample of full texts from Germany on a daily basis 2019-2022), [Google Trends](https://trends.google.com/) data (search query counts on a weekly and regional basis starting from 2005), or parliamentary speech (@abramiGermanParliamentaryCorpus2022: speeches from regional German parliaments from the nineties until 2021). paralimantery questions @hutterWhoRespondsProtest2018
+
+#### Online newspapers {#sec-mediacloud}
+
+##### Full-text availability {#sec-mediacloud-fulltexts}
+
+Only metadata is contained in the Mediacloud service (see below), and the full texts need to be scraped from the links given there. The problem is that some newspapers undertake measures to prevent scraping, or to slow it down immensely, such that a _complete_ collection of full texts is illusionary. Focusing on full texts from a small set of newspapers, such as "newspapers of record", may be a more feasible route for future research.
+
+#### Print newspapers
+
+xyz
+
+##### Full-text availability {#sec-dereko-fulltexts}
+
+Large extracts around the query keywords are available for download, but this requires scraping the user interface and is complicated and slow. Obtaining daily word counts is much faster.
+
+#### Press releases
+
+["My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive [...]." ([LexisNexisTools](https://cran.r-project.org/web/packages/LexisNexisTools/index.html))]{.aside}
+
+### Instruments
+
+#### Weather
+
+{{< embed ../protest_impact/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
+
+Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
+
+#### Pandemic restrictions
+
+{{< embed ../protest_impact/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
+
+Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.

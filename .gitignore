@@ -1,3 +1,7 @@
+# Quarto HTML versions of notebooks
+*_files/
+*.ipynb.html
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

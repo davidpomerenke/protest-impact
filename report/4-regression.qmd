@@ -1,0 +1,6 @@
+## Controlling and balancing with historic variables
+
+TODO
+### Without controls
+
+### Controlling for historic values

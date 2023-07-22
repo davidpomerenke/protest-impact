@@ -1,0 +1,82 @@
+---
+subtitle: Investigating the causal impact of protest events on newspaper coverage of protests and protest matter
+author: David Pomerenke
+toc: true
+toc-depth: 5
+---
+
+# WIP: Do climate protests lead to more attention to the climate crisis?
+
+\newpage
+
+{{< include 1-introduction.qmd >}}
+
+\newpage
+
+{{< include 2-data.qmd >}}
+
+\newpage
+
+{{< include 3-modeling.qmd >}}
+
+\newpage
+
+{{< include 4-regression.qmd >}}
+
+\newpage
+
+{{< include 5-instrumental-variable.qmd >}}
+
+\newpage
+
+{{< include 6-synthetic-control.qmd >}}
+
+\newpage
+
+{{< include 7-propensity-scores.qmd >}}
+
+\newpage
+
+## Results
+
+Factors
+- different movements = protest radicality
+- protest size
+
+\newpage
+
+## Discussion
+
+- the large variation (with negative impact for many individual protests) could either be a measurement error (then there would actually be only positive impacts), or it could be due to unobserved factors, and there might actually be negative impact. Reducing the error or finding the other factors is crucial for future work to enable recommendations for protesters.
+
+### Comparison of results
+
+### Comparison of limitations
+
+## Conclusion
+
+### Implications
+
+### Transferability to other protests
+
+### Future work
+
+impact on policy
+
+RL approaches
+
+Other causal approaches
+- instrumental variables
+- Backdoor via Path models?: cite Pearl, maybe Iamnitchi, maybe Runge
+
+\newpage
+
+## Nontechnical summary
+
+\newpage
+
+## Appendix
+
+{{< include 2-2-1-gpreg-table.qmd >}}
+
+{{< include 5-1-placebo-tests.qmd >}}
