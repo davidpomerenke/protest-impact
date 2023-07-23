@@ -50,7 +50,7 @@ The end of this ladder of discourse -- compare figure @fig-wheel -- is very remo
 
 I use public discourse, specifically newspapers, as a proxy for policy decisions. They are suitable for data analysis because data is available for every single day and also on a regional level, and the amount of data is sufficiently large such that trends in word and article counts are relatively smooth. I assume that attention in newspaper coverage has an indirect long-term effect on policy outcomes, where more attention leads -- other things being equal -- to more effective policies.
 
-### Problem statement and research questions
+### Problem statement and research questions {#sec-problem}
 
 I assume that public discourse, specifically the coverage of the climate crisis in newspapers, is a rough proxy for policy outcomes
 in the long term.^[This is discussed in section TODO: XXX.] Therefore I want to estimate the impact that protest events have on newspaper coverage^[The specific dimensions are defined in section TODO: XXX.] of the climate crisis.
@@ -63,7 +63,9 @@ I want to compare multiple causal methods and see what they can tell us about th
 
 2. What is the _Conditional Average Treatment Effect on the Treated_[^CATT] (CATT) of protest events on newspaper coverage, depending on the protest group that organized the protest?
 
-[^CATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. Since different protest groups organize very different protests, I do not study the overall ATT, but the ATT conditional on the protest group (CATT).
+3. What can we say about the hypothesis that climate protests _distract_ from discussing solutions to the climate crisis constructively?
+
+[^CATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. Since different protest groups organize very different protest forms, I do not study the overall ATT, but the ATT conditional on the protest group (CATT).
 
 ### Ethical concerns
 

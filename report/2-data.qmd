@@ -1,5 +1,7 @@
 ## Data
 
+All data are retrieved for the years 2020-2022, because _ACLED_ is not available earlier, and _DeReKo_ is only released yearly with some delay and not available for 2023 at the time of writing. All data sources are also expected to be available for the next years, with the exception of data related to the COVID-19 pandemic.
+
 ```{python}
 # | echo: false
 
@@ -150,7 +152,7 @@ __Dataset__. The resulting dataset contains 49,800 events from 13 cities. For 11
 
 @wiedemannGeneralizedApproachProtest2022 show how to detect protest events in newspaper articles. They employ the [`gelectra-large`](https://huggingface.co/deepset/gelectra-large) model, a transformer model that is fine-tuned on German texts of various genres. Their dataset consists of almost 4000 newspaper articles from 4 German cities, namely Leipzig, Dresden, Stuttgart, and Bremen, from between 2009 and 2016.
 
-I replicate their results and obtain F1-scores of 0.93 for in-distribution and 0.76 for out-of-distribution classification, which is almost identical to the authors' results. I try out some alternative approaches on their data: Simple machine learning models based on TFIDF-features; finetuning the more recent multilingual FlanT5 model; and using GPT 3.0 in a zero-shot setting. None of the alternatives perform closely to the `gelectra-large` model (see @tbl-glpn-alternative-methods for metrics).
+__Replication and experiments:__ I replicate their results and obtain F1-scores of 0.93 for in-distribution and 0.76 for out-of-distribution classification, which is almost identical to the authors' results. I try out some alternative approaches on their data: Simple machine learning models based on TFIDF-features; finetuning the more recent multilingual FlanT5 model; and using GPT 3.0 in a zero-shot setting. None of the alternatives perform closely to the `gelectra-large` model (see @tbl-glpn-alternative-methods for metrics).
 
 \begingroup
 \small\selectfont
@@ -180,32 +182,67 @@ In a first labeling phase, I annotate 650 random articles for training and 500 r
 \color{Red}TODO: Extraction of dates, locations, protest groups.
 \endgroup
 
-### Public discourse
+### Public discourse {sec-data-discourse}
 
-This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query. This could be expanded in two dimensions:
+This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query.
 
-- __Using more interesting metrics__, such as how prominent the keywords are within each article, and what other words they cooccur with most, and what sentiments they are accompanied by. Another approach would be the use of topic models to create topics in an unsupervised manner, and observe how their prevalence shifts in the face of protests. All of these techniques require full-text data. For newspaper articles, full-text data is in principle available, but very hard to obtain (see @sec-mediacloud-fulltexts, @sec-dereko-fulltexts).
-- __Using other types of discourse__, such as Twitter data (@kratzkeMonthlySamplesGerman2023: a sample of full texts from Germany on a daily basis 2019-2022), [Google Trends](https://trends.google.com/) data (search query counts on a weekly and regional basis starting from 2005), or parliamentary speech (@abramiGermanParliamentaryCorpus2022: speeches from regional German parliaments from the nineties until 2021). paralimantery questions @hutterWhoRespondsProtest2018
+__Queries:__ I use queries that allow to examine how many mentions of climate change occur in newspaper articles overall, and how this is further subdivided. I formulate 5 sub-queries (the full word lists are found in @sec-app-queries):
 
-![](figures/queries.svg){width=50% .column-margin}
+- _Topic:_ Whether an article mentions climate change or climate policy.
+- _Protest:_ Whether an article mentions protest activity (including both general terms, and terms and organization names that are specific to the climate movement).
+- _Framing:_ Whether more dramatic words than "climate change" are used, such as "climate crisis", "climate catastrophy", etc.
+- _Goals_: Whether long-term goals of the climate movement such as carbon neutrality are mentioned.
+- _Subsidiary goals:_ Whether more concrete measures such as a speed limit for cars, or a citizen's assembly on climate change are mentioned.
+
+From these sub-queries, I use the _topic_ query as a standalone query, and combine each of the other queries with the _topic_ query to make sure that the terms are actually used in the context of climate change. (Many of the terms have an unambiguous relation to climate change anyway, but some, such as the protest forms or specific solutions, could also appear in other contexts.) I retrieve absolute article counts for each query, aggregated daily on the regional or on the national level.
+
+The queries allow me to study not only research question 2 (how much overall coverage of climate change is affected); but also (to some extent) to investigate research question 3 (whether this does not backfire by focusing the discussion on the protests rather than the policy issues):
+
+- If the article counts for the _topic `and not` protest_^[This query can be derived from the other queries logically.] query remain constant or even increase due to protests, then this is strong evidence that the protests do not backfire; and if it increases, then their effect is very strong such that they cause more discussion even when the protests are not themselves a topic. A decrease of the article count for this query does not tell us much, since it could still be, or not be, that relevant contents are transported as part of he articles that also mention protests.
+
+- The other queries (_topic `and` framing_, _topic `and` goal_, _topic `and` subisidiary goal_) aim to look at topics where it would be a success for the protests if they occur more in public discourse. If their article counts increase due to protests, then backfiring is unlikely (but still possible in other topic niches that I am not querying for); and if they decrease, it is strong evidence that the protests are indeed backfiring. A result where the counts for some of these queries increase, while they decrease for others may indicate more complicated effects of protests that warrant further research.
+
+- The _topic `and` protest_ query can serve as a sanity check: It would be very surprising if protest events did not cause the counts for this query to markedly increase. This is even more true for the _ACLED_ and _GPRep_ datasets, where the events are (manually or automatically) extracted from newspaper articles.
+
+![The queries produce different lenses on the mass of articles about climate change. The left lens has the disadvantage that we do not know how much the articles that also mention the protests contribute to the discourse about the topic. The right lens has the disadvantage that it ignores aspects that we do not explicitly query for.](figures/queries.svg){.column-margin}
+
+__Limitations:__ The querying approach that I employ for this study is very coarse, and will deliver clear conclusions only in some cases. It would also be very interesting to see how much room is typically given to the discussion of climate policy in an article that also mentions protests. Moreover, one could measure how prominent the various keywords are within each article, and what other words they cooccur with most, and what sentiments they are accompanied by. Another approach would use topic models to create topics in an unsupervised manner, and observe how their prevalence shifts in the face of protests. All of these techniques require full-text data. For newspaper articles, full-text data is in principle available, but relatively hard to obtain (see the notes on fulltext availability in @sec-mediacloud, @sec-dereko); so I have not used full-texts here, in order to focus more on the causal aspect.
+
+__Other types of public discourse__ could also be explored in future work. This includes Twitter data (@kratzkeMonthlySamplesGerman2023: a sample of full texts from Germany on a daily basis 2019-2022), [Google Trends](https://trends.google.com/) data (search query counts on a weekly and regional basis starting from 2005), or parliamentary speech (@abramiGermanParliamentaryCorpus2022: speeches from regional German parliaments from the nineties until 2021). Twitter data does not come with geographical annotations, and Google Trends and parliamentary speech are not available on a continuous daily basis, so I focus on newspaper articles here.
 
 #### Online newspapers {#sec-mediacloud}
 
-##### Full-text availability {#sec-mediacloud-fulltexts}
+```{python}
+# | label: fig-mediacloud-history
+# | fig-cap: TODO.
+# | column: page
+# | echo: false
 
-Only metadata is contained in the Mediacloud service (see below), and the full texts need to be scraped from the links given there. The problem is that some newspapers undertake measures to prevent scraping, or to slow it down immensely, such that a _complete_ collection of full texts is illusionary. Focusing on full texts from a small set of newspapers, such as "newspapers of record", may be a more feasible route for future research.
+from src.data.news.mediacloud.word_counts import counts_for_region
+from src.data.protests.keywords import climate_queries
 
-#### Print newspapers
+fig, ax = plt.subplots(figsize=(14, 2))
+for k, v in climate_queries().items():
+    df = counts_for_region(v, "Bayern")
+    df = df.set_index("date")
+    # df["count"] = df["count"] / df["count"].mean()
+    df =df.query("date >= '2020-01-01' and date <= '2022-12-31'")
+    df.rolling(28).mean().plot(ax=ax)
+ax.legend(climate_queries().keys())
+ax.set_title("Bayern")
+plt.show()
+```
 
-xyz
+[Media Cloud](https://www.mediacloud.org/) is an open data platform that continuously crawls newspaper websites around the world and stores article metadata and word counts in a database. Full texts are in principle available by following the links and scraping the websites oneself, but this is very slow and often hampered by anti-scraping measures of the websites. I use the [`api/v2/stories_public/count`](https://github.com/mediacloud/backend/blob/master/doc/api_2_0_spec/api_2_0_spec.md#apiv2stories_publiccount) endpoint of their API. I query for tags from the [regional and national collections about Germany](https://search.mediacloud.org/collections/news/geographic). Baden-Württemberg and Mecklenburg-Vorpommern are missing from the collection. There has been a (partial) outage in January 2022 resulting in (near-)zero counts for that timespan. I do not exclude this timespan because it would be complicated and error-prone with respect to time-series analysis. This may lead to an under-estimation of eventual causal effect sizes of up to $\frac{1}{36}\approx 0.028$, but I do not expect it to influence my results in any other systematic way.
 
-##### Full-text availability {#sec-dereko-fulltexts}
+#### Print newspapers {#sec-dereko}
 
-Large extracts around the query keywords are available for download, but this requires scraping the user interface and is complicated and slow. Obtaining daily word counts is much faster.
+
+__Full-text availability:__ Large extracts around the query keywords are available for download, but this requires scraping the user interface and is complicated and slow. Obtaining daily word counts is much faster.
 
 #### Press releases
 
-["My PhD supervisor once told me that everyone doing newspaper analysis starts by writing code to read in files from the 'LexisNexis' newspaper archive [...]." ([LexisNexisTools](https://cran.r-project.org/web/packages/LexisNexisTools/index.html))]{.aside}
+
 
 ### Instruments
 
@@ -220,3 +257,5 @@ Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) pro
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
 
 Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.
+
+TODO: Needs control for COVID word counts.

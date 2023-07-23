@@ -23,9 +23,9 @@ df.to_csv(tables / "gpreg-overview.csv", sep=";")
 \endgroup
 :::
 
-Table: Official overview. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available; _incl?_ = whether the data is used in this thesis.
+Table: Overview of the German Protest Registrations (GPReg) dataset. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available; _incl?_ = whether the data is used in this thesis.
 
-### Queries for retrieving article counts
+### Queries for retrieving article counts {#sec-app-queries}
 
 ```{python}
 # | echo: False
@@ -45,3 +45,5 @@ df.to_csv(tables / "queries.csv", index=False)
 \csvautobooktabular[separator=comma,respect all]{/Users/david/Repositories/protest-impact/report/tables/queries.csv}
 \endgroup
 :::
+
+Table: Queries for retrieving article counts from online and print newspapers. The words for each category are joined by `OR` operators, and the resulting sub-queries are further combined as described in @sec-data-discourse. The query for the protest events is adapted from @wiedemannGeneralizedApproachProtest2022.
