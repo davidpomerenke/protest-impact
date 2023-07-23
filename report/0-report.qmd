@@ -75,8 +75,4 @@ Other causal approaches
 
 \newpage
 
-## Appendix
-
-{{< include 2-1-gpreg-table.qmd >}}
-
-{{< include 5-1-placebo-tests.qmd >}}
+{{< include 12-appendix.qmd >}}

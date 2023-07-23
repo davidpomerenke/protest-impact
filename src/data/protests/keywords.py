@@ -1,5 +1,6 @@
 from itertools import chain
 
+import pandas as pd
 import yaml
 
 from src.paths import _root
@@ -78,6 +79,15 @@ def climate_queries(mode="default", short=False):
     goal_keywords = movement_keywords["climate"]["goal"]
     subsidiary_goal = movement_keywords["climate"]["subsidiary_goal"]
 
+    if mode == "raw":
+        return dict(
+            topic=topic_keywords,
+            protest=protest_keywords,
+            framing=framing_keywords,
+            goal=goal_keywords,
+            subsidiary_goal=subsidiary_goal,
+        )
+
     protest = join(protest_keywords, mode=mode, short=short)
     topic = join(topic_keywords, mode=mode, short=short)
     framing = join(framing_keywords, mode=mode, short=short)
@@ -93,3 +103,14 @@ def climate_queries(mode="default", short=False):
         goal=f"({topic}) AND ({goal})",
         subsidiary_goal=f"({topic}) AND ({subsidiary_goal})",
     )
+
+
+def climate_query_table():
+    qs = climate_queries(mode="raw")
+    qs = {
+        k: [v.replace("\\", "") for v in vs if not v.startswith("?")]
+        for k, vs in qs.items()
+    }
+    maxlen = max([len(v) for v in qs.values()])
+    df = pd.DataFrame({k: v + [""] * (maxlen - len(v)) for k, v in qs.items()})
+    return df
