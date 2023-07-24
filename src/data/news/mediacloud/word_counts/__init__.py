@@ -1,11 +1,10 @@
 import re
-from datetime import date
 from os import environ
 
 import pandas as pd
 from dotenv import load_dotenv
 
-from src import kill_umlauts_without_mercy
+from src import end, kill_umlauts_without_mercy, start
 from src.cache import get_cached
 from src.data.news.mediacloud.newspaper_collections import region_tags
 
@@ -20,13 +19,15 @@ load_dotenv()
 
 
 def counts_for_region(
-    q: str, region: str, start_date: pd.Timestamp = None, end_date: pd.Timestamp = None
+    q: str, region: str, start_date: pd.Timestamp = start, end_date: pd.Timestamp = end
 ) -> pd.DataFrame:
     region_query = "tags_id_media:" + str(to_mediacloud_region(region))
     return counts(q, region_query, start_date, end_date)
 
 
-def counts(q: str, fq: str, start: pd.Timestamp, end: pd.Timestamp) -> pd.DataFrame:
+def counts(
+    q: str, fq: str, start: pd.Timestamp = start, end: pd.Timestamp = end
+) -> pd.DataFrame:
     _start_date = pd.Timestamp("2015-01-01")
     _end_date = pd.Timestamp("2023-06-30")
     assert start is None or start >= _start_date, "Start date "

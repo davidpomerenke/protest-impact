@@ -14,14 +14,5 @@ def counts_for_region(
     end_date:
     source: one of "dereko", "mediacloud"
     """
+    # if source == "mediacloud":::::
     return mediacloud(q=query, region=region, start_date=start, end_date=end)
-
-
-# # TODO:
-# def proportions_for_region(q, region, start_date=None, end_date=None) -> pd.DataFrame:
-#     # the #articles containing "und" is an approximation of the total #articles
-#     q1, q2 = q, "und"
-#     df1 = counts(q1, region, start_date, end_date)
-#     df2 = counts(q2, region, start_date, end_date).rolling(28, center=True).mean()
-#     df1["count"] = df1["count"] / df2["count"]
-#     return df1

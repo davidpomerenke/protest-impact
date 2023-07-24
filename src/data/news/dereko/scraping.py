@@ -8,8 +8,8 @@ from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from playwright.async_api import Browser, BrowserContext, Page, async_playwright
 
-from src import project_root
 from src.data.protests.keywords import climate_queries
+from src.paths import external_data
 
 load_dotenv()
 
@@ -19,7 +19,7 @@ cookie_path = Path("cookies.json")
 async def scrape_count_table(
     corpus, code, title, query, headless=True
 ) -> pd.DataFrame | None:
-    path = project_root / "data/ids-dereko/counts" / corpus / code
+    path = external_data / "ids-dereko/counts" / corpus / code
     path.mkdir(parents=True, exist_ok=True)
     csv_path = path / f"{query}.csv"
     html_path = path / f"{query}.html"
