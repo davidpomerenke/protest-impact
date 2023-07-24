@@ -2,7 +2,7 @@
 
 Master thesis project (in progress) by David Pomerenke
 
-![](report/img/graphical-abstract.png)
+![](report/figures/graphical-abstract.png)
 
 ## Abstract
 
