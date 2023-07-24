@@ -182,7 +182,7 @@ I see mainly 3 objections against using such variables as instruments, yet I am 
 3. There is an obvious direct impact of COVID-19 in that stricter restrictions may correlate with an intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for, except for protests whose concern is also focused on the pandemic. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics. -->
 
 
-
+<!--
 ### Placebo tests for instrumental variables
 
 To further strengthen the evidence that the _precipitation_ variable has a significant impact on protest occurrence and size, I perform placebo tests where I try to predict protest occurrence and size not from the weather of the respective day, but from other days before and after the protest. I expect:
@@ -199,4 +199,4 @@ e. When performing regression with only the instruments and no control variables
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
 
-It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
+It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. --> -->
