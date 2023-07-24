@@ -1,0 +1,23 @@
+## Discussion
+
+<!-- - the large variation (with negative impact for many individual protests) could either be a measurement error (then there would actually be only positive impacts), or it could be due to unobserved factors, and there might actually be negative impact. Reducing the error or finding the other factors is crucial for future work to enable recommendations for protesters.
+
+### Comparison of results
+
+### Comparison of limitations
+
+## Conclusion
+
+### Implications
+
+### Transferability to other protests
+
+### Future work
+
+impact on policy
+
+RL approaches
+
+Other causal approaches
+- instrumental variables
+- Backdoor via Path models?: cite Pearl, maybe Iamnitchi, maybe Runge -->

@@ -1,6 +1,7 @@
 ## Controlling and balancing with historic variables
 
-TODO
 ### Without controls
+
+### Controlling for weekdays and holidays
 
 ### Controlling for historic values

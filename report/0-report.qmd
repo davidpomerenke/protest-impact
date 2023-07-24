@@ -23,55 +23,29 @@ toc-depth: 5
 
 {{< include 4-regression.qmd >}}
 
-<!-- \newpage -->
+\newpage
 
-<!-- {{< include 5-instrumental-variable.qmd >}} -->
-
-<!-- \newpage -->
-
-<!-- {{< include 6-synthetic-control.qmd >}} -->
+{{< include 5-instrumental-variable.qmd >}}
 
 <!-- \newpage -->
 
-<!-- {{< include 7-propensity-scores.qmd >}} -->
-<!--
-\newpage
+{{< include 6-synthetic-control.qmd >}}
 
-## Results
+<!-- \newpage -->
 
-Factors
-- different movements = protest radicality
-- protest size
+{{< include 7-propensity-scores.qmd >}}
 
-\newpage
+<!-- \newpage -->
 
-## Discussion
+{{< include 8-results.qmd >}}
 
-- the large variation (with negative impact for many individual protests) could either be a measurement error (then there would actually be only positive impacts), or it could be due to unobserved factors, and there might actually be negative impact. Reducing the error or finding the other factors is crucial for future work to enable recommendations for protesters.
+<!-- \newpage -->
 
-### Comparison of results
+{{< include 9-discussion.qmd >}}
 
-### Comparison of limitations
+<!-- \newpage -->
 
-## Conclusion
-
-### Implications
-
-### Transferability to other protests
-
-### Future work
-
-impact on policy
-
-RL approaches
-
-Other causal approaches
-- instrumental variables
-- Backdoor via Path models?: cite Pearl, maybe Iamnitchi, maybe Runge
-
-\newpage
-
-## Nontechnical summary --> -->
+## Nontechnical summary
 
 \newpage
 

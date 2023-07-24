@@ -1,6 +1,8 @@
 ## Causal analysis via synthetic control
 
-This is location-based matching
+WIP
+
+<!-- This is location-based matching
 
 Alternative: @MatrixProfileStumpy for time-based matching. But: would assume that confounders are time-invariant, not plausible; or that they are fully caught somehow by the time series, also not too plausible.
 
@@ -35,4 +37,4 @@ select n_components based on cross-validation
 
 #### Difficulties with small protest events
 
-#### Difficulties with large protest events
+#### Difficulties with large protest events -->

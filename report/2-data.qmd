@@ -56,7 +56,7 @@ df.plot(
 plt.show()
 ```
 
-#### ACLED and other existing protest datasets
+#### ACLED and other existing protest datasets {#sec-acled}
 
 My main data source for protest events is the [_Armed Conflict Location and Event Dataset_](https://acleddata.com/) (ACLED; @raleighIntroducingACLEDArmed2010a). ACLED is a grand effort that keeps track not only of violent conflicts and riots, but also of ordinary protest events. The data is human-curated based on newspaper reports, and contains coded information on dates, locations, actor groups, police interventions, and more, as well as a short free-text summary for each event, containing an estimate of the size as per the newspaper data source. Data for Germany is available starting from 2020 and is continuously updated. For the period from 2020-2022, it contains 13235 protest events, 1314 of which are organized by climate protest groups or mention the climate in their description.
 
@@ -104,7 +104,7 @@ Protest statistics are often recorded by public authorities, either when organiz
 \scriptsize\selectfont
 ```{python}
 # | label: tbl-protest-most-common
-# | tbl-cap: Number of protest events for the five most busy climate protest days 2020-2022. Future work might explore the impact of celestial events (such as the equinoxes) on protest activity.
+# | tbl-cap: Number of protest events for the five most busy climate protest days 2020-2022; they are concentrated around the spring and autumn equinoxes. (More esoteric future work might explore the astrological determinants of protest activity.)
 # | column: margin
 # | echo: false
 
@@ -180,7 +180,7 @@ In a first labeling phase, I annotate 650 random articles for training and 500 r
 \color{Red}TODO: Extraction of dates, locations, protest groups.
 \endgroup
 
-### Public discourse {sec-data-discourse}
+### Public discourse {#sec-data-discourse}
 
 This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query.
 
@@ -212,7 +212,7 @@ __Other types of public discourse__ could also be explored in future work. This 
 
 ```{python}
 # | label: fig-mediacloud-history
-# | fig-cap: TODO.
+# | fig-cap: Number of daily online newspaper articles published in the region of Bavaria falling under 5 different queries relating to climate change. A rolling mean with a 7-day window has been applied for smoother display. The effects of an outage of the collection system in January 2022 are visible.
 # | column: page
 # | echo: false
 
@@ -223,11 +223,12 @@ fig, ax = plt.subplots(figsize=(14, 2))
 for k, v in climate_queries().items():
     df = counts_for_region(v, "Bayern")
     df = df.set_index("date")
-    # df["count"] = df["count"] / df["count"].mean()
-    df =df.query("date >= '2020-01-01' and date <= '2022-12-31'")
-    df.rolling(28).mean().plot(ax=ax)
+    df = df.query("date >= '2020-01-01' and date <= '2022-12-31'")
+    df.rolling(7).mean().plot(ax=ax, linewidth=1)
 ax.legend(climate_queries().keys())
-ax.set_title("Bayern")
+ax.set_ylabel("#articles")
+ax.set_xlabel(None)
+ax.set_title("Article counts for online newspapers in Bayern")
 plt.show()
 ```
 
@@ -235,12 +236,37 @@ plt.show()
 
 #### Print newspapers {#sec-dereko}
 
+```{python}
+# | label: fig-derekp-history
+# | fig-cap: Number of daily print newspaper articles published in the region of Bavaria falling under 5 different queries relating to climate change. A rolling mean with a 7-day window has been applied for smoother display.
+# | column: page
+# | echo: false
 
-__Full-text availability:__ Large extracts around the query keywords are available for download, but this requires scraping the user interface and is complicated and slow. Obtaining daily word counts is much faster.
+from src.data.news.dereko import counts_for_region
+from src.data.protests.keywords import climate_queries
+
+fig, ax = plt.subplots(figsize=(14, 2))
+for k in climate_queries().keys():
+    df = counts_for_region(k, "Bayern")
+    df.rolling(7).mean().plot(ax=ax, linewidth=1)
+ax.legend(climate_queries().keys())
+ax.set_ylabel("#articles")
+ax.set_xlabel(None)
+ax.set_title("Article counts for print newspapers in Bayern")
+plt.show()
+```
+
+The [German reference corpus](https://www.ids-mannheim.de/digspra/kl/projekte/korpora/) (_Deutsches Referenzkorpus_, DeReKo) archives the full texts of most German-language print newspapers and magazines in an online database for the purpose of linguistic research. An API contains access to a selected corpus, and by (automatically) navigating the user interface, an extended corpus can be searched. The content is renewed on an annual basis and with a delay of a few months, so no data for 2023 is available. Full texts cannot be retrieved from DeReKo, but large context windows for search results are available, which could be used for more nuanced further research. Here, I only use the functionality of obtaining daily article counts for a given query.
+
+I extract an overview table of all newspapers from the corpora W1-W4, remove newspapers that are not available until 2022, remove newspapers that are about niche topics such as cars, beauty, or history, or that are published with less than weekly frequency. I annotate the remaining 154 newspapers on whether they have a national or regional scope, and retrieve the applicable regions for the regional ones, drawing from information on Wikipedia and the newspaper websites. 121 are from Germany, and 15 of these have a (primarily) national scope, while 106 have a regional scope. All regions are represented with at least one newspaper, except the city state of Bremen. Among the 4 (or more) German "newspapers of record" (see @NewspaperRecord2023), the conservative _Frankfurter Allgemeine Zeitung_ is missing, and the very popular tabloid _Bild_ is also missing.
+
+I retrieve daily article counts for all queries and all thus filtered newspapers, and aggregate them by day on the regional level as well as into a category of national newspapers.
 
 #### Press releases
 
+As a source for events related to the climate crisis, I consider press release full texts. They contain unstructured textual information that can be made useful for the computation of propensity scores via text classifiers.
 
+I retrieve press release full texts from the commercial _Nexis Uni_ database, querying for `klima*`, and restricting the results to German-language press releases from the _dpa-AFX ProFeed_, yielding 29,052 articles for 2020-2022.
 
 ### Instruments
 

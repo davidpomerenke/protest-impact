@@ -24,7 +24,6 @@ def counts_for_region(
     ]
     dfs = []
     for corpus, sigle in zip(newspapers["Corpus"], newspapers["Sigle"]):
-        print(corpus, sigle)
         df = pd.read_csv(path / "counts" / corpus / sigle / f"{query}.csv")
         df["date"] = pd.to_datetime(df["date"])
         df = df.set_index("date")
@@ -39,4 +38,4 @@ def counts_for_region(
         df = df[df.index >= start]
     if end is not None:
         df = df[df.index <= end]
-    return df
+    return df["text_count"]

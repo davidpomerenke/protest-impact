@@ -1,6 +1,8 @@
 ## Causal analysis via instrumental variables
 
-```{dot}
+WIP
+
+<!-- ```{dot}
 // | fig-width: 150px
 // | fig-height: 150px
 // | column: margin
@@ -42,28 +44,37 @@ While the previous literature has mostly focused on rainfall, I consider all wea
 
 Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data, specifically from the respective capital of the region. This is a potential weakness that will be addressed later.
 
-{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
-
 Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
 
 ##### Indirect paths
 
-- @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
-- @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables, and only affect the exogenous climate variables.
+WIP
+
+@mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
 
 ##### Spatial interdependence
 
+WIP
+
+@coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables, and only affect the exogenous climate variables.
+
 ##### Seasonality
 
-(see mostly later)
+TODO
 
 ##### Detecting invalid instruments
 
+TODO
+
 #### The impact of the weather on protests
+
+WIP
 
 For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information.
 
 ##### Precipitation
+
+WIP
 
 I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
 
@@ -76,13 +87,19 @@ Results for the significant regression coefficients are shown in @tbl-first-stag
 
 ##### Other weather variables
 
+TODO
+
 ##### Principal components
+
+WIP
 
 #### Making the weather more random
 
 Describe the problem and show the impact on the BLM movement data. Explain that _controlling_ can help a lot here, or rather that IV is a nice addition to controlling.
 
 ##### Separating short-term and long-term weather components
+
+WIP
 
 An additional concern that has been identified and adjusted for by some previous studies (see @sec-weatherlit) is that weather contains a non-random component that is correlated both temporally with annual seasonality (which may be linked, for example, to media attention cycles, and many other variables), and geographically with places with generally nice or bad weather (which may be linked, for example, to economic indicators, or also to previous protest activity). This is in violation of condition (1.) on valid instruments from above. Therefore I try to split each weather variable into a long-term non-random variable and a short-term almost-random variable.
 
@@ -103,6 +120,8 @@ I only investigate the first stage.
 Fig: Placebo test for monthly average. Conclusion: separate climate and weather!
 
 ##### Leveraging the gap between pre-registered and observed protest size
+
+WIP
 
 Predicting the change for all Berlin data:
 
@@ -148,18 +167,22 @@ And results for the 2nd stage (the actually interesting thing):
 
 ### Pandemic restrictions as an instrument
 
+WIP
+
 The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
 
 #### Validity of restrictions as an instrument
+
+WIP
 
 I see mainly 3 objections against using such variables as instruments, yet I am uncertain how much they really matter:
 
 1. Just like the weather, the spread of the coronavirus is to some extent a natural event. It is, however, to some extent controlled by the behaviour of humans, and especially the restrictions due to COVID-19 have a large political component. I worry especially about geographical confounding: Restrictions in Germany have in large part been up to the regional legislators and governments, and perhaps those governing parties whose climate policy causes outrage tend to impose especially strict (or loose) COVID-19 restrictions for one reason or another.
 2. Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally correlated with political processes and with media attention cycles.
-3. There is an obvious direct impact of COVID-19 in that stricter restrictions may correlate with an intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for, except for protests whose concern is also focused on the pandemic. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics.
+3. There is an obvious direct impact of COVID-19 in that stricter restrictions may correlate with an intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for, except for protests whose concern is also focused on the pandemic. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics. -->
 
 
-<!--
+
 ### Placebo tests for instrumental variables
 
 To further strengthen the evidence that the _precipitation_ variable has a significant impact on protest occurrence and size, I perform placebo tests where I try to predict protest occurrence and size not from the weather of the respective day, but from other days before and after the protest. I expect:

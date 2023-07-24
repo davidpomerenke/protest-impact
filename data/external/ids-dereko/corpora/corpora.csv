@@ -26,9 +26,9 @@ W1;soz;Die Südostschweiz;;;2005;2018;NA;Chur;CH;;
 W1;spiegel;Der Spiegel;;;1947;2022;NA;;;DE;1
 W1;spk;spektrumdirekt;;;1997;2012;NA;;;DE;
 W1;ste;Stern;;;1996;2022;NA;;;DE;
-W1;sz;Süddeutsche Zeitung;;;1992;2022;NA;München;BY;DE;1
+W1;sz;Süddeutsche Zeitung;;;1992;2022;NA;;;DE;1
 W1;tas;SonntagsZeitung (Tages-Anzeiger);;;2000;2022;NA;;;CH;
-W1;taz-pub;die tageszeitung;;;2000;2022;NA;Berlin;BE;DE;
+W1;taz-pub;die tageszeitung;;;2000;2022;NA;;;DE;
 W1;ttz;Tiroler Tageszeitung;;;1996;2000;NA;Innsbruck;AT;;
 W1;wwo;Weltwoche;;;2005;2022;NA;;;CH;
 W1;zeit;Die Zeit;;;1953;2022;NA;;;DE;1
@@ -77,13 +77,13 @@ W2;lan;Lauterbacher Anzeiger;;;2004;2022;NA;Lauterbach;HE;;
 W2;laz;Lampertheimer Zeitung;;;2007;2022;NA;Lampertheim;HE;;
 W2;lru;Lausitzer Rundschau;;;2000;2022;NA;Frankfurt (Oder);BB;;
 W2;msp;Main-Spitze;;;1998;2022;NA;Rüsselsheim am Main;HE;;
-W2;neo;NEON;;;2015;2018;NA;;DE;;
+W2;neo;NEON;;;2015;2018;NA;;;DE;
 W2;noz;Neue Osnabrücker Zeitung;;;2012;2022;NA;Osnabrück;NI;;
-W2;nwt;Neue Welt;;;2015;2022;NA;;DE;;
+W2;nwt;Neue Welt;;;2015;2022;NA;;;DE;
 W2;osz;Ostsee-Zeitung;;;2016;2022;NA;Rostock;MV;;
 W2;paz;Peiner Allgemeine Zeitung;;;2015;2022;NA;Peine;NI;;
 W2;stb;Straubinger, Tagblatt;;;2014;2022;NA;Straubing;BY;;
-W2;tvd;TV Digital;;;2015;2022;NA;;DE;;
+W2;tvd;TV Digital;;;2015;2022;NA;;;DE;
 W2;vzs;Schweinfurter Volkszeitung;;;2013;2022;NA;Schweinfurt;BY;;
 W2;w;Die Welt;;;1999;2022;NA;;;DE;
 W2;was;Welt am Sonntag;;;1997;2022;NA;;;DE;
@@ -141,7 +141,7 @@ W3;sbn;Salzburger Nachrichten;;;2001;2022;NA;;;AT;
 W3;smp;Solinger Morgenpost;;;2013;2022;NA;Solingen;NW;;
 W4;bkr;Bersenbrücker Kreisblatt;;;2012;2019;NA;Bersenbrück;NI;;
 W4;sta;Der Standard;;;2000;2022;NA;;;AT;
-W4;tsp;Der Tagesspiegel;;;2000;2022;NA;Berlin;BE;DE;
+W4;tsp;Der Tagesspiegel;;;2000;2022;NA;;;DE;
 W4;fpc;Freie Presse;;;2011;2022;NA;Chemnitz;SN;;
 W4;giz;Giessener Anzeiger;;;2004;2022;NA;Gießen;HE;;
 W4;haa;Hamburger Abendblatt;;;1999;2022;NA;Hamburg;HH;;
