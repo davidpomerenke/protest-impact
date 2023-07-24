@@ -19,10 +19,10 @@ load_dotenv()
 
 
 def counts_for_region(
-    q: str, region: str, start_date: pd.Timestamp = start, end_date: pd.Timestamp = end
+    q: str, region: str, start: pd.Timestamp = start, end: pd.Timestamp = end
 ) -> pd.DataFrame:
     region_query = "tags_id_media:" + str(to_mediacloud_region(region))
-    return counts(q, region_query, start_date, end_date)
+    return counts(q, region_query, start, end)
 
 
 def counts(
@@ -36,9 +36,9 @@ def counts(
     if df is None:
         return None
     if start is not None:
-        df = df[df["date"] >= start]
+        df = df[df.index >= start]
     if end is not None:
-        df = df[df["date"] <= end]
+        df = df[df.index <= end]
     return df
 
 
@@ -75,12 +75,7 @@ def _counts_for_general_query(
     # WORKAROUND: sum counts by day
     df = df.groupby("date").sum().reset_index()
     # set missing dates to 0 (without making date the index)
-    df = (
-        df.set_index("date")
-        .reindex(pd.date_range(start, end, freq="D"), fill_value=0)
-        .reset_index()
-    )
-    df = df.rename(columns={"index": "date"})
+    df = df.set_index("date").reindex(pd.date_range(start, end, freq="D"), fill_value=0)
     return df
 
 

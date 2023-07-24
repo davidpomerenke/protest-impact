@@ -23,14 +23,13 @@ from src.features.time_series.holidays import get_holidays
 
 @cache
 def outcome(
-    region: str, start: pd.Timestamp = start, end: pd.Timestamp = end
+    region: str, source, start: pd.Timestamp = start, end: pd.Timestamp = end
 ) -> TimeSeries:
     aspects = dict()
     for qname, query in climate_queries().items():
-        df = counts_for_region(region, query)
+        df = counts_for_region(qname, region, source)
         if df is None:
             return None
-        df = df.set_index("date")
         aspects[f"media_{qname}"] = df["count"]
     df = pd.concat(aspects, axis=1)
     df = df[(df.index >= start) & (df.index <= end)]
@@ -158,12 +157,12 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
 
 
 def naive_one_region(
-    region: str, source: str = "acled"
+    region: str, protest_source: str = "acled", media_source: str = "mediacloud"
 ) -> tuple[pd.DataFrame, pd.DataFrame] | tuple[None, None]:
-    df_y = outcome(region)
+    df_y = outcome(region, media_source)
     if df_y is None:
         return None, None
-    df_w = treatment(region, source)
+    df_w = treatment(region, protest_source)
     df_x = controls(region)
     df = pd.concat([df_y, df_w, df_x], axis=1)
     y = list(df_y.columns)
@@ -177,8 +176,11 @@ def naive_one_region(
     return df, vars
 
 
-def naive_all_regions(source: str = "acled"):
-    data = [naive_one_region(region["name"], source) for region in tqdm(german_regions)]
+def naive_all_regions(protest_source: str = "acled", media_source: str = "mediacloud"):
+    data = [
+        naive_one_region(region["name"], protest_source, media_source)
+        for region in tqdm(german_regions)
+    ]
     dfs, vars = zip(*[(d, v) for d, v in data if d is not None])
     vars = vars[0]
     for df in dfs:
