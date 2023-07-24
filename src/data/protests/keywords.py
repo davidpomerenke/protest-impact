@@ -11,7 +11,6 @@ abbreviations = dict(
     ALG="Letzte Generation",
     XR="Extinction Rebellion",
     EG="Ende Gelände",
-    EFO="End Fossil Occupy",
     GP="Greenpeace",
     OTHER_CLIMATE_ORG="Other",
 )

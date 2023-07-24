@@ -64,8 +64,10 @@ movement_keywords:
         - ?fff
         - for future
         - 4 future
+        - climate strike
       xr:
         - extinction rebellion
+        - scientist rebellion
         - ?xr
       jso:
         - just stop oil
@@ -78,9 +80,6 @@ movement_keywords:
         - ende gelände
         - ?ende gelaende
         - ?ende gelande
-      efo:
-        - end fossil
-        - fossil occupy
       gp:
         - greenpeace
     movement:
