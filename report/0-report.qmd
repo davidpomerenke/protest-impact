@@ -23,18 +23,18 @@ toc-depth: 5
 
 {{< include 4-regression.qmd >}}
 
-\newpage
+<!-- \newpage -->
 
-{{< include 5-instrumental-variable.qmd >}}
+<!-- {{< include 5-instrumental-variable.qmd >}} -->
 
-\newpage
+<!-- \newpage -->
 
-{{< include 6-synthetic-control.qmd >}}
+<!-- {{< include 6-synthetic-control.qmd >}} -->
 
-\newpage
+<!-- \newpage -->
 
-{{< include 7-propensity-scores.qmd >}}
-
+<!-- {{< include 7-propensity-scores.qmd >}} -->
+<!--
 \newpage
 
 ## Results
@@ -71,7 +71,7 @@ Other causal approaches
 
 \newpage
 
-## Nontechnical summary
+## Nontechnical summary --> -->
 
 \newpage
 

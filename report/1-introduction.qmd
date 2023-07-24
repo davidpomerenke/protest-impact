@@ -1,6 +1,6 @@
 <!-- ## Abstracti
 
-In the face of (Western) governmental failure to appropriately address global heating, protests appear as an effective course of action. But how does one make an effective protest, and especially not one that is counterproductive to its cause / runs counter/contrary to its cause? I investigate the impact of protest events on the number of published articles relating to the climate crisis in regional and national newspapers, as a proxy for political focus/salience/attention. In order to remove the impact of confounders such as political discourse itself or external events, I employ and compare three causal inference techniques: synthetic control regions, instrumental variables, and doubly robust regression with propensity scores. Focusing on Germany, one of the worst polluters with a rich landscape of climate protest movements, I find that XYZ.
+Protests appear as an effective course of action for pushing climate policies in the face of governmental inertia. But how does one make an effective protest, and especially not one that is counterproductive to its cause / runs counter/contrary to its cause? I investigate the impact of protest events on the number of published articles relating to the climate crisis in regional and national newspapers, as a proxy for political focus/salience/attention. In order to remove the impact of confounders such as political discourse itself or external events, I employ and compare three causal inference techniques: synthetic control regions, instrumental variables, and doubly robust regression with propensity scores. Focusing on Germany, one of the worst polluters with a rich landscape of climate protest movements, I find that XYZ.
 
 Further keywords: Computational social science, protest event analysis, agenda setting. -->
 
@@ -98,14 +98,14 @@ radical flank effect: cite Ozden, Malm -->
 
 #### The effect on public discourse
 
-
+<!--
 cite Teune, Wasow, maybe Repke
 
-@barrieDoesProtestInfluence: time series effects on tweets by uk mps, recent and very nice (not strictly causal, but really plausible; or could perhaps consider it a discontinuity design)
+@barrieDoesProtestInfluence: time series effects on tweets by uk mps, recent and very nice (not strictly causal, but really plausible; or could perhaps consider it a discontinuity design) -->
 
 ### Causal methods for determining the impact of protests
 
-cite Ozden
+<!-- cite Ozden
 
 cite Wasow
 
@@ -115,9 +115,9 @@ effects on policy and laws: cite Bernardi, Hutter 2018, Walgrave, Agnone, ...
 
 __Causes of protests__
 
-cite Seitz
+cite Seitz -->
 
-#### Instrumental variables {#sec-weatherlit}
+#### Instrumental variable approaches {#sec-weatherlit}
 
 Among the protest effects literature that employs causal methods, the instrumental variable method is the most commonly used method. Usually, rainfall over a period ranging from one day up to one month is used to estimate the effect of protests during that timeframe on a later outcome, where a direct influence of the weather is very unlikely. With the exception of @huet-vaughnQuietRiotCausal2013, all previous literature has a setting where they look at a fixed timeframe and compare effects across regional units. @huet-vaughnQuietRiotCausal2013 has a methodical approach that is more similar to mine, looking at a larger dataset where events are scattered across regions and also across time
 
@@ -141,6 +141,10 @@ Other literature uses instruments that are less clearly random, such as whether 
 
 <!-- Germany is one of the worst emitters ... -->
 
-There has been little climate protest in Germany until 2018, with the exception of established environmental NGOs such as Greenpeace, and the activist formation _Ende Gelände_ (established 2015) that stages protests directly in coal mining areas. In the end of 2018, the climate movement has taken off with the founding of both the activist organization _Extinction Rebellion_ and the broad students' movement _Fridays for Future_. Since 2022 the activist formation _Letzte Generation_ is making the headlines. The smaller _End Fossil Occupy_ movement has started occupying universities mostly in 2023.
+The climate protest movement in Germany has only stepped into existence toward the end of the 2010's. Before then, climate activism was mostly associated with established environmental NGOs such as Greenpeace, which did not play a major role in the media. In 2015 the activist formation _Ende Gelände_ (EG) was established, and began organizing blockades and demonstrations directly in coal mining areas. In late 2018 _Extinction Rebellion_ (XR) was established in Germany to protest the biodiversity crisis that comes along with the climate crisis, through demonstrations as well as blockades.
 
-The movements pursue different strategies, resulting in different public reactions. Fridays for Future organizes legal protest marches, mostly on Friday. They have been criticized for breaking the rules, and even
+Around the same time, the global _Fridays for Future_ (FFF) movement gained traction in Germany, accumulating a huge momentum -- more than a million protesters --, especially among high school and university students, and later also among other social groups with sub-movements such as _Scientists for Future_, _Parents for Future_, and _Grandparents for Future_. They emphasize constructive discourse and inclusivity, organize exclusively pre-registered demonstrations, and often collaborate with other protest groups. However, they mostly protest on Fridays, that is, during school time, which has caused outrage from conservative politicians and media. As part of this outrage, the argument was first raised that the protests may run counter to their goals by stirring discussions about the appropriateness of their methods, and thereby diverting attention from climate policy issues themselves. (Supporters of the movement may claim that this is a hypocritical argument and is employed by the same people who deliberately cause this distraction because they are opposed to climate policy.)
+
+A contrary (or complimentary) approach is taken by _Letzte Generation_ (originally _Aufstand der Letzten Generation_, ALG), which was founded by the participants of a hunger strike during the pre-election phase in 2021. Since 2021 the group -- consisting only of a few dozen members -- employs highly disruptive tactics: most prominently unregistered sit-ins on car highways, as well as supplementary action forms including throwing soup at paintings (which are protected by glass sheets), turning off oil pipelines, or vandalizing symbols of climate-afflicting luxury. The group has concrete demands including a citizen's assembly on climate policy, a ban on food waste, a speed limit for cars, and heavily subsidized public transport tickets. The protesters face a vast backlash, are criticized by politicians from across the poltical spectrum as well as by many media formats, and are pursued under terrorism laws by public prosecutors (who, in Germany, report to the government); at the same time they have successfully negotiated with multiple mayors to support their concern, have held talks with the chancellor and the minister for traffic, and have been endorsed by the UN general secretary and by multiple religious organizations. Again, and this time perhaps with more plausibility, the argument was raised that the caused disruption runs counter to the goals of the group.^[A version of this argument is presented by @jansteckelKlimaprotestAufAbwegen2022, and not without [controversy](https://twitter.com/jan_c_steckel/status/1601048858129477632).]
+
+In late 2022 the _End Fossil Occupy_ (EFO) movement made its first appearances by occupying buildings, especially lecture halls in universities.

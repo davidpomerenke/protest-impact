@@ -148,8 +148,6 @@ __Dataset__. The resulting dataset contains 49,800 events from 13 cities. For 11
 
 #### The German Protest Reports dataset
 
-[@wiedemannGeneralizedApproachProtest2022] demonstrate how the use of transformer models can now reliably take over the classification of relevant protest articles. They achieve an F1-score of 94% using on a homogeneous train-test split (data from the same newspaper and timespan), and 75% for training and testing on different newspaper sources. The automatic coding of more fine-grained coding units is an open research problem, which may eventually be solved en passant by applying more advanced large language models.
-
 @wiedemannGeneralizedApproachProtest2022 show how to detect protest events in newspaper articles. They employ the [`gelectra-large`](https://huggingface.co/deepset/gelectra-large) model, a transformer model that is fine-tuned on German texts of various genres. Their dataset consists of almost 4000 newspaper articles from 4 German cities, namely Leipzig, Dresden, Stuttgart, and Bremen, from between 2009 and 2016.
 
 __Replication and experiments:__ I replicate their results and obtain F1-scores of 0.93 for in-distribution and 0.76 for out-of-distribution classification, which is almost identical to the authors' results. I try out some alternative approaches on their data: Simple machine learning models based on TFIDF-features; finetuning the more recent multilingual FlanT5 model; and using GPT 3.0 in a zero-shot setting. None of the alternatives perform closely to the `gelectra-large` model (see @tbl-glpn-alternative-methods for metrics).
