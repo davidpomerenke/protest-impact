@@ -222,8 +222,7 @@ from src.data.protests.keywords import climate_queries
 fig, ax = plt.subplots(figsize=(14, 2))
 for k, v in climate_queries().items():
     df = counts_for_region(v, "Bayern")
-    df = df.set_index("date")
-    df = df.query("date >= '2020-01-01' and date <= '2022-12-31'")
+    df = df.query("index >= '2020-01-01' and index <= '2022-12-31'")
     df.rolling(7).mean().plot(ax=ax, linewidth=1)
 ax.legend(climate_queries().keys())
 ax.set_ylabel("#articles")

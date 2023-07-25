@@ -60,7 +60,27 @@ The core of the model is the relation $W \rightarrow Y$ that I want to investiga
    2. We can leverage __*instrumental variables*__ __Z__, for which we assume that they do not affect the outcome __Y__ directly, and trace their effect on __Y__ via the treatment __W__.
    3. We can assume that certain texts such as press releases may cover many relevant unknown confounders, and learn __*propensity scores from texts*__, without needing to specify the confounders explicitly.
 
-{{< include 3-1-overview-table.qmd >}}
+:::{.column-page}
+
+\begin{tabular}{l| c c c c}
+& Regression & Instr. var. & Synth. contr. & Prop. score \\
+\hline
+Instrumenting & & \bullet &  &  \\
+Controlling & \bullet & (\bullet) & (\bullet) & (\bullet) \\
+Balancing &  &  & \bullet & \bullet \\
+\hline
+Time series & \bullet & (\bullet) & (\bullet) & \bullet \\
+Regions &  &  & \bullet &  \\
+Weather &  & \bullet &  &  \\
+Texts &  &  &  & (\bullet) \\
+\hline
+Confounders? & $\checkmark^1$ & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^4$ \\
+Hidden conf.? &  & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^{4,5}$ \\
+\end{tabular}
+
+Core assumptions: (1) Linearity; (2) Valid instrument; (3) No regional confounding; (4) Overlap; (5) Hidden confounding is captured by text. (Most of these assumptions are actually a bit more nuanced and are discussed in the respective chapters.)
+
+:::
 
 ### Overview of causal methods
 
@@ -144,31 +164,6 @@ digraph D {
 Propensity score methods estimate the probability (propensity) of receiving the treatment. There are various strategies for eliminating selection bias with the use of propensity scores, notably propensity score matching, propensity score stratification, inverse propensity weighting. Double machine learning estimators such as causal forests help with estimating heterogenous treatment effects.
 
 Propensity score methods still suffer from _omitted variable bias_ if there are unknown confounders. This can be mitigated by learning propensity scores from less structured big data such as texts, using classification models from natural language processing. The advantage of doing so is that the unknown confounders need not be pre-specified. The assumption is that the texts need to contain all of the unknown confounders, and in some detectable form. While this will never completely be the case (and cannot be verified anyway), we can hope that it at least substantially reduces the bias.
-
-#### Summary
-
-:::{.column-page}
-
-\begin{tabular}{l| c c c c}
-& Regression & Instr. var. & Synth. contr. & Prop. score \\
-\hline
-Instrumenting & & \bullet &  &  \\
-Controlling & \bullet & (\bullet) & (\bullet) & (\bullet) \\
-Balancing &  &  & \bullet & \bullet \\
-\hline
-Time series & \bullet & (\bullet) & (\bullet) & \bullet \\
-Regions &  &  & \bullet &  \\
-Weather &  & \bullet &  &  \\
-Texts &  &  &  & (\bullet) \\
-\hline
-Confounders? & $\checkmark^1$ & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^4$ \\
-Hidden conf.? &  & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^{4,5}$ \\
-\end{tabular}
-
-Core assumptions: (1) Linearity; (2) Valid instrument; (3) No regional confounding; (4) Overlap; (5) Hidden confounding is captured by text. (Most of these assumptions are actually a bit more nuanced and are discussed in the respective chapters.)
-
-:::
-
 
 ### (Time-series modelling)
 

@@ -14,6 +14,7 @@ def shift_df(df: pd.DataFrame, y_cols: list[str], shift: int) -> pd.DataFrame:
     df_ = df_.dropna()
     return df_
 
+
 @cache
 def lagged_impact(
     dfs: list[pd.DataFrame],
@@ -40,8 +41,10 @@ def plot_lagged_impact(
     results: pd.DataFrame,
     predictor: str,
     targets: str = "protest",
+    ax: plt.Axes = None,
 ) -> tuple[plt.Figure, plt.Axes]:
-    fig, ax = plt.subplots(figsize=(8, 4))
+    if ax is None:
+        _, ax = plt.subplots(figsize=(8, 4))
     match targets:
         case "protest":
             targets = ["media_protest", "media_not_protest"]
@@ -59,9 +62,7 @@ def plot_lagged_impact(
     ax.set_xticks(range(-10, 11, 1))
     ax.set_xlabel("Shift (days)")
     ax.set_ylabel("Coefficient")
-    ax.set_title("Naive regression coefficients")
     ax.axhline(0, color="black", linewidth=1)
     ax.axvline(0, color="black", linewidth=1)
-    ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
-    fig.tight_layout()
-    return fig, ax
+    ax.legend()
+    return ax

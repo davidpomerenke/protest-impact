@@ -7,46 +7,46 @@ toc-depth: 3
 
 # WIP: Do climate protests lead to more attention to the climate crisis?
 
-\newpage
+{{< pagebreak >}}
 
 {{< include 1-introduction.qmd >}}
 
-\newpage
+{{< pagebreak >}}
 
 {{< include 2-data.qmd >}}
 
-\newpage
+{{< pagebreak >}}
 
 {{< include 3-modeling.qmd >}}
 
-\newpage
+{{< pagebreak >}}
 
 {{< include 4-regression.qmd >}}
 
-\newpage
+{{< pagebreak >}}
 
 {{< include 5-instrumental-variable.qmd >}}
 
-<!-- \newpage -->
+<!-- {{< pagebreak >}} -->
 
 {{< include 6-synthetic-control.qmd >}}
 
-<!-- \newpage -->
+<!-- {{< pagebreak >}} -->
 
 {{< include 7-propensity-scores.qmd >}}
 
-<!-- \newpage -->
+<!-- {{< pagebreak >}} -->
 
 {{< include 8-results.qmd >}}
 
-<!-- \newpage -->
+<!-- {{< pagebreak >}} -->
 
 {{< include 9-discussion.qmd >}}
 
-<!-- \newpage -->
+<!-- {{< pagebreak >}} -->
 
 ## Nontechnical summary
 
-\newpage
+{{< pagebreak >}}
 
 {{< include 12-appendix.qmd >}}

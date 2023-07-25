@@ -1,1 +1,57 @@
 ## Results
+
+### Regression
+
+Some text.
+
+```{python}
+# | label: fig-regression-basic
+# | fig-cap: "No controls. Results for regressing online newspaper coverage on protest occurrence without any controls (left) and controlling for weekdays and holidays (right)."
+# | column: page
+# | echo: false
+
+import matplotlib.pyplot as plt
+from src.models.regression import regression
+from src.features.time_series.lagged_impact import plot_lagged_impact
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+results = regression(include_controls=False)
+plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0])
+axes[0].set_title("Regression without controls")
+
+results = regression(max_lags=0)
+plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[1])
+axes[1].set_title("Regression with controls for weekdays and holidays")
+fig.tight_layout()
+plt.show()
+```
+
+Some text.
+
+```{python}
+# | label: fig-regression-lagged-multiple
+# | fig-cap: Results for regressing online/print newspaper coverage on protest occurrence, controlling for weekdays and holidays and lagged values of media coverage and protest occurrence (n_lags=1).
+# | column: page
+# | echo: false
+
+fig, axes = plt.subplots(2, 2, figsize=(10, 8))
+results = regression(max_lags=1)
+plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0, 0])
+axes[0, 0].set_title("Online newspapers")
+
+results = regression(max_lags=1, media_source="dereko")
+plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0, 1])
+axes[0, 1].set_title("Print newspapers")
+
+results = regression(max_lags=1)
+plot_lagged_impact(results, "occ_FFF", "goals", ax=axes[1, 0])
+axes[1, 0].set_title("Online newspapers: goals and framing")
+
+results = regression(max_lags=1, media_source="dereko")
+plot_lagged_impact(results, "occ_FFF", "goals", ax=axes[1, 1])
+axes[1, 1].set_title("Print newspapers: goals and framing")
+fig.tight_layout()
+plt.show()
+```
+
+__Lagged controls:__ Increasing the number of lags does not substantially change the results.
