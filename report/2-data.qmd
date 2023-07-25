@@ -1,6 +1,6 @@
-## Data
+## Data {#sec-data}
 
-All data are retrieved for the years 2020-2022, because _ACLED_ is not available earlier, and _DeReKo_ is only released yearly with some delay and not available for 2023 at the time of writing. All data sources are also expected to be available for the next years, with the exception of data related to the COVID-19 pandemic.
+All data is retrieved for the timespan from 2020 to 2022. This is because the _ACLED_ data is not available earlier, and the _DeReKo_ data is only released yearly with some delay, and not yet available for 2023 at the time of writing. All data sources are expected to be available for the next years, with the exception of data related to the COVID-19 pandemic.
 
 ```{python}
 # | echo: false
@@ -267,15 +267,17 @@ As a source for events related to the climate crisis, I consider press release f
 
 I retrieve press release full texts from the commercial _Nexis Uni_ database, querying for `klima*`, and restricting the results to German-language press releases from the _dpa-AFX ProFeed_, yielding 29,052 articles for 2020-2022.
 
-### Instruments
+### Regional sociodemographics
 
-#### Weather
+I consult the [Regionalatlas](https://regionalatlas.statistikportal.de) by the German statistical bureau, and select 29 variables from 2022 that are available on a regional level and do not incorporate or directly depend on the absolute areas or population sizes of the regions, so that they are more comparable. The variables are selected to cover diverse areas from demographics, economics, and sociology. Apart from the immigration/emigration balance, all variables are nonnegative. The full list of variables is included in @sec-app-sociodem.
+
+### Weather
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
 
-#### Pandemic restrictions
+### Pandemic restrictions
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
 

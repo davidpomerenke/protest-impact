@@ -1,4 +1,4 @@
-## Causal analysis via synthetic control
+## Causal analysis via synthetic control {#sec-synth}
 
 WIP
 

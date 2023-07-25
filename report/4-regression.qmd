@@ -1,7 +1,9 @@
-## Controlling and balancing with historic variables
+## Baseline analysis via regression
 
-### Without controls
+WIP
+
+<!-- ### Without controls
 
 ### Controlling for weekdays and holidays
 
-### Controlling for historic values
+### Controlling for historic values -->

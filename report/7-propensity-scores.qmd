@@ -1,4 +1,4 @@
-## Causal analysis via propensity score matching
+## Causal analysis via propensity score
 
 TODO
 

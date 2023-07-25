@@ -2,11 +2,9 @@
 
 ### Regression
 
-Some text.
-
 ```{python}
 # | label: fig-regression-basic
-# | fig-cap: "No controls. Results for regressing online newspaper coverage on protest occurrence without any controls (left) and controlling for weekdays and holidays (right)."
+# | fig-cap: "No controls. Results for regressing regional online newspaper coverage on Fridays For Future protest occurrence without any controls (left) and controlling for weekdays and holidays (right)."
 # | column: page
 # | echo: false
 
@@ -26,11 +24,9 @@ fig.tight_layout()
 plt.show()
 ```
 
-Some text.
-
 ```{python}
 # | label: fig-regression-lagged-multiple
-# | fig-cap: Results for regressing online/print newspaper coverage on protest occurrence, controlling for weekdays and holidays and lagged values of media coverage and protest occurrence (n_lags=1).
+# | fig-cap: Results for regressing regional online/print newspaper coverage on Fridays For Future protest occurrence, controlling for weekdays and holidays and lagged values of media coverage and protest occurrence (n_lags=1). Increasing the number of lags does not substantially change the results.
 # | column: page
 # | echo: false
 
@@ -53,5 +49,3 @@ axes[1, 1].set_title("Print newspapers: goals and framing")
 fig.tight_layout()
 plt.show()
 ```
-
-__Lagged controls:__ Increasing the number of lags does not substantially change the results.

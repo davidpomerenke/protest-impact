@@ -96,6 +96,7 @@ def climate_queries(mode="default", short=False):
     and_not = "NOT" if mode == "dereko" else "AND NOT"
 
     return dict(
+        # topic=topic,
         protest=f"({topic}) AND ({protest})",
         not_protest=f"({topic}) {and_not} ({protest})",
         framing=f"({topic}) AND ({framing})",

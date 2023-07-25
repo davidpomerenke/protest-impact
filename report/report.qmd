@@ -5,7 +5,7 @@ toc: true
 toc-depth: 3
 ---
 
-# WIP: Do climate protests lead to more attention to the climate crisis?
+# _Work in progress:_ Do climate protests lead to more attention to the climate crisis?
 
 {{< pagebreak >}}
 
@@ -23,7 +23,7 @@ toc-depth: 3
 
 {{< include 4-regression.qmd >}}
 
-{{< pagebreak >}}
+<!-- {{< pagebreak >}} -->
 
 {{< include 5-instrumental-variable.qmd >}}
 
@@ -35,11 +35,11 @@ toc-depth: 3
 
 {{< include 7-propensity-scores.qmd >}}
 
-<!-- {{< pagebreak >}} -->
+{{< pagebreak >}}
 
 {{< include 8-results.qmd >}}
 
-<!-- {{< pagebreak >}} -->
+{{< pagebreak >}}
 
 {{< include 9-discussion.qmd >}}
 
