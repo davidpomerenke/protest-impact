@@ -12,12 +12,14 @@ format:
     colorlinks: true
     mainfont: "Lato Light"
     sansfont: "Lato Black"
+    mathfont: "Lato Math"
     link-citations: true
     papersize: a4
     lang: en
     fontsize: 9pt
     include-in-header:
       text: |
+        \usepackage{mathastext}
         \usepackage[l3]{csvsimple}
         \usepackage{booktabs}
         \usepackage{url}

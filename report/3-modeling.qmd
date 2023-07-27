@@ -305,12 +305,12 @@ Using subscripts $\scriptsize f, h, s$ to denote future, historic and static var
 
 | Target | Predictors | Method |
 | ------ | ---------- | ------ |
-| __Y__ | $X_{f,s}, Y_h, W_f$ | Regression |
-| __Y__ | $X_{f,s}, Y_h, W_h$ | Double ML |
-| __Y__ | $X_{f,s}, Y_h, W_h, \hat W_s$ | IV stage 2 |
-| __Y__ | $X_{f,s}, Y_h, W_h, Y_{control f}$ |  SC counterfactual |
-| __W__ | $X_{f,s}, Y_h, W_h$ | Propensity score, Double ML |
-| __W__ | $X_{f,s}, Y_h, W_h, Z_f$ | IV stage 1 |
+| __Y__ | \boldmath$X_{f,s}, Y_h, W_f$ | Regression |
+| __Y__ | \boldmath$X_{f,s}, Y_h, W_h$ | Double ML |
+| __Y__ | \boldmath$X_{f,s}, Y_h, W_h, \hat W_s$ | IV stage 2 |
+| __Y__ | \boldmath$X_{f,s}, Y_h, W_h, Y_{control\: f}$ |  SC counterfactual |
+| __W__ | \boldmath$X_{f,s}, Y_h, W_h$ | Propensity score, Double ML |
+| __W__ | \boldmath$X_{f,s}, Y_h, W_h, Z_f$ | IV stage 1 |
 
 <!-- | __Y__ | $X_{f,s}, Y_h, W_h$ | use estimates | Counterfactual for synthetic control (version 2) | -->
 
