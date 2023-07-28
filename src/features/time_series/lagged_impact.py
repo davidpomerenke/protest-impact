@@ -1,40 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from darts import TimeSeries
 
 from src.cache import cache
-from src.features.time_series import LagDict, TimeSeriesRegressor
-from src.models.statsmodels import SMLinearRegression
 
 
-def shift_df(df: pd.DataFrame, y_cols: list[str], shift: int) -> pd.DataFrame:
-    df_ = df.copy()
-    for col in y_cols:
-        df_[col] = df_[col].shift(shift)
-    df_ = df_.dropna()
-    return df_
-
-
-@cache
 def lagged_impact(
-    dfs: list[pd.DataFrame],
-    y_cols: list[str],
-    lags: LagDict,
-    regressor=SMLinearRegression(),
+    y: pd.DataFrame, x: pd.DataFrame, evaluator: callable
 ) -> pd.DataFrame:
-    models = dict()
-    results = []
+    dfs = []
     for shift in range(-10, 11):
-        dfs_ = [shift_df(df, y_cols, shift) for df in dfs]
-        model = TimeSeriesRegressor(regressor, y_cols=y_cols, lags=lags)
-        model.fit_multiple(dfs_, static_covariates="dummies")
-        res = model.get_coefficients()
+        y_ = y.shift(shift).dropna()
+        x_ = x.loc[y_.index]
+        res = evaluator(y_, x_)
         res["shift"] = shift
-        cols = ["shift"] + list(res.columns[:-1])
-        res = res[cols].sort_values(by=cols)
-        results.append(res)
-        models[shift] = model
-    return models, pd.concat(results)
+        dfs.append(res)
+    df = pd.concat(dfs).reset_index(drop=True)
+    return df
 
 
 def plot_lagged_impact(

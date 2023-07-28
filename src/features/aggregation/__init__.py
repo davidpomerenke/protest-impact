@@ -158,31 +158,22 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
 
 def naive_one_region(
     region: str, protest_source: str = "acled", media_source: str = "mediacloud"
-) -> tuple[pd.DataFrame, pd.DataFrame] | tuple[None, None]:
+) -> Munch | None:
     df_y = outcome(region, media_source)
     if df_y is None:
-        return None, None
+        return None
     df_w = treatment(region, protest_source)
-    df_x = controls(region)
-    df = pd.concat([df_y, df_w, df_x], axis=1)
-    y = list(df_y.columns)
-    w = [ww for ww in df_w.columns if ww.startswith("occ_")]
-    x = list(df_x.columns)
-    future = w + [xx for xx in x if not xx.startswith("weekday_")]
-    future_only = [xx for xx in x if xx.startswith("weekday_")]
-    all_cols = y + w + x
-    df = df[all_cols]
-    vars = Munch(y=y, w=w, x=x, future=future, future_only=future_only)
-    return df, vars
+    df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
+    df_x = pd.concat([df_w, controls(region)], axis=1)
+    return Munch(y=df_y, x=df_x)
 
 
 def naive_all_regions(protest_source: str = "acled", media_source: str = "mediacloud"):
     data = [
-        naive_one_region(region["name"], protest_source, media_source)
+        naive_one_region(region.name, protest_source, media_source)
         for region in tqdm(german_regions)
     ]
-    dfs, vars = zip(*[(d, v) for d, v in data if d is not None])
-    vars = vars[0]
-    for df in dfs:
-        df[vars.y] = df[vars.y] / df[vars.y].mean()
-    return dfs, vars
+    return Munch(
+        y=[d.y for d in data if d is not None],
+        x=[d.x for d in data if d is not None],
+    )
