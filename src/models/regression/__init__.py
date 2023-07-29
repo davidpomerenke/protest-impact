@@ -75,14 +75,15 @@ def ts_results(
             static_cols=list(dummies.columns),
         )
 
-    x = merge_with_statics(x), merge_with_statics(y)
+    x = merge_with_statics(x)
+    y = [TimeSeries.from_dataframe(df) for df in y]
     model = RegressionModel(
         lags=None if lags == 0 else lags,
         lags_future_covariates=(lags, 1),
         model=model,
     )
     model.fit(y, future_covariates=x)
-    coefs = retrieve_params(model)
+    coefs = retrieve_params(model, list(y[0].columns))
     # if (conf_int := retrieve_conf_int(model)) is not None:
     #     conf_ints = [
     #         dict(
@@ -129,22 +130,9 @@ def _decode_param_names(
     return df
 
 
-def _get_target_columns(model: RegressionModel) -> list[str]:
-    tcols = model.training_series.columns
-    pcols = model.past_covariate_series.columns if model.uses_past_covariates else []
-    fcols = (
-        model.future_covariate_series.columns if model.uses_future_covariates else []
-    )
-    all_cols = list(tcols) + list(pcols) + list(fcols)
-    unique = len(all_cols) == len(set(all_cols))
-    assert unique, f"Duplicate column names: {', '.join(all_cols)}."
-    return tcols
-
-
 def _retrieve_params(
-    return_type: str, model: RegressionModel
+    return_type: str, model: RegressionModel, targets: list[str]
 ) -> dict[str, pd.DataFrame]:
-    tcols = _get_target_columns(model)
     mm = model.model
     key = return_type + "_"
     if isinstance(mm, MultiOutputRegressor):
@@ -154,22 +142,22 @@ def _retrieve_params(
     else:
         if not hasattr(mm, key):
             return None
-        params = [getattr(mm, key)] if len(tcols) == 1 else getattr(mm, key)
+        params = getattr(mm, key)
     dfs = []
-    for col, param in zip(tcols, params):
+    for target, param in zip(targets, params):
         df = _decode_param_names(param, model.lagged_feature_names, return_type)
-        df["target"] = col
+        df["target"] = target
         dfs.append(df)
     return pd.concat(dfs).reset_index(drop=True)
 
 
-def retrieve_coefficients(model: RegressionModel) -> pd.DataFrame:
-    return _retrieve_params("coef", model)
+def retrieve_coefficients(model: RegressionModel, targets: list[str]) -> pd.DataFrame:
+    return _retrieve_params("coef", model, targets)
 
 
-def retrieve_params(model: RegressionModel) -> pd.DataFrame:
-    coef = _retrieve_params("coef", model)
-    conf_int = _retrieve_params("conf_int", model)
+def retrieve_params(model: RegressionModel, targets: list[str]) -> pd.DataFrame:
+    coef = _retrieve_params("coef", model, targets)
+    conf_int = _retrieve_params("conf_int", model, targets)
     if conf_int is not None:
         coef = coef.merge(conf_int, on=["target", "predictor", "lag"])
     return coef
