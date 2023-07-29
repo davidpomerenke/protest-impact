@@ -24,7 +24,7 @@ from src.features.time_series.lagged_impact import lagged_impact
 # @cache
 def regression(max_lags=0, include_controls=True, media_source="mediacloud"):
     data = naive_all_regions(media_source=media_source)
-    results = lagged_impact(data.y[0], data.x[0], ts_lr)
+    results = lagged_impact(data.y, data.x, ts_lr)
     return results
 
 
@@ -55,8 +55,27 @@ class SMWrapper(BaseEstimator, RegressorMixin):
 sk_ols = SMWrapper(sm.OLS, fit_args=dict(cov_type="HC3"))
 
 
-def ts_results(y: pd.DataFrame, x: pd.DataFrame, model: BaseEstimator, lags=14):
-    x, y = TimeSeries.from_dataframe(x), TimeSeries.from_dataframe(y)
+def ts_results(
+    y: list[pd.DataFrame], x: list[pd.DataFrame], model: BaseEstimator, lags=14
+):
+    def merge_with_statics(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+        value_cols = dfs[0].columns
+        for i, df in enumerate(dfs):
+            groups = pd.Series(i, index=df.index)
+            df["group"] = groups
+            df.reset_index(inplace=True)
+        df = pd.concat(dfs)
+        dummies = pd.get_dummies(df["group"], prefix="SERIES")
+        df = pd.concat([df, dummies], axis=1)
+        return TimeSeries.from_group_dataframe(
+            df,
+            group_cols="group",
+            time_col="index",
+            value_cols=value_cols,
+            static_cols=list(dummies.columns),
+        )
+
+    x = merge_with_statics(x), merge_with_statics(y)
     model = RegressionModel(
         lags=None if lags == 0 else lags,
         lags_future_covariates=(lags, 1),

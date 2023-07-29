@@ -7,12 +7,12 @@ from src.cache import cache
 
 
 def lagged_impact(
-    y: pd.DataFrame, x: pd.DataFrame, evaluator: callable
+    y: list[pd.DataFrame], x: list[pd.DataFrame], evaluator: callable
 ) -> pd.DataFrame:
     dfs = []
     for shift in range(-10, 11):
-        y_ = y.shift(shift).dropna()
-        x_ = x.loc[y_.index]
+        y_ = [yy.shift(shift).dropna() for yy in y]
+        x_ = [xx.loc[yy.index] for xx, yy in zip(x, y_)]
         res = evaluator(y_, x_)
         res["shift"] = shift
         dfs.append(res)
