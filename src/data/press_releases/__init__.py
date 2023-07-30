@@ -19,17 +19,18 @@ from src.paths import external_data
 
 load_dotenv()
 
+# config:
 cookie_path = Path("cookies.json")
-
-permalink_climate = "https://advance-lexis-com.mu.idm.oclc.org/api/permalink/6bd70d80-8b5c-46dc-8a95-803a79780ca2/?context=1516831"
+query = "klima*"
+data_path = external_data / "nexis/climate"
 
 
 async def main():
-    await scrape("klima*", headless=False)
+    await scrape(query, headless=False)
 
 
-def process_dowloads():
-    for path in sorted((external_data / "nexis/zip").glob("**/*.zip")):
+def process_downloads():
+    for path in sorted((data_path / "zip").glob("**/*.zip")):
         process(path)
 
 
@@ -49,7 +50,6 @@ async def scrape(
                 page, browser, context = await download(
                     1_000, year, month, page, browser, context
                 )
-        # await page.wait_for_timeout(600_000)
         await context.add_cookies(json.loads(cookie_path.read_text()))
     except Exception as e:
         print(e)
@@ -59,7 +59,7 @@ async def scrape(
 
 
 async def setup(headless=True) -> tuple[Page, Browser, BrowserContext]:
-    path = external_data / "nexis" / "tmp"
+    path = data_path / "tmp"
     path.mkdir(parents=True, exist_ok=True)
     p = await async_playwright().start()
     browser = await p.chromium.launch(
@@ -126,8 +126,8 @@ async def search(
 async def search_by_month(
     year: int, month: int, page: Page, browser: Browser, context: BrowserContext
 ) -> tuple[Page, Browser, BrowserContext] | None:
-    existing_files = (external_data / "nexis/zip").glob(f"{year}-{month:02d}/*.zip")
-    if any([a for a in existing_files if not a.name.endswith("00.zip")]):
+    existing_files = (data_path / "zip").glob(f"{year}-{month:02d}/*.zip")
+    if any([not a.name.endswith("00.zip") for a in existing_files]):
         # then we already have all files for this month
         return None
     try:
@@ -171,7 +171,7 @@ async def download(
     n_results = int(re.search(r"\((\d+)\)", await el.inner_text()).group(1))
     for i in range(0, min(n_results, n), 100):
         range_ = f"{i+1}-{min(i+100, n_results)}"
-        dest_path = external_data / f"nexis/zip/{year}-{month:02d}/{range_}.zip"
+        dest_path = data_path / f"zip/{year}-{month:02d}/{range_}.zip"
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         if dest_path.exists():
             continue
@@ -189,20 +189,24 @@ async def download(
     return page, browser, context
 
 
-def unpack(path: Path) -> list[str]:
+def unpack(path: Path) -> list[tuple[str, str]]:
     with ZipFile(path) as zipObj:
         plaintexts = []
         for file in zipObj.filelist:
+            if "_doclist" in file.filename:
+                continue
             rtf = zipObj.read(file).decode("utf-8")
             plaintext = rtf_to_text(rtf, errors="ignore").strip()
             plaintext = plaintext.replace("\xa0", " ")
-            plaintexts.append(plaintext)
+            plaintexts.append((file.filename, plaintext))
     return plaintexts
 
 
 def parse(plaintext: str) -> Munch:
     title, rest = plaintext.split("\n", 1)
     feed, rest = rest.split("\n", 1)
+    if feed.startswith("Job Number"):
+        return None
     date, rest = rest.split("\n", 1)
     date = dateparser.parse(date.strip(), languages=["de"])
     meta, rest = rest.split("Body", 1)
@@ -239,10 +243,10 @@ def parse(plaintext: str) -> Munch:
 
 def process(path: Path):
     texts = unpack(path)
-    for text in texts:
+    for fn, text in texts:
         item = parse(text)
         datestr = date.strftime(dateparser.parse(item.date), "%Y-%m-%d")
-        jpath = external_data / "nexis/json" / datestr / f"{item.title[:50]}.json"
+        jpath = data_path / "json" / datestr / f"{fn}.json"
         jpath.parent.mkdir(parents=True, exist_ok=True)
         jpath.write_text(json.dumps(item, indent=2, ensure_ascii=False))
 
