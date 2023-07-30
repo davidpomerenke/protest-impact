@@ -24,7 +24,7 @@ from src.features.time_series.lagged_impact import lagged_impact
 # @cache
 def regression(max_lags=0, include_controls=True, media_source="mediacloud"):
     data = naive_all_regions(media_source=media_source)
-    results = lagged_impact(data.y, data.x, ts_lr)
+    results = lagged_impact(data.y, data.x, ts_ols)
     return results
 
 
@@ -58,25 +58,26 @@ sk_ols = SMWrapper(sm.OLS, fit_args=dict(cov_type="HC3"))
 def ts_results(
     y: list[pd.DataFrame], x: list[pd.DataFrame], model: BaseEstimator, lags=14
 ):
-    def merge_with_statics(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    def merge_with_statics(dfs: list[pd.DataFrame], statics: bool) -> pd.DataFrame:
         value_cols = dfs[0].columns
         for i, df in enumerate(dfs):
             groups = pd.Series(i, index=df.index)
             df["group"] = groups
             df.reset_index(inplace=True)
         df = pd.concat(dfs)
-        dummies = pd.get_dummies(df["group"], prefix="SERIES")
-        df = pd.concat([df, dummies], axis=1)
+        if statics:
+            dummies = pd.get_dummies(df["group"], prefix="SERIES")
+            df = pd.concat([df, dummies], axis=1)
         return TimeSeries.from_group_dataframe(
             df,
             group_cols="group",
             time_col="index",
             value_cols=value_cols,
-            static_cols=list(dummies.columns),
+            static_cols=list(dummies.columns) if statics else None,
         )
 
-    x = merge_with_statics(x)
-    y = [TimeSeries.from_dataframe(df) for df in y]
+    x = merge_with_statics(x, statics=True)
+    y = merge_with_statics(y, statics=False)
     model = RegressionModel(
         lags=None if lags == 0 else lags,
         lags_future_covariates=(lags, 1),
@@ -84,15 +85,6 @@ def ts_results(
     )
     model.fit(y, future_covariates=x)
     coefs = retrieve_params(model, list(y[0].columns))
-    # if (conf_int := retrieve_conf_int(model)) is not None:
-    #     conf_ints = [
-    #         dict(
-    #             target=name,
-    #             lower=ci["occurrence"][0][0],
-    #             upper=ci["occurrence"][0][1],
-    #         )
-    #         for name, ci in conf_int.items()
-    #     ]
     return coefs
 
 
@@ -122,7 +114,12 @@ def plot_lagged_impact(results: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
 def _decode_param_names(
     coefficients: list, feature_names: list[str], return_type: str
 ) -> pd.DataFrame:
-    df = pd.DataFrame({"feature_name": feature_names, return_type: coefficients})
+    if return_type == "conf_int":
+        df = pd.DataFrame({"feature_name": feature_names})
+        df["ci_lower"] = coefficients[:, 0]
+        df["ci_upper"] = coefficients[:, 1]
+    elif return_type == "coef":
+        df = pd.DataFrame({"feature_name": feature_names, "coef": coefficients})
     name_parts = df["feature_name"].str.rsplit("_", n=2)
     df["predictor"] = name_parts.str[0]
     df["lag"] = name_parts.str[2].str.replace("lag", "").astype(int)

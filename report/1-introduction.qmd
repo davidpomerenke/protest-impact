@@ -12,6 +12,10 @@ Since this is a thesis in artificial intelligence, I focus on applying, evaluati
 
 ### Motivation
 
+Citation sources:
+
+- @jamesozdenSocialChangeProtests2023 (Apollo survey)
+
 Citizens in democracies have an interest in understanding the effectiveness of protest movements, and which factors make them effective.
 
 Protests play a _crucial role_ in democracies, complementing the sometimes insufficient institutional participation. Large protest movements are known to have brought about progress that we nowadays take as indispensable, especially in the areas of civil rights and women's rights.

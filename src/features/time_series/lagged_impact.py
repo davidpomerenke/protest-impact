@@ -40,8 +40,8 @@ def plot_lagged_impact(
             & (results["lag"] == 0)
         ]
         ax.plot(r["shift"], r["coef"], label=target, linewidth=1.5)
-        if "lower" in r.columns and "upper" in r.columns:
-            ax.fill_between(r["shift"], r["upper"], r["lower"], alpha=0.2)
+        if "ci_lower" in r.columns and "ci_upper" in r.columns:
+            ax.fill_between(r["shift"], r["ci_upper"], r["ci_lower"], alpha=0.2)
     ax.set_xticks(range(-10, 11, 1))
     ax.set_xlabel("Shift (days)")
     ax.set_ylabel("Coefficient")

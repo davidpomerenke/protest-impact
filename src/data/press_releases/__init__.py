@@ -1,0 +1,214 @@
+import asyncio
+import json
+import re
+import shutil
+from os import environ
+from pathlib import Path
+from zipfile import ZipFile
+
+import dateparser
+import pandas as pd
+from dotenv import load_dotenv
+from munch import Munch
+from playwright.async_api import Browser, BrowserContext, Page, async_playwright
+from striprtf.striprtf import rtf_to_text
+
+from src.paths import external_data
+
+load_dotenv()
+
+cookie_path = Path("cookies.json")
+
+permalink_climate = "https://advance-lexis-com.mu.idm.oclc.org/api/permalink/6bd70d80-8b5c-46dc-8a95-803a79780ca2/?context=1516831"
+
+
+async def main():
+    n = 10_000
+    await scrape(n, permalink=permalink_climate, headless=False)
+    for path in sorted((external_data / "nexis/zip").glob("*.zip")):
+        unpack(path)
+    for path in sorted((external_data / "nexis/txt").glob("**/*.txt")):
+        parse(path)
+
+
+async def scrape(
+    n: int, permalink=None, query=None, headless=True
+) -> pd.DataFrame | None:
+    assert permalink or query
+    try:
+        page, browser, context = await start(headless=headless)
+        page, browser, context = await login(page, browser, context)
+        if not permalink:
+            page, browser, context = await search("klima*", page, browser, context)
+        else:
+            page, browser, context = await visit_permalink(
+                permalink_climate, page, browser, context
+            )
+        page, browser, context = await download(n, page, browser, context)
+        # await page.wait_for_timeout(600_000)
+        await context.add_cookies(json.loads(cookie_path.read_text()))
+    except Exception as e:
+        print(e)
+    finally:
+        await browser.close()
+
+
+async def start(headless=True) -> tuple[Page, Browser, BrowserContext]:
+    path = external_data / "nexis" / "tmp"
+    path.mkdir(parents=True, exist_ok=True)
+    p = await async_playwright().start()
+    browser = await p.chromium.launch(
+        timeout=10_000, downloads_path=path, headless=headless
+    )
+    context = await browser.new_context()
+    if cookie_path.exists():
+        await context.add_cookies(json.loads(cookie_path.read_text()))
+    page = await context.new_page()
+    return page, browser, context
+
+
+async def click(page: Page, selector: str, n: int = 0, timeout=5_000) -> Page:
+    await page.wait_for_selector(selector, timeout=timeout)
+    els = await page.query_selector_all(selector)
+    await els[n].click()
+    return page
+
+
+async def login(
+    page: Page, browser: Browser, context: BrowserContext
+) -> tuple[Page, Browser, BrowserContext]:
+    if not cookie_path.exists():
+        await page.goto("http://umlib.nl/lexis_go")
+        element = await page.query_selector('text="Maastricht University"')
+        button = await element.query_selector("xpath=../..//button")
+        await button.dispatch_event("click")
+        await page.fill('input[id="userNameInput"]', environ["UNI_USER"])
+        await page.fill('input[id="passwordInput"]', environ["UNI_PASSWORD"])
+        await click(page, 'span[id="submitButton"]')
+        await page.wait_for_timeout(5_000)
+        cookies = await context.cookies()
+        cookie_path.write_text(json.dumps(cookies))
+    return page, browser, context
+
+
+async def search(
+    query: str, page: Page, browser: Browser, context: BrowserContext
+) -> tuple[Page, Browser, BrowserContext]:
+    await page.fill("lng-expanding-textarea", query)
+    await click(page, "lng-search-button")
+    await page.wait_for_timeout(5_000)
+    await click(page, 'button[title="Timeline: Afgelopen 2 jaar"]')
+    await page.wait_for_timeout(5_000)
+    await click(page, 'button[data-filtertype="source"]')
+    await page.wait_for_timeout(3_000)
+    el = await page.query_selector('input[data-value="dpa-AFX ProFeed"]')
+    await el.dispatch_event("click")
+    await page.wait_for_timeout(5_000)
+    await click(page, 'button[data-filtertype="datestr-news"]')
+    await page.wait_for_timeout(3_000)
+    await page.fill('input[class="min-val"]', "01/01/2020")
+    await page.wait_for_timeout(2_000)
+    await page.fill('input[class="max-val"]', "31/12/2022")
+    await page.wait_for_timeout(2_000)
+    await click(page, 'div[class="date-form"]')
+    await page.wait_for_timeout(1_000)
+    await click(page, 'button[class="save btn secondary"]')
+    await page.wait_for_timeout(5_000)
+    await click(page, 'span[id="sortbymenulabel"]')
+    await page.wait_for_timeout(1_000)
+    await click(page, 'button[data-value="dateascending"]')
+    await page.wait_for_timeout(30_000)
+    return page, browser, context
+
+
+async def visit_permalink(
+    permalink: str, page: Page, browser: Browser, context: BrowserContext
+) -> tuple[Page, Browser, BrowserContext]:
+    await page.goto(permalink)
+    await click(page, 'input[data-action="viewlink"]')
+    await page.wait_for_timeout(10_000)
+    return page, browser, context
+
+
+async def download(
+    n: int, page: Page, browser: Browser, context: BrowserContext
+) -> tuple[Page, Browser, BrowserContext]:
+    for i in range(0, n, 100):
+        range_ = f"{i+1}-{i+100}"
+        dest_path = external_data / f"nexis/zip/{range_}.zip"
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        if dest_path.exists():
+            continue
+        await click(page, 'span[class="icon la-Download"]')
+        await page.wait_for_timeout(2_000)
+        await page.fill('input[id="SelectedRange"]', range_)
+        async with page.expect_download(timeout=120_000) as download_info:
+            await click(page, 'button[data-action="download"]')
+        download = await download_info.value
+        tmp_path = await download.path()
+        print(f"Downloading {range_} to {tmp_path}")
+        shutil.move(tmp_path, dest_path)
+        await page.wait_for_timeout(5_000)
+    return page, browser, context
+
+
+def unpack(path: Path):
+    with ZipFile(path) as zipObj:
+        for file in zipObj.filelist:
+            dest_path = (
+                external_data / "nexis/txt" / path.stem / (file.filename[:-4] + ".txt")
+            )
+            if dest_path.exists():
+                continue
+            rtf = zipObj.read(file).decode("utf-8")
+            plaintext = rtf_to_text(rtf, errors="ignore").strip()
+            plaintext = plaintext.replace("\xa0", " ")
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(dest_path, "w") as f:
+                f.write(plaintext)
+
+
+def parse(path: Path):
+    plaintext = path.read_text()
+    title, rest = plaintext.split("\n", 1)
+    feed, rest = rest.split("\n", 1)
+    date, rest = rest.split("\n", 1)
+    date = dateparser.parse(date.strip(), languages=["de"])
+    meta, rest = rest.split("Body", 1)
+    if rest.strip().startswith("Zusammenfassung\n"):
+        _, summary, rest = rest.strip().split("\n", 2)
+        summary = summary.strip()
+    else:
+        summary = None
+    try:
+        location, rest = re.split(r" ?\(dpa| ?\(dap", rest, 1)
+        location = location.strip()
+        if rest.startswith("/"):
+            region, rest = re.split(r"\) ?- ?|\) ?– ?", rest[1:], 1)
+            region = region.strip()
+        else:
+            region = ""
+            rest = rest[4:]
+    except ValueError:
+        location = None
+        region = None
+    if "Graphic" in rest:
+        text, _ = rest.split("Graphic", 1)
+    else:
+        text, _ = rest.split("Load-Date", 1)
+    item = Munch(
+        title=title.strip(),
+        date=date.isoformat(),
+        summary=summary,
+        location=location,
+        region=region,
+        text=text.strip(),
+    )
+    datestr = date.strftime("%Y-%m-%d")
+    jpath = external_data / "nexis/json" / datestr / (path.stem + ".json")
+    jpath.parent.mkdir(parents=True, exist_ok=True)
+    jpath.write_text(json.dumps(item, indent=2, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
