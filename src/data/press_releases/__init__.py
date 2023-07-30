@@ -2,6 +2,8 @@ import asyncio
 import json
 import re
 import shutil
+from calendar import monthrange
+from datetime import date
 from os import environ
 from pathlib import Path
 from zipfile import ZipFile
@@ -23,37 +25,40 @@ permalink_climate = "https://advance-lexis-com.mu.idm.oclc.org/api/permalink/6bd
 
 
 async def main():
-    n = 10_000
-    await scrape(n, permalink=permalink_climate, headless=False)
-    for path in sorted((external_data / "nexis/zip").glob("*.zip")):
-        unpack(path)
-    for path in sorted((external_data / "nexis/txt").glob("**/*.txt")):
-        parse(path)
+    await scrape("klima*", headless=False)
+
+
+def process_dowloads():
+    for path in sorted((external_data / "nexis/zip").glob("**/*.zip")):
+        process(path)
 
 
 async def scrape(
-    n: int, permalink=None, query=None, headless=True
+    query=None, headless=True, start=2020, end=2022
 ) -> pd.DataFrame | None:
-    assert permalink or query
     try:
-        page, browser, context = await start(headless=headless)
+        page, browser, context = await setup(headless=headless)
         page, browser, context = await login(page, browser, context)
-        if not permalink:
-            page, browser, context = await search("klima*", page, browser, context)
-        else:
-            page, browser, context = await visit_permalink(
-                permalink_climate, page, browser, context
-            )
-        page, browser, context = await download(n, page, browser, context)
+        page, browser, context = await search(query, page, browser, context)
+        for year in range(start, end):
+            for month in range(1, 13):
+                res = await search_by_month(year, month, page, browser, context)
+                if res is None:
+                    continue
+                page, browser, context = res
+                page, browser, context = await download(
+                    1_000, year, month, page, browser, context
+                )
         # await page.wait_for_timeout(600_000)
         await context.add_cookies(json.loads(cookie_path.read_text()))
     except Exception as e:
         print(e)
+        await page.wait_for_timeout(600_000)
     finally:
         await browser.close()
 
 
-async def start(headless=True) -> tuple[Page, Browser, BrowserContext]:
+async def setup(headless=True) -> tuple[Page, Browser, BrowserContext]:
     path = external_data / "nexis" / "tmp"
     path.mkdir(parents=True, exist_ok=True)
     p = await async_playwright().start()
@@ -88,36 +93,65 @@ async def login(
         await page.wait_for_timeout(5_000)
         cookies = await context.cookies()
         cookie_path.write_text(json.dumps(cookies))
+    else:
+        await page.goto("https://advance-lexis-com.mu.idm.oclc.org/")
     return page, browser, context
 
 
 async def search(
-    query: str, page: Page, browser: Browser, context: BrowserContext
+    query: str,
+    page: Page,
+    browser: Browser,
+    context: BrowserContext,
 ) -> tuple[Page, Browser, BrowserContext]:
     await page.fill("lng-expanding-textarea", query)
     await click(page, "lng-search-button")
-    await page.wait_for_timeout(5_000)
-    await click(page, 'button[title="Timeline: Afgelopen 2 jaar"]')
-    await page.wait_for_timeout(5_000)
+    try:
+        await click(page, 'span[class="filter-text"]', timeout=15_000)
+        await page.wait_for_timeout(5_000)
+    except Exception:
+        pass
     await click(page, 'button[data-filtertype="source"]')
     await page.wait_for_timeout(3_000)
     el = await page.query_selector('input[data-value="dpa-AFX ProFeed"]')
     await el.dispatch_event("click")
     await page.wait_for_timeout(5_000)
-    await click(page, 'button[data-filtertype="datestr-news"]')
+    await click(page, 'span[id="sortbymenulabel"]')
+    await page.wait_for_timeout(1_000)
+    await click(page, 'button[data-value="dateascending"]')
+    await page.wait_for_timeout(5_000)
+    return page, browser, context
+
+
+async def search_by_month(
+    year: int, month: int, page: Page, browser: Browser, context: BrowserContext
+) -> tuple[Page, Browser, BrowserContext] | None:
+    existing_files = (external_data / "nexis/zip").glob(f"{year}-{month:02d}/*.zip")
+    if any([a for a in existing_files if not a.name.endswith("00.zip")]):
+        # then we already have all files for this month
+        return None
+    try:
+        await click(page, 'span[class="filter-text"]', n=1)
+    except Exception:
+        pass
+    await page.wait_for_timeout(5_000)
+    try:
+        await click(
+            page, 'button[data-filtertype="datestr-news"][data-action="expand"]'
+        )
+    except Exception as e:
+        print(e)
+        pass
     await page.wait_for_timeout(3_000)
-    await page.fill('input[class="min-val"]', "01/01/2020")
+    await page.fill('input[class="min-val"]', f"01/{month}/{year}")
     await page.wait_for_timeout(2_000)
-    await page.fill('input[class="max-val"]', "31/12/2022")
+    day = monthrange(year, month)[1]
+    await page.fill('input[class="max-val"]', f"{day}/{month}/{year}")
     await page.wait_for_timeout(2_000)
     await click(page, 'div[class="date-form"]')
     await page.wait_for_timeout(1_000)
     await click(page, 'button[class="save btn secondary"]')
-    await page.wait_for_timeout(5_000)
-    await click(page, 'span[id="sortbymenulabel"]')
-    await page.wait_for_timeout(1_000)
-    await click(page, 'button[data-value="dateascending"]')
-    await page.wait_for_timeout(30_000)
+    await page.wait_for_timeout(10_000)
     return page, browser, context
 
 
@@ -131,11 +165,13 @@ async def visit_permalink(
 
 
 async def download(
-    n: int, page: Page, browser: Browser, context: BrowserContext
+    n: int, year, month, page: Page, browser: Browser, context: BrowserContext
 ) -> tuple[Page, Browser, BrowserContext]:
-    for i in range(0, n, 100):
-        range_ = f"{i+1}-{i+100}"
-        dest_path = external_data / f"nexis/zip/{range_}.zip"
+    el = await page.query_selector('header[class="resultsHeader"]')
+    n_results = int(re.search(r"\((\d+)\)", await el.inner_text()).group(1))
+    for i in range(0, min(n_results, n), 100):
+        range_ = f"{i+1}-{min(i+100, n_results)}"
+        dest_path = external_data / f"nexis/zip/{year}-{month:02d}/{range_}.zip"
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         if dest_path.exists():
             continue
@@ -146,30 +182,25 @@ async def download(
             await click(page, 'button[data-action="download"]')
         download = await download_info.value
         tmp_path = await download.path()
-        print(f"Downloading {range_} to {tmp_path}")
         shutil.move(tmp_path, dest_path)
-        await page.wait_for_timeout(5_000)
+        print(f"Downloaded {dest_path}")
+        process(dest_path)
+        await page.wait_for_timeout(2_000)
     return page, browser, context
 
 
-def unpack(path: Path):
+def unpack(path: Path) -> list[str]:
     with ZipFile(path) as zipObj:
+        plaintexts = []
         for file in zipObj.filelist:
-            dest_path = (
-                external_data / "nexis/txt" / path.stem / (file.filename[:-4] + ".txt")
-            )
-            if dest_path.exists():
-                continue
             rtf = zipObj.read(file).decode("utf-8")
             plaintext = rtf_to_text(rtf, errors="ignore").strip()
             plaintext = plaintext.replace("\xa0", " ")
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            with open(dest_path, "w") as f:
-                f.write(plaintext)
+            plaintexts.append(plaintext)
+    return plaintexts
 
 
-def parse(path: Path):
-    plaintext = path.read_text()
+def parse(plaintext: str) -> Munch:
     title, rest = plaintext.split("\n", 1)
     feed, rest = rest.split("\n", 1)
     date, rest = rest.split("\n", 1)
@@ -196,7 +227,7 @@ def parse(path: Path):
         text, _ = rest.split("Graphic", 1)
     else:
         text, _ = rest.split("Load-Date", 1)
-    item = Munch(
+    return Munch(
         title=title.strip(),
         date=date.isoformat(),
         summary=summary,
@@ -204,10 +235,16 @@ def parse(path: Path):
         region=region,
         text=text.strip(),
     )
-    datestr = date.strftime("%Y-%m-%d")
-    jpath = external_data / "nexis/json" / datestr / (path.stem + ".json")
-    jpath.parent.mkdir(parents=True, exist_ok=True)
-    jpath.write_text(json.dumps(item, indent=2, ensure_ascii=False))
+
+
+def process(path: Path):
+    texts = unpack(path)
+    for text in texts:
+        item = parse(text)
+        datestr = date.strftime(dateparser.parse(item.date), "%Y-%m-%d")
+        jpath = external_data / "nexis/json" / datestr / f"{item.title[:50]}.json"
+        jpath.parent.mkdir(parents=True, exist_ok=True)
+        jpath.write_text(json.dumps(item, indent=2, ensure_ascii=False))
 
 
 if __name__ == "__main__":
