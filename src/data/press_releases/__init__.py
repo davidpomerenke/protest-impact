@@ -3,7 +3,7 @@ import json
 import re
 import shutil
 from calendar import monthrange
-from datetime import date
+from datetime import date, datetime
 from os import environ
 from pathlib import Path
 from zipfile import ZipFile
@@ -41,6 +41,9 @@ async def scrape(
         page, browser, context = await setup(headless=headless)
         page, browser, context = await login(page, browser, context)
         page, browser, context = await search(query, page, browser, context)
+        await page.wait_for_timeout(60_000)
+        cookies = await context.cookies()
+        cookie_path.write_text(json.dumps(cookies))
         for year in range(start, end):
             for month in range(1, 13):
                 res = await search_by_month(year, month, page, browser, context)
@@ -175,8 +178,11 @@ async def download(
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         if dest_path.exists():
             continue
-        await click(page, 'span[class="icon la-Download"]')
-        await page.wait_for_timeout(2_000)
+        await page.wait_for_timeout(10_000)
+        print(datetime.now().strftime("%H:%M:%S"), "Downloading", dest_path)
+        el = await page.query_selector('span[class="icon la-Download"]')
+        await el.dispatch_event("click")
+        await page.wait_for_timeout(5_000)
         await page.fill('input[id="SelectedRange"]', range_)
         async with page.expect_download(timeout=120_000) as download_info:
             await click(page, 'button[data-action="download"]')
