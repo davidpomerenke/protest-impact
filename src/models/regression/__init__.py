@@ -58,26 +58,25 @@ sk_ols = SMWrapper(sm.OLS, fit_args=dict(cov_type="HC3"))
 def ts_results(
     y: list[pd.DataFrame], x: list[pd.DataFrame], model: BaseEstimator, lags=14
 ):
-    def merge_with_statics(dfs: list[pd.DataFrame], statics: bool) -> pd.DataFrame:
+    def get_ts_list_with_statics(dfs: list[pd.DataFrame]) -> list[pd.DataFrame]:
         value_cols = dfs[0].columns
         for i, df in enumerate(dfs):
             groups = pd.Series(i, index=df.index)
             df["group"] = groups
             df.reset_index(inplace=True)
         df = pd.concat(dfs)
-        if statics:
-            dummies = pd.get_dummies(df["group"], prefix="SERIES")
-            df = pd.concat([df, dummies], axis=1)
+        dummies = pd.get_dummies(df["group"], prefix="SERIES")
+        df = pd.concat([df, dummies], axis=1)
         return TimeSeries.from_group_dataframe(
             df,
             group_cols="group",
             time_col="index",
             value_cols=value_cols,
-            static_cols=list(dummies.columns) if statics else None,
-        )
+            static_cols=list(dummies.columns),
+        )  # this returns a list!
 
-    x = merge_with_statics(x, statics=True)
-    y = merge_with_statics(y, statics=False)
+    x = get_ts_list_with_statics(x)
+    y = get_ts_list_with_statics(y)
     model = RegressionModel(
         lags=None if lags == 0 else lags,
         lags_future_covariates=(lags, 1),
@@ -120,6 +119,11 @@ def _decode_param_names(
         df["ci_upper"] = coefficients[:, 1]
     elif return_type == "coef":
         df = pd.DataFrame({"feature_name": feature_names, "coef": coefficients})
+    # deal with static covariates, which do not have lags
+    # but have a name like "SERIES_13_statcov_target_global_components"
+    df["feature_name"] = df["feature_name"].str.replace(
+        "_target_global_components", "_lag0"
+    )
     name_parts = df["feature_name"].str.rsplit("_", n=2)
     df["predictor"] = name_parts.str[0]
     df["lag"] = name_parts.str[2].str.replace("lag", "").astype(int)
