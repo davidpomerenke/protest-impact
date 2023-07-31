@@ -25,7 +25,7 @@ def regression(max_lags=0, include_controls=True, n_days=10, media_source="media
         data.x = [df[[c for c in df.columns if c.startswith("occ_")]] for df in data.x]
     sk_ols = SMWrapper(
         sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
-    )  # because the static variables are multicollinear anyway
+    )  # the intercept can be dropped because the static variable dummies do not drop the first column
     ts_ols = partial(ts_results, model=sk_ols, lags=max_lags)
     results = lagged_impact(data.y, data.x, ts_ols)
     return results
