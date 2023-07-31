@@ -4,15 +4,17 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statsmodels.api as sm
 from darts import TimeSeries
+from darts.dataprocessing.transformers import StaticCovariatesTransformer
 from darts.models import RegressionModel
 from sklearn.base import BaseEstimator
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import OneHotEncoder
 
 from src.cache import cache
 from src.features.aggregation import naive_all_regions
 from src.features.time_series.lagged_impact import lagged_impact
 from src.models.util.darts_helpers import retrieve_params
-from src.models.util.statsmodels_wrapper import sk_ols
+from src.models.util.statsmodels_wrapper import SMWrapper, sk_ols
 
 
 @cache
@@ -21,31 +23,32 @@ def regression(max_lags=0, include_controls=True, n_days=10, media_source="media
     if not include_controls:
         # only keep the treatments (occurrence of protests)
         data.x = [df[[c for c in df.columns if c.startswith("occ_")]] for df in data.x]
+    sk_ols = SMWrapper(
+        sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
+    )  # because the static variables are multicollinear anyway
     ts_ols = partial(ts_results, model=sk_ols, lags=max_lags)
     results = lagged_impact(data.y, data.x, ts_ols)
     return results
 
 
 def get_ts_list_with_statics(dfs: list[pd.DataFrame]) -> list[pd.DataFrame]:
-    value_cols = dfs[0].columns
     for i, df in enumerate(dfs):
-        groups = pd.Series(i, index=df.index)
+        groups = pd.Series(f"SERIES{i}", index=df.index)
         df["group"] = groups
         df.reset_index(inplace=True)
     df = pd.concat(dfs)
-    dummies = pd.get_dummies(df["group"], prefix="SERIES")
-    df = pd.concat([df, dummies], axis=1)
-    return TimeSeries.from_group_dataframe(
-        df,
-        group_cols="group",
-        time_col="index",
-        value_cols=value_cols,
-        static_cols=list(dummies.columns),
-    )  # this returns a list!
+    ts_list = TimeSeries.from_group_dataframe(df, group_cols="group", time_col="index")
+    ohe = OneHotEncoder(drop=None)
+    transformer = StaticCovariatesTransformer(transformer_cat=ohe)
+    ts_list = transformer.fit_transform(ts_list)
+    return ts_list
 
 
 def ts_results(
-    y: list[pd.DataFrame], x: list[pd.DataFrame], model: BaseEstimator, lags=14
+    y: list[pd.DataFrame],
+    x: list[pd.DataFrame],
+    model: BaseEstimator,
+    lags: int = 14,
 ):
     x = get_ts_list_with_statics(x)  # list of ts
     y = get_ts_list_with_statics(y)  # list of ts

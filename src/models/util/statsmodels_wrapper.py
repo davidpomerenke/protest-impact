@@ -15,9 +15,10 @@ class SMWrapper(BaseEstimator, RegressorMixin):
             X = sm.add_constant(X)
         self.model_ = self.model_class(y, X)
         self.results_ = self.model_.fit(**self.fit_args)
-        self.coef_ = self.results_.params[1:]
+        first_param_idx = 1 if self.fit_intercept else 0
+        self.coef_ = self.results_.params[first_param_idx:]
         self.intercept_ = self.results_.params[0]
-        self.conf_int_ = self.results_.conf_int()[1:]
+        self.conf_int_ = self.results_.conf_int()[first_param_idx:]
         return self
 
     def predict(self, X):
