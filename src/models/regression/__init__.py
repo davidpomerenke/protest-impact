@@ -7,18 +7,17 @@ from darts import TimeSeries
 from darts.dataprocessing.transformers import StaticCovariatesTransformer
 from darts.models import RegressionModel
 from sklearn.base import BaseEstimator
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import BayesianRidge, Lasso, LassoLarsIC, LinearRegression
 from sklearn.preprocessing import OneHotEncoder
 
 from src.cache import cache
 from src.features.aggregation import naive_all_regions
-from src.features.time_series.lagged_impact import lagged_impact
 from src.models.util.darts_helpers import retrieve_params
 from src.models.util.statsmodels_wrapper import SMWrapper, sk_ols
 
 
 @cache
-def regression(max_lags=0, include_controls=True, n_days=10, media_source="mediacloud"):
+def regression(lags=0, gap=3, include_controls=True, media_source="mediacloud"):
     data = naive_all_regions(media_source=media_source)
     if not include_controls:
         # only keep the treatments (occurrence of protests)
@@ -26,8 +25,7 @@ def regression(max_lags=0, include_controls=True, n_days=10, media_source="media
     sk_ols = SMWrapper(
         sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
     )  # the intercept can be dropped because the static variable dummies do not drop the first column
-    ts_ols = partial(ts_results, model=sk_ols, lags=max_lags)
-    results = lagged_impact(data.y, data.x, ts_ols)
+    results = ts_results(data.y, data.x, model=sk_ols, lags=lags, gap=gap)
     return results
 
 
@@ -48,14 +46,16 @@ def ts_results(
     y: list[pd.DataFrame],
     x: list[pd.DataFrame],
     model: BaseEstimator,
-    lags: int = 14,
+    lags: int,
+    gap: int,
 ):
     x = get_ts_list_with_statics(x)  # list of ts
     y = get_ts_list_with_statics(y)  # list of ts
     model = RegressionModel(
         lags=None if lags == 0 else lags,
-        lags_future_covariates=(lags, 1),
+        lags_future_covariates=(lags - gap, lags + gap + 1),
         model=model,
+        output_chunk_length=1 + gap,
     )
     model.fit(y, future_covariates=x)
     coefs = retrieve_params(model, list(y[0].columns))

@@ -43,10 +43,15 @@ def _retrieve_params(
         if not hasattr(mm, key):
             return None
         params = getattr(mm, key)
+    targets_ = []
+    for i in range(len(params)):
+        for target in targets:
+            targets_.append((i, target))
     dfs = []
-    for target, param in zip(targets, params):
+    for (step, target), param in zip(targets_, params):
         df = _decode_param_names(param, model.lagged_feature_names, return_type)
         df["target"] = target
+        df["step"] = step
         dfs.append(df)
     return pd.concat(dfs).reset_index(drop=True)
 
@@ -59,7 +64,7 @@ def retrieve_params(model: RegressionModel, targets: list[str]) -> pd.DataFrame:
     coef = _retrieve_params("coef", model, targets)
     conf_int = _retrieve_params("conf_int", model, targets)
     if conf_int is not None:
-        coef = coef.merge(conf_int, on=["target", "predictor", "lag"])
+        coef = coef.merge(conf_int, on=["target", "predictor", "lag", "step"])
     return coef
 
 
