@@ -7,7 +7,7 @@ def plot_lagged_impact(
     predictor: str,
     targets: str = "protest",
     ax: plt.Axes = None,
-    gap=3,
+    gap=0,
 ) -> tuple[plt.Figure, plt.Axes]:
     if ax is None:
         _, ax = plt.subplots(figsize=(8, 4))
@@ -20,12 +20,12 @@ def plot_lagged_impact(
         r = results[
             (results["target"] == target)
             & (results["predictor"] == predictor)
-            & (results["step"] == gap)
+            & (results["lag"] == gap)
         ]
-        ax.plot(-r["lag"] + gap, r["coef"], label=target, linewidth=1.5)
+        ax.plot(r["step"] + gap, r["coef"], label=target, linewidth=1.5)
         if "ci_lower" in r.columns and "ci_upper" in r.columns:
-            ax.fill_between(-r["lag"] + gap, r["ci_upper"], r["ci_lower"], alpha=0.2)
-    ax.set_xticks(range(-10, 11, 1))
+            ax.fill_between(r["step"] + gap, r["ci_upper"], r["ci_lower"], alpha=0.2)
+    # ax.set_xticks(range(-10, 11, 1))
     ax.set_xlabel("Shift (days)")
     ax.set_ylabel("Coefficient")
     ax.axhline(0, color="black", linewidth=1)

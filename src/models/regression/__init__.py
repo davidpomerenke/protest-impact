@@ -17,7 +17,9 @@ from src.models.util.statsmodels_wrapper import SMWrapper, sk_ols
 
 
 @cache
-def regression(lags=0, gap=3, include_controls=True, media_source="mediacloud"):
+def regression(
+    lags=0, steps=7, gap=0, include_controls=True, media_source="mediacloud"
+):
     data = naive_all_regions(media_source=media_source)
     if not include_controls:
         # only keep the treatments (occurrence of protests)
@@ -25,7 +27,7 @@ def regression(lags=0, gap=3, include_controls=True, media_source="mediacloud"):
     sk_ols = SMWrapper(
         sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
     )  # the intercept can be dropped because the static variable dummies do not drop the first column
-    results = ts_results(data.y, data.x, model=sk_ols, lags=lags, gap=gap)
+    results = ts_results(data.y, data.x, model=sk_ols, lags=lags, steps=steps, gap=gap)
     return results
 
 
@@ -47,15 +49,16 @@ def ts_results(
     x: list[pd.DataFrame],
     model: BaseEstimator,
     lags: int,
-    gap: int,
+    steps: int = 1,
+    gap: int = 0,
 ):
     x = get_ts_list_with_statics(x)  # list of ts
     y = get_ts_list_with_statics(y)  # list of ts
     model = RegressionModel(
-        lags=None if lags == 0 else lags,
-        lags_future_covariates=(lags - gap, lags + gap + 1),
+        lags=None if lags == 0 else list(range(-lags - gap, -gap)),
+        lags_future_covariates=(lags, steps),
         model=model,
-        output_chunk_length=1 + gap,
+        output_chunk_length=steps,
     )
     model.fit(y, future_covariates=x)
     coefs = retrieve_params(model, list(y[0].columns))
