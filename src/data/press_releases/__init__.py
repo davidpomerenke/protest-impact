@@ -56,7 +56,7 @@ async def scrape(
         await context.add_cookies(json.loads(cookie_path.read_text()))
     except Exception as e:
         print(e)
-        await page.wait_for_timeout(600_000)
+        await page.wait_for_timeout(60_000)
     finally:
         await browser.close()
 
@@ -171,14 +171,16 @@ async def download(
     n: int, year, month, page: Page, browser: Browser, context: BrowserContext
 ) -> tuple[Page, Browser, BrowserContext]:
     el = await page.query_selector('header[class="resultsHeader"]')
-    n_results = int(re.search(r"\((\d+)\)", await el.inner_text()).group(1))
+    n_results = int(
+        re.search(r"\(((\d|\.)+)\)", await el.inner_text()).group(1).replace(".", "")
+    )
     for i in range(0, min(n_results, n), 100):
         range_ = f"{i+1}-{min(i+100, n_results)}"
         dest_path = data_path / f"zip/{year}-{month:02d}/{range_}.zip"
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         if dest_path.exists():
             continue
-        await page.wait_for_timeout(10_000)
+        await page.wait_for_timeout(5_000)
         print(datetime.now().strftime("%H:%M:%S"), "Downloading", dest_path)
         el = await page.query_selector('span[class="icon la-Download"]')
         await el.dispatch_event("click")
@@ -191,7 +193,7 @@ async def download(
         shutil.move(tmp_path, dest_path)
         print(f"Downloaded {dest_path}")
         process(dest_path)
-        await page.wait_for_timeout(2_000)
+        await page.wait_for_timeout(60_000)
     return page, browser, context
 
 
