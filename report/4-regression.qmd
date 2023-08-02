@@ -19,12 +19,12 @@ $$
 $$
 
 
-### Naive regression
+### Regression as a causal method {#sec-reg-math}
 
 The following assumptions allow us to use regression to determine the CATT:
 
-- Unconfoundedness, $W \perp\!\!\!\perp Y(0) | X$: The counterfactual outcome if there was no treatment is independent from the actual treatment. (It is not plausible that this assumption actually holds, but regression will just serve as a baseline model.)
-- Overlap, $e(X) < 1$ for the propensity score $e(X) = P(W=1|X)$: The treatment assignment is not deterministic.
+- __Unconfoundedness__, $W \perp\!\!\!\perp Y(0) | X$: The counterfactual outcome if there was no treatment is independent from the actual treatment. (It is not plausible that this assumption actually holds, but regression will just serve as a baseline model.)
+- __Overlap__, $e(X) < 1$ for the propensity score $e(X) = P(W=1|X)$: The treatment assignment is not deterministic.
 
 Under these assumptions, we can identify $\tau$ as follows [see @dingFirstCourseCausal2023, ch. 13 for proof]:
 
@@ -61,12 +61,28 @@ allows for the estimation of the CATT $\hat\tau_{g,d}=\hat\beta_W$ for all prote
 
 ### Regression with controls
 
-### Combining multiple time series
+__Naive regression__ uses the simplified regression model $ E(Y_d|W_g) = \beta + \beta_W W_g$. The result is just the correlation between the variables, and not causally interpretable.
 
-(dummies vs regional)
+__Regression with controls__ comes closer to a causal model, and is a valid causal model under the assumptions of linearity and unconfoundedness made in @sec-reg-math. I control for the following sets of variables:
 
-### Delayed impact
+- Day of the week, as dummy variables.
+- Holiday, as a dummy variable with time-series lags.
+- Time-series lags of the outcome: Including at least one lag for the outcome variable is crucial to enbale the model to focus on the effect of the protest event, without needing to guess the overall level of coverage. I add lags for all dimensions of newspaper coverage to model eventual interactions, for example that a catastrophic framing on the previous day leads to heightened coverage on the following day.
+- Time-series lags of the treatment: I control for events by other protest groups on the same day and for events by all protest groups in the past, in order to properly separate out the conditional effect of each group.
+<!-- - A slight shortcoming is that events that are jointly organized by multiple groups (as opposed to multiple events organized by single groups on the same day) are just treated as a separate single protest group (FFF+X, since Fridays for Future is involved in almost all of them). The alternative would be  -->
 
-Problem of differencing
+### Regional and national data
 
-### Cumulative impact
+To __combine multiple time series__ from the various regions into a single regression model, I add static dummy variables for each region, as is common of all 14 region dummies and all 5 treatment variables, as well as potentially some of the control variables. This would lead to more than 50 interaction terms, thereby immensely blowing up the model and hindering the interpretation of results.
+
+The __differences between the regions__ -- especially in size, population size, and number of newspapers -- are potentially problematic for the estimation of a global model. I minimize this problem by (a) controlling for previous amounts of coverage and (b) using absolute rather than relative coverage. While the relative coverage of a protest event will presumably be lower in larger regions because a smaller proportion of the region is affected by any event, this will not be the case in absolute terms. However, it may be the case that there are major protest events with a strong relation to regional politics, and that they have an impact throughout the whole region, and in that case the size of the region might matter. This would not be captured by the model and could lead to high standard errors for the treatment effects.
+
+Estimating a __global model__ for regional treatment effects has substantial methodical benefits: It increases the size of the dataset by a factor of 14 (in comparison to using national data, or to estimating single regional models), which increases statistical power and leads to more reliable results.
+
+On the other hand, the __national impact__ of protests is politically more interesting, so I also estimate a model on the national level, which has the structure as any of the regional models, but with aggregated treatment variables and newspaper coverage from national rather than regional newspapers.
+
+### Delayed and cumulative impact
+
+For estimating delayed effects, I do not include lags for the day of the protest event and following days. This is because they plausibly mediate the delayed impact of the protest, so that their inclusion would lead to an under-estimation of the total impact. For example, if protests cause a spike in coverage on the day of their occurrence, then the model might expect a similarly high coverage on the next day and observe that it decreases, which could lead even to negative estimates instead of positive ones for delayed effects.
+
+Next to the impact for each single day, the cumulative impact is of interest. Point estimates (expected values) can be computed by summing the effects from multiple days. This is not so easy for standard errors, since they involve the variance, and the variance of the sum of the effects depends on their covariance. The covariance could be determined using multivariate regression, but this is not supported by the `statsmodels` library or other Python libraries. As an alternative, I estimate separate regression models for each cumulative outcome variable; that is, a model for the 1-day impact, for the 2-day impact, for the 3-day impact, and so on. Experiments indicate, however, that the point estimates from both methods differ significantly. (TODO: figure out why.)
