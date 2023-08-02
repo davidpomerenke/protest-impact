@@ -49,15 +49,15 @@ $$
 &= E(\beta + \beta_W + \beta_X X |W=1) - E(\beta + \beta_X X | W=1) \\
 &= \beta_W
 \end{aligned}
-$$
+$$ {#eq-reg-beta}
 
-The coefficient $\beta_W$ can be estimated via OLS and then serve as estimate for the CATT. Specifically, using the linear regression model
+The coefficient $\beta_W$ can be estimated via _Ordinary Least Squares_ (OLS) regression, and then serve as estimate for the CATT. Specifically, using the linear regression model
 
 $$
 E(Y_d|W_g,X) = \beta + \beta_W W_g + \beta_X X
 $$ {#eq-reg-lin-model}
 
-allows for the estimation of the CATT $\hat\tau_{g,d}=\hat\beta_W$ for all protest groups $g \in G$ and outcome dimensions $d \in D$.
+allows for the estimation of the CATT $\hat\tau_{g,d}=\hat\beta_W$ for all protest groups $g \in G$ and outcome dimensions $d \in D$. Standard errors and confidence intervals can also be obtained from the OLS procedure.
 
 ### Regression with controls
 
