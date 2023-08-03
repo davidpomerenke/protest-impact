@@ -57,7 +57,9 @@ $$
 E(Y_d|W_g,X) = \beta + \beta_W W_g + \beta_X X
 $$ {#eq-reg-lin-model}
 
-allows for the estimation of the CATT $\hat\tau_{g,d}=\hat\beta_W$ for all protest groups $g \in G$ and outcome dimensions $d \in D$. Standard errors and confidence intervals can also be obtained from the OLS procedure.
+allows for the estimation of the CATT $\hat\tau_{g,d}=\hat\beta_W$ for all protest groups $g \in G$ and outcome dimensions $d \in D$.^[catt-cate] Standard errors and confidence intervals can also be obtained from the OLS procedure.
+
+[catt-cate]: Note that the CATT is here identical to the CATE, because "the linear model assumes constant causal effects across units" [@dingFirstCourseCausal2023, p. 165].
 
 ### Regression with controls
 

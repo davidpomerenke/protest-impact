@@ -4,68 +4,77 @@ The idea of the _instrumental variable_ approach is to look for _natural experim
 
 ### Theory
 
-There are three conditions that make a variable __Z__ a valid instrument [@dingFirstCourseCausal2023, p. 279]:
+There are three conditions that make a variable $Z$ a valid instrument [@dingFirstCourseCausal2023, p. 279]:
 
-1. __Z__ should be random or almost random, so we can be sure that it is independent from hidden confounders.
-2. __Z__ should change the distribution of the treatment __W__.
-3. __Z__ should not directly influence __W__ (_exclusion restriction_).
-
- [ch. 23] gives an overview over three common instrumental variable methods: _indirect least squares_, _two-stage least-squares_, and _weak IV_.
+1. $Z$ is a random or almost random.
+2. $Z$ changes the distribution of the treatment $W$.
+3. $Z$ does not directly influence $Y$, but only indirectly via $W$ (_exclusion restriction_).
 
 #### Wald estimator
 
-In the case of a single binary instrument and a single treatment, we can use the Wald estimator [@dingFirstCourseCausal2023, ch. 21]. For the relaxed case -- where the instrument is not necessarily binary -- it is also known as indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2], or simply as instrumental variable method.
-
-##### Deduction from structural equation model
+In the case of a single instrument and a single treatment, we can use indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2]. It is also known simply as _instrumental variable_ method, and -- especially in the case of a binary instrument -- the Wald estimator [@dingFirstCourseCausal2023, ch. 21].
 
 [@dingFirstCourseCausal2023, ch. 23; @pischkeLabourEconomicsPhD2019, slides on instrumental variables; @facurealvesCausalInferenceBrave2022, ch. 8]
 
-First stage:
-
-$$
-W = \beta + \beta_Z Z + \beta_U U
-$$
-
-Reduced form:
-
-$$
-Y = \gamma + \gamma_Z Z + \gamma_U U
-$$
-
-Structural equation:
-
-$$
-Y = \alpha + \alpha_W W + \alpha_U U
-$$
-
-Proof:
+To estimate the CATT, we can set up the following linear model (sometimes designated as _structural equation_):
 
 $$
 \begin{aligned}
-W &= \alpha + Cov(W,Z) Z + \alpha_U U && \text{First stage} \\
-Y &= \gamma + Cov(Y,Z) Z + \gamma_U U && \text{Reduced form} \\
-Y &= \beta + \beta_W W + \beta_U U && \text{Structural equation} \\
+E(Y|W,U) = \beta + \beta_W W + \beta_U U && \text{Structural equation}
+\end{aligned}
+$$
 
-Y &= \gamma + Cov(Z,\beta + \beta_W W + \beta_U U) Z + \gamma_U U && \text{Substitute structural equation into reduced form} \\
-&= \gamma + \beta_W Cov(Z, W) Z + \gamma_U U \\
+This is very similar to @eq-reg-lin-model, only that now the unmeasured confounders are included rather than the known covariates. (We can leave out the known confounders X from the model without loss of generality, because when we do not include them they will also be unknown confounders, and can thus be treated as pasrt of the unknown confounders U.)
 
-0 &= \beta_W Cov(Z,W) Z - Cov(Y, Z) Z && \text{Subtract from reduced form} \\
-&= (\beta_W Cov(Z,W) - Cov(Y,Z)) Z \\
-&= (\beta_W Cov(Z,W) - Cov(Y,Z)) && Assert Z \neq 0 \\
+@eq-reg-beta identifies the CATT as $\tau=\beta_W$ and is also applicable here. The assumptions are unconfoundedness and overlap (see @sec-reg-math). Unconfoundedness $W \perp\!\!\!\perp Y(0) | X$ is implausible in the simple regression context, but here the analogous assumption is $W \perp\!\!\!\perp Y(0) | U$, that is, unconfoundedness _given the unknown confounders_, which trivially applies.
+
+In addition to the structural equation, we can set up two further equations that describe the impact of the instrument Z on both W and Y:
+
+$$
+\begin{aligned}
+W = \alpha + \alpha_Z Z + \alpha_U U && \text{First stage} \\
+Y = \gamma + \gamma_Z Z + \gamma_U U && text{Reduced form} \\
+\end{aligned}
+$$
+
+The randomization assumption implies that the instrument is not correlated with any variables that are not causally affected by the instrument. The exclusion restriction formulates that there is no path from $Z$ to $Y$ other than through $W$. Together, they imply that $Z$ is independent from $U$ in both equations. Since $Z$ is independent from the other predictor variables, the calculation of the coefficients $\alpha_Z$ and $\gamma_Z$ resolves to the simpler case of univariate OLS, where we have $\alpha_Z=\frac{Cov(W,Z)}{Var(Z)}$ and $\gamma_Z=\frac{Cov(Y,Z)}{Var(Z)}$:
+
+$$
+\begin{aligned}
+W &= \alpha + \frac{Cov(W,Z)}{Var(Z)} Z + \alpha_U U && \text{First stage} \\
+Y &= \gamma + \frac{Cov(Y,Z)}{Var(Z)} Z + \gamma_U U && \text{Reduced form} \\
+\end{aligned}
+$$
+
+Substitution and reordering shows how $\beta_W$ can be calculated from the covariances:
+
+$$
+\begin{aligned}
+Y &= \gamma + \frac{Cov(Z,\beta + \beta_W W + \beta_U U)}{Var(Z)} Z + \gamma_U U && \text{Substitute structural equation into reduced form} \\
+&= \gamma + \beta_W \frac{Cov(Z, W)}{Var(Z)} Z + \gamma_U U \\
+
+0 &= \beta_W \frac{Cov(W,Z)}{Var(Z)} Z - \frac{Cov(Y,Z)}{Var(Z)} Z && \text{Subtract the result from the reduced form} \\
+&= (\beta_W Cov(Z,W) - Cov(Y,Z)) \frac{Z}{Var{Z}} \\
+&= (\beta_W Cov(Z,W) - Cov(Y,Z)) \\
 
 \beta_W &= \frac{Cov(Y,Z)}{Cov(Z,W)}
 \end{aligned}
 $$
 
-In @eq-reg-beta we had a regression model of the same structure, and showed that the coefficient for the treatment is an estimate of the CATT. Hence $\tau_{g,d}=\frac{Cov(Y_d,Z)}{Cov(Z,W_g)}$. Estimators for the variance are given in @dingFirstCourseCausal2023 [ch. 21]. Impressively, the instrument allows us to control for confounders without needing to specify them.
+In @eq-reg-beta we had a regression model of the same structure, and showed that the coefficient for the treatment is an estimate for the CATT. Hence $\tau_{g,d}=\frac{Cov(Y_d,Z)}{Cov(Z,W_g)}$. Estimators for the variance are given in @dingFirstCourseCausal2023 [ch. 21]. Impressively, the instrument allows us to control for confounders without needing to specify them -- if the strong assumptions of randomization and exclusion actually hold.
 
-If randomization holds only conditionally, then we need to control for all covariates conditional to which the instrument is random. Adding controls is also useful to increase statistical power. @torgovitskyWhenTSLSActually point out widespread problems with this approach.
+A subtlety is that this is not the CATT or CATE^[catt-cate], but rather the Conditional _Local_ Average Treatment Effect CLATE, that is, the effect of those days where the instrument actually had an impact on the outcome. This can be intuitively explained by deducing the estimator from the notions of _compliers_, _defiers_, _always-takers_, and _never-takers_: Using the example of rainfall as a binary instrument for protest days, we have
 
-##### Deduction from complier setting
+- _always-takers_: days where there would be a protest regardless of rainfall;
+- _never-takers_: days where there would be no protest regardless of rainfall;
+- _compliers_: days where the rainfall _positively_ determines whether there is a protest:
+  - non-rainy days with protests that would not have occurred if there had been rainfall and
+  - rainy days without protests where without rainfall there would have been protests;
+- _defiers_: days where the rainfall _negatively_ determines whether there is a protest. This is often implausible, and also implausible in this example.
 
-[@dingFirstCourseCausal2023, ch. 21; @pischkeLabourEconomicsPhD2019, slides on the LATE theorem; facurealvesCausalInferenceBrave2022, ch. 9]
+It can be proven that indirect least squares and other instrumental variable methods only estimate the treatment effect for the group of compliers [@dingFirstCourseCausal2023, ch. 21; @pischkeLabourEconomicsPhD2019, slides on the LATE theorem; facurealvesCausalInferenceBrave2022, ch. 9]. In the deduction above, this assumption is implicit in the form of the regression model (TODO: is it?), where $Z$ is assumed to have a constant effect on $Y$.
 
-In the special case of a linear model with a single instrumental variable and a single treatment, we can use _indirect least squares_ as a causal method. This entails using linear regressions to obtain coefficient $\beta_0$ for the effect of the instrument __Z__ on the treatment __W__, and the coefficient $\beta_1$ for the effect of the instrument __Z__ on the outcome __Y__. Since the effect on the outcome is supposed to flow entirely via the treatment, the ratio $\beta_1/\beta_0$ reveals the causal effect of __W__ on __Y__.
+In the case of protests, an instrumental variable approach would ignore the effect of protests where the organizers and participants are very weather-resistant. If such protests are systematically more or less effective than the weather-complying protests, this will introduce bias. For Covid restrictions as an instrument, protests that ignore the restrictions would be excluded from the estimate; this is reasonably negligible because such violations are not known by the climate protest movement.
 
 #### Two stage least squares
 
@@ -78,11 +87,13 @@ For linear models with more complicated settings, we can use the _two-stage leas
 
 For the single-instrument single-treatment case, the results will be numerically identical with the indirect least squares approach. An advantage is that two-stage least squares allows for the calculation of standard errors.
 
-#### Other methods
+#### Other methods and stuff
 
 Another method that is more robust to weak instruments is the _Weak IV_ estimator.
 
 Causal forests for instrumental variables provide a more flexible model than linear regression, and allow for the estimation of heterogenous treatment effects [@bargagli-stoffiHeterogeneousCausalEffects2021].
+
+If randomization holds only conditionally, then we need to control for all covariates conditional to which the instrument is random. Adding controls is also useful to increase statistical power. @torgovitskyWhenTSLSActually point out widespread problems with this approach.
 
 ### Weather as an instrument
 
