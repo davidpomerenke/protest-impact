@@ -1,6 +1,47 @@
 ## Causal analysis via synthetic control {#sec-synth}
 
-WIP
+### Global confounding
+
+$$
+Y_r = \beta + \beta_X X_r + \beta_W W_r + \beta_U U
+$$
+
+$$
+Y_r(0) = \beta + \beta_X X_r + \beta_U U
+$$
+
+### Restricted regional confounding
+
+$$
+Y_r = \beta + \beta_X X_r + \beta_W W_r + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU}
+$$
+
+with m-dimensional vectors $\beta_{UX}, X_r$ and n-dimensional vectors $\beta_{XU}, U$, so their product term in the equation above is scalar.
+
+The counterfactual:
+
+$$
+Y_r(0) = \beta + \beta_X X_r + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU}
+$$
+
+Assumptions:
+
+Let $R_0 = \{r \in R|W_r=0\}$ be the set of control regions.
+
+1. $\sum_{s \in R_0} \gamma_s = 1$
+2. $\sum_{s \in R_0} \gamma_s X_s = X_r$
+
+Interpolation from other regions:
+
+$$
+\begin{aligned}
+\hat Y_r(0) &= \sum_{s \in R_0} \gamma_s Y_s \\
+&= \sum_{s \in R_0} \gamma_s \left(\beta + \beta_X X_s + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU} \right) \\
+&= \beta + \beta_U U + \beta_X \sum_{s \in R_0} \gamma_s  X_s + \beta_{UX}^T \left[\left(\sum_{s \in R_0} \gamma_s X_r \right) U^T\right] \beta_{XU} && \text{By assumption 1} \\
+&= \beta + \beta_X X_r + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU} && \text{By assumption 2} \\
+&= Y_r(0)
+\end{aligned}
+$$
 
 <!-- This is location-based matching
 
