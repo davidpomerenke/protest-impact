@@ -20,7 +20,7 @@ To estimate the CATT, we can set up the following linear model (sometimes design
 
 $$
 \begin{aligned}
-E(Y|W,U) = \beta + \beta_W W + \beta_U U && \text{Structural equation}
+E(Y|W,U) &= \beta + \beta_W W + \beta_U U && \text{Structural equation}
 \end{aligned}
 $$
 
@@ -32,8 +32,8 @@ In addition to the structural equation, we can set up two further equations that
 
 $$
 \begin{aligned}
-W = \alpha + \alpha_Z Z + \alpha_U U && \text{First stage} \\
-Y = \gamma + \gamma_Z Z + \gamma_U U && text{Reduced form} \\
+W &= \alpha + \alpha_Z Z + \alpha_U U && \text{First stage} \\
+Y &= \gamma + \gamma_Z Z + \gamma_U U && \text{Reduced form} \\
 \end{aligned}
 $$
 
@@ -61,6 +61,8 @@ Y &= \gamma + \frac{Cov(Z,\beta + \beta_W W + \beta_U U)}{Var(Z)} Z + \gamma_U U
 \end{aligned}
 $$
 
+TODO: doublecheck whether ATE = ATT actually holds here
+
 In @eq-reg-beta we had a regression model of the same structure, and showed that the coefficient for the treatment is an estimate for the CATT. Hence $\tau_{g,d}=\frac{Cov(Y_d,Z)}{Cov(Z,W_g)}$. Estimators for the variance are given in @dingFirstCourseCausal2023 [ch. 21]. Impressively, the instrument allows us to control for confounders without needing to specify them -- if the strong assumptions of randomization and exclusion actually hold.
 
 A subtlety is that this is not the CATT or CATE^[catt-cate], but rather the Conditional _Local_ Average Treatment Effect CLATE, that is, the effect of those days where the instrument actually had an impact on the outcome. This can be intuitively explained by deducing the estimator from the notions of _compliers_, _defiers_, _always-takers_, and _never-takers_: Using the example of rainfall as a binary instrument for protest days, we have
@@ -78,22 +80,16 @@ In the case of protests, an instrumental variable approach would ignore the effe
 
 #### Two stage least squares
 
-For linear models with more complicated settings, we can use the _two-stage least squares_ method. It is based on two ordinary least-squares regressions:
+An alternative to indirect least squares that extends to multiple instruments and treatments is the _two-stage least squares_ (TSLS) estimator. It involves two OLS regression steps:
 
-- 1. stage: Regress __W__ on __Z__ using.
-- 2. stage: Regress __Y__ on the fitted values $\hat W$.
+1. Estimate $E(W|Z) = \alpha + \alpha_Z Z$ and obtain predictions $\hat W$. These are the "random components" of $W$.
+2. Estimate $E(Y,\hat W) = \beta + \beta_W \hat W$, and obtain the causal estimate $\hat\tau = \hat\beta_W$.
 
-#### Weak IV
+This procedure is proven to also produce estimates of the LATE, and it is identical to indirect least squares in the case of a single instrument and a single treatment [@dingFirstCourseCausal2023, ch. 23].
 
-For the single-instrument single-treatment case, the results will be numerically identical with the indirect least squares approach. An advantage is that two-stage least squares allows for the calculation of standard errors.
+__Including covariates:__ Instrumental variable methods do not generally require the specification of any covariates or confounders. In the case that randomization holds only conditionally, we need to control for all covariates conditional to which the instrument is random. Besides this, adding covariates may also be useful to increase statistical power. @torgovitskyWhenTSLSActually point out that adding covariates causes the estimate to differ from the LATE, which poses a problem that has often been ignored in practice.
 
-#### Other methods and stuff
-
-Another method that is more robust to weak instruments is the _Weak IV_ estimator.
-
-Causal forests for instrumental variables provide a more flexible model than linear regression, and allow for the estimation of heterogenous treatment effects [@bargagli-stoffiHeterogeneousCausalEffects2021].
-
-If randomization holds only conditionally, then we need to control for all covariates conditional to which the instrument is random. Adding controls is also useful to increase statistical power. @torgovitskyWhenTSLSActually point out widespread problems with this approach.
+__Other instrumental variable methods__ include the _Weak IV_ estimator, which is more robust to weak instruments [@dingFirstCourseCausal2023, ch. 21 & 23]. _Causal forests_ for instrumental variables provide a more flexible model than linear regression, and allow for the estimation of heterogenous treatment effects [@bargagli-stoffiHeterogeneousCausalEffects2021].
 
 ### Weather as an instrument
 
