@@ -1,17 +1,5 @@
 ## Causal analysis via synthetic control {#sec-synth}
 
-### Global confounding
-
-$$
-Y_r = \beta + \beta_X X_r + \beta_W W_r + \beta_U U
-$$
-
-$$
-Y_r(0) = \beta + \beta_X X_r + \beta_U U
-$$
-
-### Restricted regional confounding
-
 $$
 Y_r = \beta + \beta_X X_r + \beta_W W_r + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU}
 $$
@@ -29,19 +17,21 @@ Assumptions:
 Let $R_0 = \{r \in R|W_r=0\}$ be the set of control regions.
 
 1. $\sum_{s \in R_0} \gamma_s = 1$
-2. $\sum_{s \in R_0} \gamma_s X_s = X_r$
+2. $E(\sum_{s \in R_0} \gamma_s X_s) = X_r$
 
-Interpolation from other regions:
+Interpolation from other regions, $\hat Y_r(0) &= \sum_{s \in R_0} \gamma_s Y_s$ as estimator.
 
 $$
 \begin{aligned}
-\hat Y_r(0) &= \sum_{s \in R_0} \gamma_s Y_s \\
-&= \sum_{s \in R_0} \gamma_s \left(\beta + \beta_X X_s + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU} \right) \\
-&= \beta + \beta_U U + \beta_X \sum_{s \in R_0} \gamma_s  X_s + \beta_{UX}^T \left[\left(\sum_{s \in R_0} \gamma_s X_r \right) U^T\right] \beta_{XU} && \text{By assumption 1} \\
+E(\hat Y_r(0)) &= E\left(\sum_{s \in R_0} \gamma_s Y_s\right) \\
+&= E\left\{\sum_{s \in R_0} \gamma_s \left[\beta + \beta_X X_s + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU} \right]\right\} \\
+&= \beta + \beta_U U + \beta_X E\left(\sum_{s \in R_0} \gamma_s  X_s\right) + \beta_{UX}^T \left[E\left(\sum_{s \in R_0} \gamma_s X_r \right) U^T\right] \beta_{XU} && \text{By assumption 1} \\
 &= \beta + \beta_X X_r + \beta_U U + \beta_{UX}^T (X_r U^T) \beta_{XU} && \text{By assumption 2} \\
 &= Y_r(0)
 \end{aligned}
 $$
+
+Weights $\gamma$ can be obtained by "upside down regression" [@facurealvesCausalInferenceBrave2022, ch. 15], that is, by performing OLS regression without intercept to estimate $E(X_r)=\gamma_1 X_1 + ... + \gamma_n X_n$ for the control regions $1...n=R_0$. Since the available control regions vary from day to day, many regressions have to be run.^[The number of models to be estimated is asympotically exponential in the number of regions, but the number of regions is small.] The number of samples for each regression may be small, leading to a large variance for $\hat Y_r(0)$ and making systematic bias more likely.
 
 <!-- This is location-based matching
 
