@@ -57,3 +57,11 @@ cite Wager, and causal NLP overview
 
 Predicting propensity scores from text: cite causalNLP overviews
 For example, @bundeskriminalamtbkaLagebildLetzteGeneration2023 hypothesize that "Die Fallzahlen unterliegen einem „wellenartigen“ Verlauf, welcher sich vornehmlich durch (das Ausbleiben von) Großveranstaltungen im gleichen Kontext erklären lässt."
+
+possible models:
+
+- gelectra: 100-300M parameters https://huggingface.co/deepset/gelectra-base
+- igel: 6B parameters https://huggingface.co/philschmid/instruct-igel-001
+- llama 2 german https://huggingface.co/flozi00/Llama-2-7b-german-assistant-v2
+
+faster finetuning: https://github.com/huggingface/peft
