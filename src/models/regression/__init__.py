@@ -13,12 +13,17 @@ from sklearn.preprocessing import OneHotEncoder
 from src.cache import cache
 from src.features.aggregation import naive_all_regions
 from src.models.util.darts_helpers import retrieve_params
-from src.models.util.statsmodels_wrapper import SMWrapper, sk_ols
+from src.models.util.statsmodels_wrapper import SMWrapper
 
 
 @cache
 def regression(
-    lags=0, steps=7, gap=0, include_controls=True, media_source="mediacloud"
+    lags=0,
+    steps=7,
+    gap=0,
+    cumulative=False,
+    include_controls=True,
+    media_source="mediacloud",
 ):
     data = naive_all_regions(media_source=media_source)
     if not include_controls:
@@ -27,7 +32,8 @@ def regression(
     sk_ols = SMWrapper(
         sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
     )  # the intercept can be dropped because the static variable dummies do not drop the first column
-    results = ts_results(data.y, data.x, model=sk_ols, lags=lags, steps=steps, gap=gap)
+    f = ts_results_cumulative if cumulative else ts_results
+    results = f(data.y, data.x, model=sk_ols, lags=lags, steps=steps, gap=gap)
     return results
 
 
@@ -65,9 +71,46 @@ def ts_results(
     return coefs
 
 
-ts_lr = partial(ts_results, model=LinearRegression())
+def ts_results_cumulative(
+    y: list[pd.DataFrame],
+    x: list[pd.DataFrame],
+    model: BaseEstimator,
+    lags: int,
+    steps: int = 1,
+    gap: int = 0,
+):
+    dfs = []
+    for i in range(1, steps + 1):
+        res = _ts_results_cumulative(y, x, model, lags=lags, steps=i, gap=gap)
+        dfs.append(res[res["step"] == i - 1])
+    return pd.concat(dfs)
 
-ts_ols = partial(ts_results, model=sk_ols)
+
+def _ts_results_cumulative(
+    y: list[pd.DataFrame],
+    x: list[pd.DataFrame],
+    model: BaseEstimator,
+    lags: int,
+    steps: int = 1,
+    gap: int = 0,
+):
+    x = [dfx.copy() for dfx in x]
+    y = [dfy.copy() for dfy in y]
+    x = get_ts_list_with_statics(x)  # list of ts
+    y_rolling = get_ts_list_with_statics(
+        [dfy.rolling(steps).sum().dropna() for dfy in y]
+    )
+    y = get_ts_list_with_statics(y)  # list of ts
+    model = RegressionModel(
+        lags=None,
+        lags_future_covariates=(lags, steps),
+        lags_past_covariates=None if lags == 0 else list(range(-lags - gap, -gap)),
+        model=model,
+        output_chunk_length=steps,
+    )
+    model.fit(y_rolling, future_covariates=x, past_covariates=y if lags > 0 else None)
+    coefs = retrieve_params(model, list(y[0].columns))
+    return coefs
 
 
 def plot_lagged_impact(results: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
