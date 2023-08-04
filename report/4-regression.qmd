@@ -23,8 +23,10 @@ $$
 
 The following assumptions allow us to use regression to determine the CATT:
 
-- __Unconfoundedness__, $W \perp\!\!\!\perp Y(0) | X$: The counterfactual outcome if there was no treatment is independent from the actual treatment. (It is not plausible that this assumption actually holds, but regression will just serve as a baseline model.)
+- __Unconfoundedness__^[unconf_naming], $W \perp\!\!\!\perp Y(0) | X$: The counterfactual outcome if there was no treatment is independent from the actual treatment. (It is not plausible that this assumption actually holds, but regression will just serve as a baseline model.)
 - __Overlap__, $e(X) < 1$ for the propensity score $e(X) = P(W=1|X)$: The treatment assignment is not deterministic.
+
+[unconf_naming]: _Unconfoundedness_ is also known as _ignorability_, _selection on observables_, or _conditional independence_.
 
 Under these assumptions, we can identify $\tau$ as follows [see @dingFirstCourseCausal2023, ch. 13 for proof]:
 
@@ -72,6 +74,10 @@ __Regression with controls__ comes closer to a causal model, and is a valid caus
 - Time-series lags of the outcome: Including at least one lag for the outcome variable is crucial to enbale the model to focus on the effect of the protest event, without needing to guess the overall level of coverage. I add lags for all dimensions of newspaper coverage to model eventual interactions, for example that a catastrophic framing on the previous day leads to heightened coverage on the following day.
 - Time-series lags of the treatment: I control for events by other protest groups on the same day and for events by all protest groups in the past, in order to properly separate out the conditional effect of each group.
 <!-- - A slight shortcoming is that events that are jointly organized by multiple groups (as opposed to multiple events organized by single groups on the same day) are just treated as a separate single protest group (FFF+X, since Fridays for Future is involved in almost all of them). The alternative would be  -->
+
+$$
+E(Y_d|W_g,X,T=t) = \beta + \sum_{t'=t-k...t\\ g\in G} \beta_{W,g,t'} W_{gt'} + \beta_X X
+$$
 
 ### Regional and national data
 

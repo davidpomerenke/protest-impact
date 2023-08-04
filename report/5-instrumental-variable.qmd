@@ -10,9 +10,9 @@ There are three conditions that make a variable $Z$ a valid instrument [@dingFir
 2. $Z$ changes the distribution of the treatment $W$.
 3. $Z$ does not directly influence $Y$, but only indirectly via $W$ (_exclusion restriction_).
 
-#### Wald estimator
+#### Indirect least squares
 
-In the case of a single instrument and a single treatment, we can use indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2]. It is also known simply as _instrumental variable_ method, and -- especially in the case of a binary instrument -- the Wald estimator [@dingFirstCourseCausal2023, ch. 21].
+In the case of a single instrument and a single treatment, we can use indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2]. It is also known simply as _instrumental variable_ method, and -- modified for the special case of a binary instrument -- as Wald estimator [@dingFirstCourseCausal2023, ch. 21].
 
 [@dingFirstCourseCausal2023, ch. 23; @pischkeLabourEconomicsPhD2019, slides on instrumental variables; @facurealvesCausalInferenceBrave2022, ch. 8]
 
@@ -78,6 +78,8 @@ It can be proven that indirect least squares and other instrumental variable met
 
 In the case of protests, an instrumental variable approach would ignore the effect of protests where the organizers and participants are very weather-resistant. If such protests are systematically more or less effective than the weather-complying protests, this will introduce bias. For Covid restrictions as an instrument, protests that ignore the restrictions would be excluded from the estimate; this is reasonably negligible because such violations are not known by the climate protest movement.
 
+<!-- manually or https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.instrumental_variable_estimator -->
+
 #### Two stage least squares
 
 An alternative to indirect least squares that extends to multiple instruments and treatments is the _two-stage least squares_ (TSLS) estimator. It involves two OLS regression steps:
@@ -90,6 +92,11 @@ This procedure is proven to also produce estimates of the LATE, and it is identi
 __Including covariates:__ Instrumental variable methods do not generally require the specification of any covariates or confounders. In the case that randomization holds only conditionally, we need to control for all covariates conditional to which the instrument is random. Besides this, adding covariates may also be useful to increase statistical power. @torgovitskyWhenTSLSActually point out that adding covariates causes the estimate to differ from the LATE, which poses a problem that has often been ignored in practice.
 
 __Other instrumental variable methods__ include the _Weak IV_ estimator, which is more robust to weak instruments [@dingFirstCourseCausal2023, ch. 21 & 23]. _Causal forests_ for instrumental variables provide a more flexible model than linear regression, and allow for the estimation of heterogenous treatment effects [@bargagli-stoffiHeterogeneousCausalEffects2021].
+
+<!--
+- https://bashtage.github.io/linearmodels/iv/index.html
+- https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.two_stage_regression_estimator
+-->
 
 ### Weather as an instrument
 
@@ -255,3 +262,5 @@ e. When performing regression with only the instruments and no control variables
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
 
 It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
+
+Future work or so: Doubly  robust IV, https://econml.azurewebsites.net/_autosummary/econml.iv.dr.DRIV.html
