@@ -80,9 +80,10 @@ def ts_results_cumulative(
     gap: int = 0,
 ):
     dfs = []
-    for i in range(1, steps + 1):
-        res = _ts_results_cumulative(y, x, model, lags=lags, steps=i, gap=gap)
-        dfs.append(res[res["step"] == i - 1])
+    for i in range(0, steps):
+        res = _ts_results_cumulative(y, x, model, lags=lags, step=i, gap=gap)
+        res["step"] = i
+        dfs.append(res)
     return pd.concat(dfs)
 
 
@@ -91,22 +92,22 @@ def _ts_results_cumulative(
     x: list[pd.DataFrame],
     model: BaseEstimator,
     lags: int,
-    steps: int = 1,
+    step: int = 0,
     gap: int = 0,
 ):
     x = [dfx.copy() for dfx in x]
     y = [dfy.copy() for dfy in y]
     x = get_ts_list_with_statics(x)  # list of ts
     y_rolling = get_ts_list_with_statics(
-        [dfy.rolling(steps).sum().dropna() for dfy in y]
+        [dfy.rolling(step + 1).sum().shift(-step).dropna() for dfy in y]
     )
     y = get_ts_list_with_statics(y)  # list of ts
     model = RegressionModel(
         lags=None,
-        lags_future_covariates=(lags, steps),
+        lags_future_covariates=(lags, 1),
         lags_past_covariates=None if lags == 0 else list(range(-lags - gap, -gap)),
         model=model,
-        output_chunk_length=steps,
+        output_chunk_length=1,
     )
     model.fit(y_rolling, future_covariates=x, past_covariates=y if lags > 0 else None)
     coefs = retrieve_params(model, list(y[0].columns))
