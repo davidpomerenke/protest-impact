@@ -1,4 +1,4 @@
-## Baseline analysis via regression
+## Baseline analysis via regression {#sec-reg}
 
 ### Mathematical notation
 

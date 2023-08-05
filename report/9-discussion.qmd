@@ -21,3 +21,6 @@ RL approaches
 Other causal approaches
 - instrumental variables
 - Backdoor via Path models?: cite Pearl, maybe Iamnitchi, maybe Runge -->
+
+
+Anticipation effects [@abadieSyntheticControlMethods2010]
