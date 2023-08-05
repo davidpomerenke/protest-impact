@@ -45,11 +45,13 @@ $$
 \tau^{Hajek} = \hat{\bar{Y}}(1) - \frac{1}{n} \sum_{i=1}^{n} \frac{\frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)Y_i}{1-e(X_i)}}{\frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)}{1-e(X_i)}}
 $$
 
-I use the implementation from the [EconML](https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.propensity_score_weighting_estimator) Python package, with a normalized weighting scheme (that is, the Hájek estimator) for ATT estimation.
+I use the implementation from the [DoWhy](https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.propensity_score_weighting_estimator) Python package, with a normalized weighting scheme (that is, the Hájek estimator) for ATT estimation.
 
 ### Doubly robust estimation
 
-https://econml.azurewebsites.net/_autosummary/econml.dr.LinearDRLearner.html
+Both regression (@sec-reg) and IPW rely on the same assumptions of overlap and conditional unconfoundedness. They can be combined into a single estimator known as _augmented inverse propensity weighting_ or as the _doubly robust estimator_. It is consistent if at least one of the models is correctly specified -- that is, if either the treatment or the outcome is consistently estimated. If both models are correct, then it helps reducing the bias of the regression estimator, and reducing the variance of the propensity score estimator.
+
+Doubly robust estimation is defined, motivated, and proven in @dingFirstCourseCausal2023 [ch. 12, ch. 13.2]. As an implementation I use the `LinearDRLearner` from the [EconML](https://econml.azurewebsites.net/_autosummary/econml.dr.LinearDRLearner.html) Python package.
 
 ### Propensity scores from press release texts
 
