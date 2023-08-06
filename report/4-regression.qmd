@@ -39,7 +39,7 @@ The coefficient $\beta_W$ can be estimated via _Ordinary Least Squares_ (OLS) re
 
 $$
 E(Y_d|W_g,X) = \beta + \beta_W W_g + \beta_X X
-$$ {#eq-reg-lin-model}
+$$
 
 allows for the estimation of the ATT $\hat\tau_{g,d}=\hat\beta_W$ for all protest groups $g \in G$ and outcome dimensions $d \in D$.[^att-ate] Standard errors and confidence intervals can also be obtained from the OLS procedure.
 

@@ -282,3 +282,13 @@ $$
 $$
 
 \endgroup
+
+###
+
+- bootstrapping for comparable standard errors
+- placebo tests to assess bias and variance
+- cross-validation of
+  - regression -> prediction mse
+  - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage))
+  - synth -> predictive quality within different pre-fit areas
+  - prop scores -> prop score f1

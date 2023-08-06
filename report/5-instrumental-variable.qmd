@@ -51,13 +51,13 @@ E(Y|Z,U) &= \gamma + \frac{Cov(Z,\beta + \beta_W W + \beta_U U)}{Var(Z)} Z + \ga
 
 <!-- TODO: doublecheck whether ATE = ATT actually holds here -->
 
-In @eq-reg-beta we had a regression model of the same structure, and showed that the ATT can be estimated by the coefficient for the treatment, so:
+In @eq-reg-beta we had a regression model of the same structure, and showed that the ATT can be estimated by the coefficient for the treatment, so we have:
 
 \begin{align}
 \tau_{g,d}=\frac{Cov(Y_d,Z)}{Cov(Z,W_g)}
 \end{align}
 
-Estimators for the variance are given in @dingFirstCourseCausal2023 [ch. 21].
+A corresponding estimator is given using the sample covariances. Estimators for the variance are deduced in @dingFirstCourseCausal2023 [ch. 21].
 
 Impressively, the instrument allows us to control for confounders without needing to specify them -- if the strong assumptions of randomization and exclusion actually hold.
 
