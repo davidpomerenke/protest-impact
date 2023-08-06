@@ -67,11 +67,11 @@ I want to compare multiple causal methods and see what they can tell us about th
 
 1. Can the causal methods -- instrumental variable, synthetic control, and propensity score methods -- be applied to study the impact of protest events on newspaper attention? What limitations apply, and what problems occur? Are the estimates consistent, and how do they differ from each other and from simple regression estimates?
 
-2. What is the _Conditional Average Treatment Effect on the Treated_[^CATT] (CATT) of protest events on newspaper coverage, depending on the protest group that organized the protest?
+2. What is the _Average Treatment Effect on the Treated_[^ATT] (ATT) of protest events on newspaper coverage, for climate protests in general, and with respect to the protest group that organizes the protest?
 
 3. What can we say about the hypothesis that climate protests _distract_ from discussing solutions to the climate crisis constructively?
 
-[^CATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. Since different protest groups organize very different protest forms, I do not study the overall ATT, but the ATT conditional on the protest group (CATT).
+[^ATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. It differs from the _Average Treatment Effect_ (ATE) by focusing on the treated units rather than the whole population.
 
 ### Ethical concerns
 

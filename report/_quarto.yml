@@ -19,7 +19,6 @@ format:
     fontsize: 9pt
     include-in-header:
       text: |
-        \usepackage{mathastext}
         \usepackage[l3]{csvsimple}
         \usepackage{booktabs}
         \usepackage{url}

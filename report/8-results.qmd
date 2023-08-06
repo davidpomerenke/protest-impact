@@ -12,16 +12,16 @@ import matplotlib.pyplot as plt
 from src.models.regression import regression
 from src.features.time_series.lagged_impact import plot_lagged_impact
 
-fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-results = regression(include_controls=False)
-plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0])
-axes[0].set_title("Regression without controls")
+# fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+# results = regression(include_controls=False)
+# plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0])
+# axes[0].set_title("Regression without controls")
 
-results = regression(max_lags=0)
-plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[1])
-axes[1].set_title("Regression with controls for weekdays and holidays")
-fig.tight_layout()
-plt.show()
+# results = regression(max_lags=0)
+# plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[1])
+# axes[1].set_title("Regression with controls for weekdays and holidays")
+# fig.tight_layout()
+# plt.show()
 ```
 
 ```{python}
@@ -30,21 +30,34 @@ plt.show()
 # | column: page
 # | echo: false
 
+from src.features.time_series.lagged_impact import plot_lagged_impact
+from src.models.regression import regression
+
+lags = 14
+steps = 7
+gap = 3
+var = "occ_FFFX"
+cum = True
+
 fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-results = regression(max_lags=1)
-plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0, 0])
+results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
+plot_lagged_impact(results, var, "protest", ax=axes[0, 0])
 axes[0, 0].set_title("Online newspapers")
 
-results = regression(max_lags=1, media_source="dereko")
-plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0, 1])
+results = regression(
+    lags=lags, steps=steps, gap=gap, cumulative=cum, media_source="dereko"
+)
+plot_lagged_impact(results, var, "protest", ax=axes[0, 1])
 axes[0, 1].set_title("Print newspapers")
 
-results = regression(max_lags=1)
-plot_lagged_impact(results, "occ_FFF", "goals", ax=axes[1, 0])
+results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
+plot_lagged_impact(results, var, "goals", ax=axes[1, 0])
 axes[1, 0].set_title("Online newspapers: goals and framing")
 
-results = regression(max_lags=1, media_source="dereko")
-plot_lagged_impact(results, "occ_FFF", "goals", ax=axes[1, 1])
+results = regression(
+    lags=lags, steps=steps, gap=gap, cumulative=cum, media_source="dereko"
+)
+plot_lagged_impact(results, var, "goals", ax=axes[1, 1])
 axes[1, 1].set_title("Print newspapers: goals and framing")
 fig.tight_layout()
 plt.show()

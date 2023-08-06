@@ -1,8 +1,8 @@
-## Causal analysis via instrumental variable {#sec-instrumental}
+## NEW Instrumental variables {#sec-instrumental}
 
-The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. As is also exploited in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.
+The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. Like in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.
 
-### Theory
+### Assumptions
 
 There are three conditions that make a variable $Z$ a valid instrument [@dingFirstCourseCausal2023, p. 279]:
 
@@ -10,86 +10,85 @@ There are three conditions that make a variable $Z$ a valid instrument [@dingFir
 2. $Z$ changes the distribution of the treatment $W$.
 3. $Z$ does not directly influence $Y$, but only indirectly via $W$ (_exclusion restriction_).
 
-#### Indirect least squares
+### Indirect least squares
 
-In the case of a single instrument and a single treatment, we can use indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2]. It is also known simply as _instrumental variable_ method, and -- modified for the special case of a binary instrument -- as Wald estimator [@dingFirstCourseCausal2023, ch. 21].
+In the case of a single instrument and a single treatment, we can use indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2; @pischkeLabourEconomicsPhD2019, slides on instrumental variables; @facurealvesCausalInferenceBrave2022, ch. 8]. It is also known simply as _instrumental variable_ method, and -- modified for the special case of a binary instrument -- as _Wald estimator_ [@dingFirstCourseCausal2023, ch. 21].
 
-[@dingFirstCourseCausal2023, ch. 23; @pischkeLabourEconomicsPhD2019, slides on instrumental variables; @facurealvesCausalInferenceBrave2022, ch. 8]
+To estimate the ATT, we can set up the following linear model (sometimes designated as _structural equation_):
 
-To estimate the CATT, we can set up the following linear model (sometimes designated as _structural equation_):
-
-$$
-\begin{aligned}
-E(Y|W,U) &= \beta + \beta_W W + \beta_U U && \text{Structural equation}
-\end{aligned}
-$$
+\begin{align}
+E(Y|W,U) &= \beta + \beta_W W + \beta_U U && \text{Structural equation} \label{eqstruct}
+\end{align}
 
 This is very similar to @eq-reg-lin-model, only that now the unmeasured confounders are included rather than the known covariates. (We can leave out the known confounders X from the model without loss of generality, because when we do not include them they will also be unknown confounders, and can thus be treated as pasrt of the unknown confounders U.)
 
-@eq-reg-beta identifies the CATT as $\tau=\beta_W$ and is also applicable here. The assumptions are unconfoundedness and overlap (see @sec-reg-math). Unconfoundedness $W \perp\!\!\!\perp Y(0) | X$ is implausible in the simple regression context, but here the analogous assumption is $W \perp\!\!\!\perp Y(0) | U$, that is, unconfoundedness _given the unknown confounders_, which trivially applies.
+@eq-reg-beta identifies the ATT as $\tau=\beta_W$ and is also applicable here. The assumptions are unconfoundedness and overlap (see @sec-reg-math). In the context of regression, we have dealt with unconfoundedness given the known confounders $W \perp\!\!\!\perp Y(0) | X$ which is implausible due to potential hidden confounders; but the equation here is not about $X$ but about $U$, so the analogous assumption is $W \perp\!\!\!\perp Y(0) | U$, that is, unconfoundedness _given the unknown confounders_, which trivially applies.
 
 In addition to the structural equation, we can set up two further equations that describe the impact of the instrument Z on both W and Y:
 
-$$
-\begin{aligned}
-W &= \alpha + \alpha_Z Z + \alpha_U U && \text{First stage} \\
-Y &= \gamma + \gamma_Z Z + \gamma_U U && \text{Reduced form} \\
-\end{aligned}
-$$
+\begin{align}
+E(W|Z,U) &= \alpha + \alpha_Z Z + \alpha_U U && \text{First stage} \\
+E(Y|Z,U) &= \gamma + \gamma_Z Z + \gamma_U U && \text{Reduced form}
+\end{align}
 
 The randomization assumption implies that the instrument is not correlated with any variables that are not causally affected by the instrument. The exclusion restriction formulates that there is no path from $Z$ to $Y$ other than through $W$. Together, they imply that $Z$ is independent from $U$ in both equations. Since $Z$ is independent from the other predictor variables, the calculation of the coefficients $\alpha_Z$ and $\gamma_Z$ resolves to the simpler case of univariate OLS, where we have $\alpha_Z=\frac{Cov(W,Z)}{Var(Z)}$ and $\gamma_Z=\frac{Cov(Y,Z)}{Var(Z)}$:
 
-$$
-\begin{aligned}
-W &= \alpha + \frac{Cov(W,Z)}{Var(Z)} Z + \alpha_U U && \text{First stage} \\
-Y &= \gamma + \frac{Cov(Y,Z)}{Var(Z)} Z + \gamma_U U && \text{Reduced form} \\
-\end{aligned}
-$$
+\begin{align}
+E(W|Z,U) &= \alpha + \frac{Cov(W,Z)}{Var(Z)} Z + \alpha_U U && \text{First stage} \\
+E(Y|Z,U) &= \gamma + \frac{Cov(Y,Z)}{Var(Z)} Z + \gamma_U U && \text{Reduced form} \label{eqreduced}
+\end{align}
 
 Substitution and reordering shows how $\beta_W$ can be calculated from the covariances:
 
-$$
-\begin{aligned}
-Y &= \gamma + \frac{Cov(Z,\beta + \beta_W W + \beta_U U)}{Var(Z)} Z + \gamma_U U && \text{Substitute structural equation into reduced form} \\
-&= \gamma + \beta_W \frac{Cov(Z, W)}{Var(Z)} Z + \gamma_U U \\
-
-0 &= \beta_W \frac{Cov(W,Z)}{Var(Z)} Z - \frac{Cov(Y,Z)}{Var(Z)} Z && \text{Subtract the result from the reduced form} \\
+\begin{align}
+E(Y|Z,U) &= \gamma + \frac{Cov(Z,\beta + \beta_W W + \beta_U U)}{Var(Z)} Z + \gamma_U U && \text{Substitute \eqref{eqstruct} into \eqref{eqreduced}} \\
+&= \gamma + \beta_W \frac{Cov(Z, W)}{Var(Z)} Z + \gamma_U U \label{eqresult} \\
+0 &= \beta_W \frac{Cov(W,Z)}{Var(Z)} Z - \frac{Cov(Y,Z)}{Var(Z)} Z && \text{Subtract \eqref{eqresult} from \eqref{eqreduced}} \\
 &= (\beta_W Cov(Z,W) - Cov(Y,Z)) \frac{Z}{Var{Z}} \\
 &= (\beta_W Cov(Z,W) - Cov(Y,Z)) \\
-
 \beta_W &= \frac{Cov(Y,Z)}{Cov(Z,W)}
-\end{aligned}
-$$
+\end{align}
 
-TODO: doublecheck whether ATE = ATT actually holds here
+<!-- TODO: doublecheck whether ATE = ATT actually holds here -->
 
-In @eq-reg-beta we had a regression model of the same structure, and showed that the coefficient for the treatment is an estimate for the CATT. Hence $\tau_{g,d}=\frac{Cov(Y_d,Z)}{Cov(Z,W_g)}$. Estimators for the variance are given in @dingFirstCourseCausal2023 [ch. 21]. Impressively, the instrument allows us to control for confounders without needing to specify them -- if the strong assumptions of randomization and exclusion actually hold.
+In @eq-reg-beta we had a regression model of the same structure, and showed that the ATT can be estimated by the coefficient for the treatment, so:
 
-A subtlety is that this is not the CATT or CATE^[catt-cate], but rather the Conditional _Local_ Average Treatment Effect CLATE, that is, the effect of those days where the instrument actually had an impact on the outcome. This can be intuitively explained by deducing the estimator from the notions of _compliers_, _defiers_, _always-takers_, and _never-takers_: Using the example of rainfall as a binary instrument for protest days, we have
+\begin{align}
+\tau_{g,d}=\frac{Cov(Y_d,Z)}{Cov(Z,W_g)}
+\end{align}
 
-- _always-takers_: days where there would be a protest regardless of rainfall;
-- _never-takers_: days where there would be no protest regardless of rainfall;
+Estimators for the variance are given in @dingFirstCourseCausal2023 [ch. 21].
+
+Impressively, the instrument allows us to control for confounders without needing to specify them -- if the strong assumptions of randomization and exclusion actually hold.
+
+### LATE
+
+A subtlety is that this is not the ATT or ATE [^att-ate], but rather the _Local_ Average Treatment Effect LATE, that is, the effect of those days where the instrument actually had an impact on the outcome. This can be intuitively explained by deducing the estimator from the notions of _compliers_, _defiers_, _always-takers_, and _never-takers_: Using the example of rainfall as a binary instrument for protest days, we have
+
+- _always-takers_: days where there would be a protest, regardless of rainfall;
+- _never-takers_: days where there would be no protest, regardless of rainfall;
 - _compliers_: days where the rainfall _positively_ determines whether there is a protest:
   - non-rainy days with protests that would not have occurred if there had been rainfall and
   - rainy days without protests where without rainfall there would have been protests;
-- _defiers_: days where the rainfall _negatively_ determines whether there is a protest. This is often implausible, and also implausible in this example.
+- _defiers_: days where the rainfall _negatively_ determines whether there is a protest. This is often implausible (also in our context) and therefore it is assumed that there are no defiers.
 
-It can be proven that indirect least squares and other instrumental variable methods only estimate the treatment effect for the group of compliers [@dingFirstCourseCausal2023, ch. 21; @pischkeLabourEconomicsPhD2019, slides on the LATE theorem; facurealvesCausalInferenceBrave2022, ch. 9]. In the deduction above, this assumption is implicit in the form of the regression model (TODO: is it?), where $Z$ is assumed to have a constant effect on $Y$.
+It can be proven that indirect least squares and other instrumental variable methods only estimate the treatment effect for the group of compliers [@dingFirstCourseCausal2023, ch. 21; @pischkeLabourEconomicsPhD2019, slides on the LATE theorem; @facurealvesCausalInferenceBrave2022, ch. 9].
+<!-- In the deduction above, this assumption is implicit in the form of the regression model (TODO: is it?), where $Z$ is assumed to have a constant effect on $Y$. -->
 
-In the case of protests, an instrumental variable approach would ignore the effect of protests where the organizers and participants are very weather-resistant. If such protests are systematically more or less effective than the weather-complying protests, this will introduce bias. For Covid restrictions as an instrument, protests that ignore the restrictions would be excluded from the estimate; this is reasonably negligible because such violations are not known by the climate protest movement.
+In the case of protests, an instrumental variable approach would ignore the effect of protests where the organizers and participants are very weather-resistant. If such protests are systematically more or less effective than the weather-complying protests, this will introduce bias. For Covid restrictions as an instrument, the instrumental variable approach would ignore the effect of protests that violate the restrictions; this is reasonably negligible because the climate protest movement is not known to have committed such violations.
 
 <!-- manually or https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.instrumental_variable_estimator -->
 
-#### Two stage least squares
+### Two stage least squares
 
 An alternative to indirect least squares that extends to multiple instruments and treatments is the _two-stage least squares_ (TSLS) estimator. It involves two OLS regression steps:
 
 1. Estimate $E(W|Z) = \alpha + \alpha_Z Z$ and obtain predictions $\hat W$. These are the "random components" of $W$.
 2. Estimate $E(Y,\hat W) = \beta + \beta_W \hat W$, and obtain the causal estimate $\hat\tau = \hat\beta_W$.
 
-This procedure is proven to also produce estimates of the LATE, and it is identical to indirect least squares in the case of a single instrument and a single treatment [@dingFirstCourseCausal2023, ch. 23].
+This procedure is proven to also produce estimates of the LATE, and in the case of a single instrument and a single treatment it is identical to indirect least squares [@dingFirstCourseCausal2023, ch. 23].
 
-__Including covariates:__ Instrumental variable methods do not generally require the specification of any covariates or confounders. In the case that randomization holds only conditionally, we need to control for all covariates conditional to which the instrument is random. Besides this, adding covariates may also be useful to increase statistical power. @torgovitskyWhenTSLSActually point out that adding covariates causes the estimate to differ from the LATE, which poses a problem that has often been ignored in practice.
+__Including covariates:__ Instrumental variable methods do not generally require the specification of any covariates or confounders. In the case that randomization holds only conditionally, we need to control for all covariates conditional to which the instrument is random. Besides this, adding covariates may also be useful for increasing statistical power. @torgovitskyWhenTSLSActually point out that adding covariates causes the estimate to differ from the LATE, which poses a problem that has often been ignored in practice.
 
 __Other instrumental variable methods__ include the _Weak IV_ estimator, which is more robust to weak instruments [@dingFirstCourseCausal2023, ch. 21 & 23]. _Causal forests_ for instrumental variables provide a more flexible model than linear regression, and allow for the estimation of heterogenous treatment effects [@bargagli-stoffiHeterogeneousCausalEffects2021].
 
@@ -100,25 +99,17 @@ __Other instrumental variable methods__ include the _Weak IV_ estimator, which i
 
 ### Weather as an instrument
 
-<!-- #### Validity of weather as an instrument
+#### Validity of weather as an instrument
 
 While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing.
 
-Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data, specifically from the respective capital of the region. This is a potential weakness that will be addressed later.
+Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data, ~~specifically from the respective capital of the region~~. This is a potential weakness that will be addressed later.
 
 Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
 
-##### Indirect paths
+__Indirect paths:__ @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
 
-WIP
-
-@mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
-
-##### Spatial interdependence
-
-WIP
-
-@coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables, and only affect the exogenous climate variables.
+__Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables, and only affect the exogenous climate variables.
 
 ##### Seasonality
 
@@ -136,16 +127,14 @@ For evaluating the validity of an instrument, an important step is to consider t
 
 ##### Precipitation
 
-WIP
-
-I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
+<!-- I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
 
 \begingroup
 \scriptsize\selectfont
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
 \endgroup
 
-Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them.
+Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them. -->
 
 ##### Other weather variables
 
@@ -161,17 +150,15 @@ Describe the problem and show the impact on the BLM movement data. Explain that 
 
 ##### Separating short-term and long-term weather components
 
-WIP
-
 An additional concern that has been identified and adjusted for by some previous studies (see @sec-weatherlit) is that weather contains a non-random component that is correlated both temporally with annual seasonality (which may be linked, for example, to media attention cycles, and many other variables), and geographically with places with generally nice or bad weather (which may be linked, for example, to economic indicators, or also to previous protest activity). This is in violation of condition (1.) on valid instruments from above. Therefore I try to split each weather variable into a long-term non-random variable and a short-term almost-random variable.
 
 I follow @negroWhichSideAre2019 in using 10-year averages for each day of the year, additionally smoothing them. I find a $\pm 14$-day window using Bayesian smoothing to deliver more satisfactory results, that is, smoother climate variables, than the $\pm 3$-day moving average applied by the authors. Using this as a long-term variable, I construct the short-term variable by subtracting the long-term variable from the original weather weather variable. Results for the short-term weather variables are displayed in @fig-weather-time-series-2.
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series-2 >}}
 
-The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which is likely attributable to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument.
+The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which may be due to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument.
 
-__Aside: First-stage validity in previous work__
+<!-- __Aside: First-stage validity in previous work__
 
 To underline the problems that I encounter, I apply my method to a case study from the literature, where an instrumental variables approach using the weather to instrument protest size has been successfully conducted. I choose the _Black Lives Matter_ movement in 2020 in the United States, which has recently received much scholarly attention and has been studied independently by both @kleinteeselinkWeatherProtestEffect2021 and @carenBlackLivesMatter2023, employing a similar methodical setting which may have been inspired by @wasowAgendaSeedingHow2020.
 
@@ -179,11 +166,9 @@ I use rainfall ... and protests from the ACLED dataset.
 
 I only investigate the first stage.
 
-Fig: Placebo test for monthly average. Conclusion: separate climate and weather!
+Fig: Placebo test for monthly average. Conclusion: separate climate and weather! -->
 
 ##### Leveraging the gap between pre-registered and observed protest size
-
-WIP
 
 Predicting the change for all Berlin data:
 
@@ -225,23 +210,19 @@ And results for the 2nd stage (the actually interesting thing):
 \begingroup
 \scriptsize\selectfont
 {{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
-\endgroup -->
+\endgroup
 
 ### Pandemic restrictions as an instrument
-<!--
-WIP
 
-The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
+The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020 and 2021, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
 
 #### Validity of restrictions as an instrument
 
-WIP
-
-I see mainly 3 objections against using such variables as instruments, yet I am uncertain how much they really matter:
+I see 3 reasons why pandemic restrictions may not be a valid instrument:
 
 1. Just like the weather, the spread of the coronavirus is to some extent a natural event. It is, however, to some extent controlled by the behaviour of humans, and especially the restrictions due to COVID-19 have a large political component. I worry especially about geographical confounding: Restrictions in Germany have in large part been up to the regional legislators and governments, and perhaps those governing parties whose climate policy causes outrage tend to impose especially strict (or loose) COVID-19 restrictions for one reason or another.
-2. Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally correlated with political processes and with media attention cycles.
-3. There is an obvious direct impact of COVID-19 in that stricter restrictions may correlate with an intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for, except for protests whose concern is also focused on the pandemic. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics. -->
+2. Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally or systematically correlated with political processes and with media attention cycles.
+3. There is a potential direct impact of COVID-19 on media coverage: Stricter restrictions may correlate with a more intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics.
 
 
 <!--
@@ -263,4 +244,9 @@ e. When performing regression with only the instruments and no control variables
 
 It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
 
-Future work or so: Doubly  robust IV, https://econml.azurewebsites.net/_autosummary/econml.iv.dr.DRIV.html
+
+### Evaluation
+
+- Placebo
+- first stage Placebo
+- statistical tests

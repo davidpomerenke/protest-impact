@@ -2,23 +2,26 @@
 
 Here I give an overview of the causal model that I generally assume. Then I give an overview of the different causal methods used in this project, how they exploit the causal model, and what additional assumptions they make. Since _time series methods_ may be used in various contexts, I also briefly introduce their structure and show how they can be applied to various machine learning problems that arise as part of the causal methods.
 
-We can group the variables from the dataset described in @sec-data into 4 causal categories, and add another category for variables that we do not know but that might be relevant. For each day and each region, we have data in the following categories:
+We can group the variables from the dataset described in @sec-data into 4 causal categories, and add another category for variables that we do not know but that might be relevant. The _treatment units_ are _days_, and data is available for multiple regions. For each day in a given region, we have data in the following categories:
 
 - Treatment __W__:
-  - For each protest group, a dummy variable whether it organizes at least one protest event in the given region (_binary treatment_)
-  - Alternatively, for each protest group the number of protesters in the given region (_continuous treatment_)
+  - For each protest group, a dummy variable whether it organizes at least one protest event in the given region (_binary treatment_)^[Alternatively, I could use for each protest group the number of protesters in the given region as a _continuous treatment_; but this requires (a) slightly more complicated methods to deal with continuous treatments, and (b) difficult assumptions about scaling -- is the effect linear, logistic, or more complicated?]
 - Outcome __Y__:
-  - Number of newspaper articles published, across several dimensions (see @sec-data-discourse)
+  - Number of newspaper articles published that mention the climate crisis, across 5 dimensions (see @sec-data-discourse): overall mentions; mentioning protest activity; mentioning long-term goals; mentioning specific short-term goals; using a drastic or catastrophic framing.
 - Instruments __Z__:
-  - Weather: min/max/avg temperature, air pressure, precipitation, snowfall, wind speed, and peak gust; with the longterm climate components removed, respectively (see @sec-instrumental for explanation and discussion)
-  - Covid restrictions: stringency index and movement variables for 6 location types
+  - Weather: min/max/avg temperature, air pressure, precipitation, snowfall, wind speed, and peak gust
+  - Covid restrictions: stringency index of the restrictions, and movement variables for 6 location types
 - Known confounders __X__:
+  - Day of the week, as dummy variables
+  - Holiday occurrence in the given region
   - Region:
     - represented as dummy variables
     - alternatively, represented using 29 sociodemographic indicators: voting behavior, average female income, ...
-  - Climate: climate components of the weather variables (see above)
+  - Time-series lags (that is, values from previous days) of some or all variables -- see @sec-time-series
 - Unknown confounders __U__:
   - __?__
+
+
 
 @fig-causal-graph-simple shows the causal relations between the 5 categories graphically.
 
@@ -157,7 +160,7 @@ Propensity score methods estimate the probability (propensity) of receiving the 
 
 Propensity score methods still suffer from _omitted variable bias_ if there are unknown confounders. This can be mitigated by learning propensity scores from less structured big data such as texts, using classification models from natural language processing. The advantage of doing so is that the unknown confounders need not be pre-specified. The assumption is that the texts need to contain all of the unknown confounders, and in some detectable form. While this will never completely be the case (and cannot be verified anyway), I can hope that it at least substantially reduces the bias.
 
-### Time-series modelling
+### Time-series modelling {#sec-time-series}
 
 The variables on one day may also be influenced by the same set of variables from the previous day. On the one hand, this makes modeling more complicated. On the other hand, it is an advantage, because we have the data from the previous days already in the dataset, and using them can help reduce the amount of unknown confounding. Specifically, I consider all variables from the previous day as potential confounders for the current day. Variables from multiple days earlier may still be relevant, but less so, so it will be acceptable to make a cutoff at some point. We can restrict the previous variables to those from the same region, or we can also include previous variables from other regions where it seems useful.
 
@@ -216,102 +219,66 @@ digraph D {
 }
 ```
 
-In time-series models, be it for forecasting or classification, the model usually consumes 3 types of variables:
+In time-series models, be it for forecasting or classification, the predictor variables usually fall into 3 categories:
 
-- __Historic variables:__ Variables that are only available for past dates but not for the date of the prediction. This is especially true for the target variable; since its future value should be predicted, it should not be present in the training data.
+- __Historic variables:__ Variables that are only available for past dates but not for the date of the prediction. This is especially true for the target variable^[The lags of the target variable are more specifically called an __autoregressive__ variable.]; since its future value should be predicted, it should not be present as a predictor.
 - __Future variables:__ Variables whose values are available for past dates as well as the date of the prediction.
 - __Static variables:__ These are time-independent.
 
-We can now use these notions to define the machine learning tasks for the different methods in terms of time series prediction.
+@tbl-time-series gives an overview how these categories are applicable within the different causal methods.
 
-#### Regression
-
-Predict __Y__ using:
-
-- __W__ as future variable [^notation]
-- __X__ as future and static variables
-- __Y__ as historic variable
-
-[^notation]: The past values of the treatment __W__ are then technically not a part of the treatment, but rather a part of the covariates __X__ (see @fig-causal-graph-time-series). This is analogously true for the past values of __Y__ and __Z__, both for regression as well as for the other methods below.
-
-Interpret the resulting coefficient for __W__ as prima facie causal effect.
-
-#### Instrumental variable
-
-<!-- #### Directly
-
-The causal effect can be estimated __directly__ (only in the case of a single instrumental variable and linear homogenous effects) ...
-
-...
-
-#### Two-stage procedure
-
-... or it can be estimated a more flexible two-stage procedure, such as two-stage least squares or causal random forests. -->
-
-Here we typically use a two-stage procedure, for which different machine learning implementations exist.
-
-(First stage.) Predict __W__ using:
-
-- __Z__ as future variable
-- __X__ as future and static variables
-- __Y, W__ as historic variables
-
-Use the estimates $\hat W$ for the second stage.
-
-(Second stage.) Predict __Y__ using:
-
-- $\hat W$ as static variable^[$\hat W$ in combination with the past values of __W__ form a future variable then.]
-- __X__ as future and static variables
-- __Y, W__ as historic variables
-
-Interpret the resulting coefficient for $\hat W$ causally.
-
-#### Synthetic control
-
-Predict __Y__ using:
-
-- __Y__ from the control regions as future variables
-- __X, Y, W__ from the prediction region and the control regions as static and historic values, for weighting purposes
-
-<!-- Alternatively, predict __Y__ using:
-
-- __X__ from the same region as future and static variables (the latter to enable transfer learning)
-  - including __Y__ as historic variable
-  - including __W__ as historic variable
-
-Interpret __Y__ - $\hat Y$ as causal effect. -->
-
-#### Propensity scores
-
-Predict __W__ using:
-
-- __X__ as future and static variables
-- __Y, W__ as historic variables
-
-Then use the estimates $\hat W$ (or the residuals) with a propensity-score based method to obtain causal estimates.
-
-For double machine learning, also predict __Y__ using:
-
-- __X__ as future and static variables
-- __Y, W__ as historic variables
-
-Use the residuals and regress them on the residuals of __W__ to obtain the causal estimate.
-
-#### Summary
-
-Using subscripts $\scriptsize f, h, s$ to denote future, historic and static variables, we can summarize the time series prediction problems:
-
-::: {.column-page-right}
+::: {.column-page #tbl-time-series}
 
 | Target | Predictors | Method |
 | ------ | ---------- | ------ |
 | __Y__ | \boldmath$X_{f,s}, Y_h, W_f$ | Regression |
-| __Y__ | \boldmath$X_{f,s}, Y_h, W_h$ | Double ML |
-| __Y__ | \boldmath$X_{f,s}, Y_h, W_h, \hat W_s$ | IV stage 2 |
-| __Y__ | \boldmath$X_{f,s}, Y_h, W_h, Y_{control\: f}$ |  SC counterfactual |
-| __W__ | \boldmath$X_{f,s}, Y_h, W_h$ | Propensity score, Double ML |
+| __Y__ | \boldmath$X_{f,s}, Y_h, W_f, Z_f$ | IV stage 1 |
 | __W__ | \boldmath$X_{f,s}, Y_h, W_h, Z_f$ | IV stage 1 |
+| __Y__ | \boldmath$X_{f,s}, Y_h, W_h, \hat W_f$ | IV stage 2 |
+| __Y__ | \boldmath$X_{f,s}, Y_h, Y_{R_0f}$ | Synthetic control |
+| __W__ | \boldmath$X_{f,s}, Y_h, W_h$ | Propensity score |
 
-<!-- | __Y__ | $X_{f,s}, Y_h, W_h$ | use estimates | Counterfactual for synthetic control (version 2) | -->
+: Subscripts $\scriptsize f, h, s$ denote future, historic and static variables.
 
 :::
+
+\begingroup
+\color{Blue}
+
+### NEW Regional and national data
+
+My setting throughout all methods is that I estimate models based on regional data. However, I do not fit separate models for each region, but always a single model on a dataset that includes all regions. This has the benefits that __(a)__ it leads to more generalizable results and __(b)__ it increases the size of the dataset by a factor of 14 (in comparison to using national data, or to estimating single regional models), and thereby increases statistical power.
+
+To integrate multiple time series from the various regions into a single dataset, I add static __dummy variables__ for each region, as is common practice for time series data. To capture the effect of regional differences properly, it would be necessary to also add interaction terms of all 14 region dummies and all 5 treatment variables, as well as potentially some of the control variables. This would lead to at least 70 interaction terms, which would make the interpretation of the results much harder.
+
+The __differences between the regions__ -- especially in size, population size, and number of newspapers -- are potentially problematic for the estimation of a global model. I minimize this problem by (a) including previous amounts of coverage and (b) using absolute rather than relative coverage. While the relative coverage of a protest event will presumably be lower in larger regions (because a smaller proportion of the region is affected by any event), this will not be the case in absolute terms. However, it may be the case that there are major protest events with a strong relation to regional politics, and that they have an impact throughout the whole region, and in that case the size of the region might matter. This would not be captured by the model and could lead to a high variance the treatment effect estimates.
+
+On the other hand, the __national impact__ of protests is politically more interesting, so I also estimate a model on the national level, which has the structure as any of the regional models, but with aggregated treatment variables and newspaper coverage from national rather than regional newspapers.
+
+### NEW Delayed and cumulative impact
+
+Protests may have an impact on newspaper converage not only on the day that they occur but also in the following days and weeks. For estimating these delayed impacts, I extend the future variables (see @sec-time-series) further into the future, in order to decrease the variance of the estimates. Crucially, I do _not_ extend the lags of the outcome further into the future, because the amount of coverage on or after the protest date likely mediates the impact on future coverage. These mediated impacts are hard to isolate. By not including potential mediators in the predictors, I make sure that all indirect impacts are also clearly attributable to the treatment. (An exception is the mediation via future protests: By including them as predictors I decide to only estimate the impact of the protest event itself and to ignore its mediated impact via future protests.)
+
+Next to the impact for each single day, the cumulative impact is of interest. Point estimates (expected values) can be computed by summing the effects from multiple days. This is not so easy for the variance (and thus also standard errors and confidence intervals), since the variance of the sum of the effects depends on their covariance. In regression models the covariance could be determined using multivariate regression, but this is not supported by the `statsmodels` library or other Python libraries. Instead, I estimate separate models for each cumulative outcome variable; that is, a model for the 1-day impact, for the 2-day impact, for the 3-day impact, and so on.
+
+### NEW Mathematical notation
+
+I want to determine the _Average Treatment Effect on the Treated (ATT)_ $\tau_T$ for different protest groups^[CATT], and along multiple dimensions of newspaper coverage. I am not interested in the _Average Treatment Effect_ [on the whole population] that is often denoted by $\tau$, so I write $\tau:=\tau_T$.
+
+[CATT]: This could also be framed as the _Conditional ATT_ (CATT), because the treatment effect is conditional on which group has protested on the day. I prefer to frame it as multiple separate ATTs. This has the benefit that I can control for the occurrence of other treatments on the same day, and thus better isolate the effects of single protest groups.
+
+The treatment units are _days_, with a treatment vector $W = [W_1, ..., W_m], m = |G|$ containing the treatments for each group (that is, whether the given group has protested on that day), and an outcome vector $Y = [Y_1, ..., Y_n], n=|Y|$ containing the number of articles published on that day for each dimension of coverage.
+
+The ATT is generally defined as follows [@dingFirstCourseCausal2023, ch. 13]:
+
+$$
+\tau = E(Y|W=1) - E(Y(0) | W=1)
+$$
+
+Considering the protest groups and coverage dimensions:
+
+$$
+\tau_{g,d} = E(Y_d|W_g=1) - E(Y_d(0) | W_g=1)
+$$
+
+\endgroup
