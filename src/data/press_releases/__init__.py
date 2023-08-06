@@ -26,7 +26,7 @@ data_path = external_data / "nexis/climate"
 
 
 async def main():
-    await scrape(query, headless=False)
+    await scrape(query, headless=False, backward=True)
 
 
 def process_downloads():
@@ -35,23 +35,27 @@ def process_downloads():
 
 
 async def scrape(
-    query=None, headless=True, start=2020, end=2022
+    query=None, headless=True, start=2020, end=2022, backward=False
 ) -> pd.DataFrame | None:
     try:
         page, browser, context = await setup(headless=headless)
         page, browser, context = await login(page, browser, context)
-        page, browser, context = await search(query, page, browser, context)
-        await page.wait_for_timeout(60_000)
+        page, browser, context = await search(
+            query, page, browser, context, backward=backward
+        )
+        # await page.wait_for_timeout(60_000)
         cookies = await context.cookies()
         cookie_path.write_text(json.dumps(cookies))
-        for year in range(start, end):
+        for year in range(start, end + 1):
             for month in range(1, 13):
-                res = await search_by_month(year, month, page, browser, context)
+                res = await search_by_month(
+                    year, month, page, browser, context, backward=backward
+                )
                 if res is None:
                     continue
                 page, browser, context = res
                 page, browser, context = await download(
-                    1_000, year, month, page, browser, context
+                    year, month, page, browser, context, backward=backward
                 )
         await context.add_cookies(json.loads(cookie_path.read_text()))
     except Exception as e:
@@ -106,6 +110,7 @@ async def search(
     page: Page,
     browser: Browser,
     context: BrowserContext,
+    backward: bool = False,
 ) -> tuple[Page, Browser, BrowserContext]:
     await page.fill("lng-expanding-textarea", query)
     await click(page, "lng-search-button")
@@ -121,18 +126,29 @@ async def search(
     await page.wait_for_timeout(5_000)
     await click(page, 'span[id="sortbymenulabel"]')
     await page.wait_for_timeout(1_000)
-    await click(page, 'button[data-value="dateascending"]')
+    order = "descending" if backward else "ascending"
+    await click(page, f'button[data-value="date{order}"]')
     await page.wait_for_timeout(5_000)
     return page, browser, context
 
 
 async def search_by_month(
-    year: int, month: int, page: Page, browser: Browser, context: BrowserContext
+    year: int,
+    month: int,
+    page: Page,
+    browser: Browser,
+    context: BrowserContext,
+    backward: bool = False,
 ) -> tuple[Page, Browser, BrowserContext] | None:
-    existing_files = (data_path / "zip").glob(f"{year}-{month:02d}/*.zip")
+    existing_files = list((data_path / "zip").glob(f"{year}-{month:02d}/*.zip"))
     if any([not a.name.endswith("00.zip") for a in existing_files]):
         # then we already have all files for this month
         return None
+    if any([a.name.endswith("000.zip") for a in existing_files]):
+        # can't download more than 1000 files per query in a straightforward way
+        # but backwards one can download another 1000, which is sufficient for my case
+        if not backward:
+            return None
     try:
         await click(page, 'span[class="filter-text"]', n=1)
     except Exception:
@@ -168,15 +184,29 @@ async def visit_permalink(
 
 
 async def download(
-    n: int, year, month, page: Page, browser: Browser, context: BrowserContext
+    year,
+    month,
+    page: Page,
+    browser: Browser,
+    context: BrowserContext,
+    n: int = 1000,
+    backward: bool = False,
 ) -> tuple[Page, Browser, BrowserContext]:
     el = await page.query_selector('header[class="resultsHeader"]')
     n_results = int(
         re.search(r"\(((\d|\.)+)\)", await el.inner_text()).group(1).replace(".", "")
     )
-    for i in range(0, min(n_results, n), 100):
-        range_ = f"{i+1}-{min(i+100, n_results)}"
-        dest_path = data_path / f"zip/{year}-{month:02d}/{range_}.zip"
+    if not backward:
+        r = range(0, min(n_results, n), 100)
+    if backward:
+        r = range(0, min(n_results - n, n), 100)
+    for i in r:
+        if not backward:
+            range_ = f"{i+1}-{min(i+100, n_results)}"
+        if backward:
+            range_ = f"{i+1}-{min(i+100, n_results - 1000)}"
+        b = "B" if backward else ""
+        dest_path = data_path / f"zip/{year}-{month:02d}/{b}{range_}.zip"
         dest_path.parent.mkdir(parents=True, exist_ok=True)
         if dest_path.exists():
             continue
@@ -193,7 +223,7 @@ async def download(
         shutil.move(tmp_path, dest_path)
         print(f"Downloaded {dest_path}")
         process(dest_path)
-        await page.wait_for_timeout(60_000)
+        await page.wait_for_timeout(120_000)
     return page, browser, context
 
 
