@@ -15,6 +15,10 @@ from src.features.aggregation import naive_all_regions
 from src.models.util.darts_helpers import retrieve_params
 from src.models.util.statsmodels_wrapper import SMWrapper
 
+sk_ols = SMWrapper(
+    sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
+)  # the intercept can be dropped because the static variable dummies do not drop the first column
+
 
 @cache
 def regression(
@@ -23,17 +27,14 @@ def regression(
     gap=0,
     cumulative=False,
     include_controls=True,
-    media_source="mediacloud",
+    model=sk_ols,
 ):
-    data = naive_all_regions(media_source=media_source)
+    data = naive_all_regions()
     if not include_controls:
         # only keep the treatments (occurrence of protests)
         data.x = [df[[c for c in df.columns if c.startswith("occ_")]] for df in data.x]
-    sk_ols = SMWrapper(
-        sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
-    )  # the intercept can be dropped because the static variable dummies do not drop the first column
     f = ts_results_cumulative if cumulative else ts_results
-    results = f(data.y, data.x, model=sk_ols, lags=lags, steps=steps, gap=gap)
+    results = f(data.y, data.x, model=model, lags=lags, steps=steps, gap=gap)
     return results
 
 

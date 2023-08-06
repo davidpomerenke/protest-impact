@@ -12,9 +12,21 @@ def plot_lagged_impact(
         _, ax = plt.subplots(figsize=(8, 4))
     match targets:
         case "protest":
-            targets = ["media_protest", "media_not_protest"]
+            targets = [
+                "media_online_protest",
+                "media_online_not_protest",
+                "media_print_protest",
+                "media_print_not_protest",
+            ]
         case "goals":
-            targets = ["media_goal", "media_subsidiary_goal", "media_framing"]
+            targets = [
+                "media_online_goal",
+                "media_online_subsidiary_goal",
+                "media_online_framing",
+                "media_print_goal",
+                "media_print_subsidiary_goal",
+                "media_print_framing",
+            ]
     for target in targets:
         r = results[
             (results["target"] == target)

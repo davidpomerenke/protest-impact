@@ -9,10 +9,10 @@ from src.data.protests.keywords import climate_queries
 def counts_for_region(
     query_key: str,
     region: str,
-    source,
+    source: str = "all",
     start: pd.Timestamp = start,
     end: pd.Timestamp = end,
-) -> pd.DataFrame:
+) -> pd.DataFrame | None:
     assert source in ["dereko", "mediacloud"]
     queries = climate_queries()
     if source == "mediacloud":

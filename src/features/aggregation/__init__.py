@@ -23,14 +23,15 @@ from src.features.time_series.holidays import get_holidays
 
 @cache
 def outcome(
-    region: str, source, start: pd.Timestamp = start, end: pd.Timestamp = end
+    region: str, start: pd.Timestamp = start, end: pd.Timestamp = end
 ) -> TimeSeries:
     aspects = dict()
-    for qname, query in climate_queries().items():
-        df = counts_for_region(qname, region, source)
-        if df is None:
-            return None
-        aspects[f"media_{qname}"] = df["count"]
+    for source_name, source in [("online", "mediacloud"), ("print", "dereko")]:
+        for qname, query in climate_queries(short=True).items():
+            df = counts_for_region(qname, region, source)
+            if df is None:
+                return None
+            aspects[f"media_{source_name}_{qname}"] = df["count"]
     df = pd.concat(aspects, axis=1)
     df = df[(df.index >= start) & (df.index <= end)]
     return df
@@ -156,10 +157,8 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
     return combinations
 
 
-def naive_one_region(
-    region: str, protest_source: str = "acled", media_source: str = "mediacloud"
-) -> Munch | None:
-    df_y = outcome(region, media_source)
+def naive_one_region(region: str, protest_source: str = "acled") -> Munch | None:
+    df_y = outcome(region)
     if df_y is None:
         return None
     df_w = treatment(region, protest_source)
@@ -168,10 +167,9 @@ def naive_one_region(
     return Munch(y=df_y, x=df_x)
 
 
-def naive_all_regions(protest_source: str = "acled", media_source: str = "mediacloud"):
+def naive_all_regions(protest_source: str = "acled"):
     data = [
-        naive_one_region(region.name, protest_source, media_source)
-        for region in tqdm(german_regions)
+        naive_one_region(region.name, protest_source) for region in tqdm(german_regions)
     ]
     return Munch(
         y=[d.y for d in data if d is not None],
