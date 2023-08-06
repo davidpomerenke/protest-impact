@@ -62,7 +62,7 @@ def ts_results(
     y = get_ts_list_with_statics(y)  # list of ts
     model = RegressionModel(
         lags=None if lags == 0 else list(range(-lags - gap, -gap)),
-        lags_future_covariates=(lags, steps),
+        lags_future_covariates=(lags + gap, 1),
         model=model,
         output_chunk_length=steps,
     )
@@ -80,9 +80,10 @@ def ts_results_cumulative(
     gap: int = 0,
 ):
     dfs = []
-    for i in range(0, steps):
-        res = _ts_results_cumulative(y, x, model, lags=lags, step=i, gap=gap)
-        res["step"] = i
+    for step in range(0, steps):
+        res = _ts_results_cumulative(y, x, model, lags=lags, step=step, gap=gap)
+        res["lag"] = res["lag"] + step
+        res["step"] = step
         dfs.append(res)
     return pd.concat(dfs)
 
@@ -99,13 +100,15 @@ def _ts_results_cumulative(
     y = [dfy.copy() for dfy in y]
     x = get_ts_list_with_statics(x)  # list of ts
     y_rolling = get_ts_list_with_statics(
-        [dfy.rolling(step + 1).sum().shift(-step).dropna() for dfy in y]
+        [dfy.rolling(step + 1).sum().dropna() for dfy in y]
     )
     y = get_ts_list_with_statics(y)  # list of ts
     model = RegressionModel(
         lags=None,
-        lags_future_covariates=(lags, 1),
-        lags_past_covariates=None if lags == 0 else list(range(-lags - gap, -gap)),
+        lags_future_covariates=list(range(-lags - gap - step, 1 - step)),
+        lags_past_covariates=None
+        if lags == 0
+        else list(range(-lags - gap - step, -gap - step)),
         model=model,
         output_chunk_length=1,
     )
