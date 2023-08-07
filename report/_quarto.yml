@@ -5,7 +5,7 @@ project:
 bibliography: [references.bib]
 csl: chicago-author-date.csl
 reference-location: margin
-citation-location: margin
+citation-location: document
 format:
   pdf:
     number-sections: true

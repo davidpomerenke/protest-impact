@@ -73,7 +73,7 @@ I want to compare multiple causal methods and see what they can tell us about th
 
 [^ATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. It differs from the _Average Treatment Effect_ (ATE) by focusing on the treated units rather than the whole population.
 
-### Ethical concerns
+<!-- ### Ethical concerns
 
 Research on the effectiveness of protests comes with significant risks of abuse, specifically that strategic knowledge can be abused. Protests are an important part of democracy because they bring attention to the genuine demands of dissatisfied indivudals. With such _grassroots_ protests we associate an element of spontaneity[^strategy], an emotional identification of the protesters and their demands, and perhaps even an irrational component to accept great individual discomfort for an uncertain and distant outcome. But there is also the phenomenon of _astroturfing_[^astroturf], where the cause is not one of concerned individuals but one of the profit-maximization of corporations or the foreign policy of interventionalist nation states. There is high concern that astroturfed movements may make use of the tools that are developed for the support, or even just for the scientific analysis, of grassroots movements. Astroturfed movements may have more capacity and a stronger emphasis on strategy. Therefore they may use these tools more effectively than grassroots movements. Partial remedy may come from the following:
 
@@ -84,7 +84,7 @@ Research on the effectiveness of protests comes with significant risks of abuse,
 
 [^astroturf]: _AstroTurf_ refers to a synthetic grass carpeting product, in contrast to natural grassroots. It metaphorically designates a disguised sponsored campaign, in contrast to an organic and self-organized _grassroots_ movement [@Astroturfing2023].
 
-Research on the effectiveness of protests has scientific and practical benefits, and there is an urgency behind many protest causes that may make it desirable to make them more effective. But these benefits must be carefully balanced against the risk of abuse.
+Research on the effectiveness of protests has scientific and practical benefits, and there is an urgency behind many protest causes that may make it desirable to make them more effective. But these benefits must be carefully balanced against the risk of abuse. -->
 
 ### The impact of protesting
 

@@ -45,11 +45,14 @@ allows for the estimation of the ATT $\hat\tau_{g,d}=\hat\beta_W$ for all protes
 
 [^att-ate]: Note that the ATT is here identical to the ATE, because "the linear model assumes constant causal effects across units" [@dingFirstCourseCausal2023, p. 165].
 
-### Experiments
+<!-- ### Experiments -->
 
-#### Anticipation effects
+### Anticipation effects
 
+TODO
+
+<!--
 ### Evaluation
 
 - Placebo
-- Train MSE vs OOD test MSE
+- Train MSE vs OOD test MSE -->

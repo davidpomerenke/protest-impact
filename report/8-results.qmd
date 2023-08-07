@@ -1,28 +1,8 @@
 ## Results
 
-### Regression
+WIP
 
-```{python}
-# | label: fig-regression-basic
-# | fig-cap: "No controls. Results for regressing regional online newspaper coverage on Fridays For Future protest occurrence without any controls (left) and controlling for weekdays and holidays (right)."
-# | column: page
-# | echo: false
-
-import matplotlib.pyplot as plt
-from src.models.regression import regression
-from src.features.time_series.lagged_impact import plot_lagged_impact
-
-# fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-# results = regression(include_controls=False)
-# plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[0])
-# axes[0].set_title("Regression without controls")
-
-# results = regression(max_lags=0)
-# plot_lagged_impact(results, "occ_FFF", "protest", ax=axes[1])
-# axes[1].set_title("Regression with controls for weekdays and holidays")
-# fig.tight_layout()
-# plt.show()
-```
+<!-- ### Regression
 
 ```{python}
 # | label: fig-regression-lagged-multiple
@@ -30,6 +10,7 @@ from src.features.time_series.lagged_impact import plot_lagged_impact
 # | column: page
 # | echo: false
 
+import matplotlib.pyplot as plt
 from src.features.time_series.lagged_impact import plot_lagged_impact
 from src.models.regression import regression
 
@@ -44,9 +25,7 @@ results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
 plot_lagged_impact(results, var, "protest", ax=axes[0, 0])
 axes[0, 0].set_title("Online newspapers")
 
-results = regression(
-    lags=lags, steps=steps, gap=gap, cumulative=cum, media_source="dereko"
-)
+results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
 plot_lagged_impact(results, var, "protest", ax=axes[0, 1])
 axes[0, 1].set_title("Print newspapers")
 
@@ -54,11 +33,9 @@ results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
 plot_lagged_impact(results, var, "goals", ax=axes[1, 0])
 axes[1, 0].set_title("Online newspapers: goals and framing")
 
-results = regression(
-    lags=lags, steps=steps, gap=gap, cumulative=cum, media_source="dereko"
-)
+results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
 plot_lagged_impact(results, var, "goals", ax=axes[1, 1])
 axes[1, 1].set_title("Print newspapers: goals and framing")
 fig.tight_layout()
 plt.show()
-```
+``` -->

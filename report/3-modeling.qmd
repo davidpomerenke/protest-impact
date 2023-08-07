@@ -227,7 +227,7 @@ In time-series models, be it for forecasting or classification, the predictor va
 
 @tbl-time-series gives an overview how these categories are applicable within the different causal methods.
 
-::: {.column-page #tbl-time-series}
+::: {#tbl-time-series}
 
 | Target | Predictors | Method |
 | ------ | ---------- | ------ |
@@ -263,9 +263,9 @@ Next to the impact for each single day, the cumulative impact is of interest. Po
 
 ### NEW Mathematical notation
 
-I want to determine the _Average Treatment Effect on the Treated (ATT)_ $\tau_T$ for different protest groups^[CATT], and along multiple dimensions of newspaper coverage. I am not interested in the _Average Treatment Effect_ [on the whole population] that is often denoted by $\tau$, so I write $\tau:=\tau_T$.
+I want to determine the _Average Treatment Effect on the Treated (ATT)_ $\tau_T$ for different protest groups[^CATT], and along multiple dimensions of newspaper coverage. I am not interested in the _Average Treatment Effect_ [on the whole population] that is often denoted by $\tau$, so I write $\tau:=\tau_T$.
 
-[CATT]: This could also be framed as the _Conditional ATT_ (CATT), because the treatment effect is conditional on which group has protested on the day. I prefer to frame it as multiple separate ATTs. This has the benefit that I can control for the occurrence of other treatments on the same day, and thus better isolate the effects of single protest groups.
+[^CATT]: This could also be framed as the _Conditional ATT_ (CATT), because the treatment effect is conditional on which group has protested on the day. I prefer to frame it as multiple separate ATTs. This has the benefit that I can control for the occurrence of other treatments on the same day, and thus better isolate the effects of single protest groups.
 
 The treatment units are _days_, with a treatment vector $W = [W_1, ..., W_m], m = |G|$ containing the treatments for each group (that is, whether the given group has protested on that day), and an outcome vector $Y = [Y_1, ..., Y_n], n=|Y|$ containing the number of articles published on that day for each dimension of coverage.
 
@@ -283,7 +283,7 @@ $$
 
 \endgroup
 
-###
+<!-- ###
 
 - bootstrapping for comparable standard errors
 - placebo tests to assess bias and variance
@@ -291,4 +291,4 @@ $$
   - regression -> prediction mse
   - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage)) -- or just directly the outcome?
   - synth -> predictive quality within different pre-fit areas
-  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust)
+  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust) -->

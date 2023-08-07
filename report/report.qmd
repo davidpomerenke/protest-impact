@@ -23,15 +23,15 @@ toc-depth: 3
 
 {{< include 4-regression.qmd >}}
 
-<!-- {{< pagebreak >}} -->
+{{< pagebreak >}}
 
 {{< include 5-instrumental-variable.qmd >}}
 
-<!-- {{< pagebreak >}} -->
+{{< pagebreak >}}
 
 {{< include 6-synthetic-control.qmd >}}
 
-<!-- {{< pagebreak >}} -->
+{{< pagebreak >}}
 
 {{< include 7-propensity-scores.qmd >}}
 
@@ -39,7 +39,7 @@ toc-depth: 3
 
 {{< include 8-results.qmd >}}
 
-{{< pagebreak >}}
+<!-- {{< pagebreak >}} -->
 
 {{< include 9-discussion.qmd >}}
 
@@ -50,3 +50,10 @@ toc-depth: 3
 {{< pagebreak >}}
 
 {{< include 12-appendix.qmd >}}
+
+{{< pagebreak >}}
+
+## References
+
+::: {#refs}
+:::

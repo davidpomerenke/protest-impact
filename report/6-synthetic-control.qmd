@@ -40,6 +40,16 @@ E(\hat Y_r(0)) &= E\left\{ \sum_{s \in R_0} \gamma_s Y_s \right\} \\
 \end{align}
 :::
 
+The ATT can thus be estimated by:
+
+\begin{align}
+\tau_r &= E(Y_r|W=1) - E(Y_r(0)|W=1) \\
+&= E(Y|W=1) - E(\sum_{s \in R_0} \gamma_s Y_s|W=1) \\
+&= E(Y|W=1) - \sum_{s \in R_0} \gamma_s E(Y_s|W=1)
+\end{align}
+
+In this setting it is not straightforward to single out the effect of different protest groups because there is no way to directly control for co-occurring protest events; therefore I only compute the average effect for all groups.
+
 Weights $\gamma$ can be obtained by "upside down regression" [@facurealvesCausalInferenceBrave2022, ch. 15] to estimate $E(X_r)=\gamma_1 X_1 + ... + \gamma_n X_n$ for the control regions $1...n=R_0$. In principle, we can use OLS or nonnegative least squares (NLS) for the estimation. However, this allows the model to _extrapolate_ rather than _interpolate_ between the control regions. To estimate weights that interpolate (that is, they are positive and sum up to 1), we can define a loss function $\left|X_r - \sum_{s \in R_0} \gamma_s X_s\right|$ and minimize it subject to the positivity and sum constraints on the weights, for example by using quadratic programming as minimization technique [@facurealvesCausalInferenceBrave2022, ch. 15; @abadieSyntheticControlMethods2010].
 
 Since the available control regions vary from day to day, many regressions have to be run. $X_r$ may be chosen to either represent (static) fundamental data about the regions that is suspected to be predictive of treatment or outcome [@abadieSyntheticControlMethods2010]; or it can just be previous time-series information about the outcome and other variables [@facurealvesCausalInferenceBrave2022, ch. 15].

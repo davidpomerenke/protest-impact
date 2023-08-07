@@ -103,27 +103,28 @@ __Other instrumental variable methods__ include the _Weak IV_ estimator, which i
 
 While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing.
 
-Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data, ~~specifically from the respective capital of the region~~. This is a potential weakness that will be addressed later.
+Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data. For each region I determine the 10 cities with the most protests and average their weather data, weighted by the number of protests in each city.
 
 Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
 
 __Indirect paths:__ @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
 
-__Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables, and only affect the exogenous climate variables.
+__Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables.
+<!-- , and only affect the exogenous climate variables. -->
 
 ##### Seasonality
 
-TODO
+WIP
 
 ##### Detecting invalid instruments
 
-TODO
+WIP
 
 #### The impact of the weather on protests
 
 WIP
 
-For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information.
+<!-- For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information. -->
 
 ##### Precipitation
 
@@ -131,14 +132,14 @@ For evaluating the validity of an instrument, an important step is to consider t
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
+embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
 \endgroup
 
 Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them. -->
 
 ##### Other weather variables
 
-TODO
+WIP
 
 ##### Principal components
 
@@ -146,7 +147,7 @@ WIP
 
 #### Making the weather more random
 
-Describe the problem and show the impact on the BLM movement data. Explain that _controlling_ can help a lot here, or rather that IV is a nice addition to controlling.
+<!-- Describe the problem and show the impact on the BLM movement data. Explain that _controlling_ can help a lot here, or rather that IV is a nice addition to controlling. -->
 
 ##### Separating short-term and long-term weather components
 
@@ -170,47 +171,50 @@ Fig: Placebo test for monthly average. Conclusion: separate climate and weather!
 
 ##### Leveraging the gap between pre-registered and observed protest size
 
+WIP
+
+<!--
 Predicting the change for all Berlin data:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-all >}}
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-all >}}
 \endgroup
 
 Placebo:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#fig-change-regression-placebo >}}
+embed ../src/models/instrumental_variable/gap/gap.ipynb#fig-change-regression-placebo >}}
 \endgroup
 
 First stage for the climate protests, reasonable:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-reasonable >}}
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-reasonable >}}
 \endgroup
 
 and more suitable for 2-stage:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful >}}
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful >}}
 \endgroup
 
 and aggregated:
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful-aggregated >}}
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful-aggregated >}}
 \endgroup
 
 And results for the 2nd stage (the actually interesting thing):
 
 \begingroup
 \scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
-\endgroup
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
+\endgroup -->
 
 ### Pandemic restrictions as an instrument
 
@@ -243,10 +247,10 @@ e. When performing regression with only the instruments and no control variables
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
 
 It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
-
+<!--
 
 ### Evaluation
 
 - Placebo
 - first stage Placebo
-- statistical tests
+- statistical tests -->
