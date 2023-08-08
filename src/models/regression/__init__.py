@@ -1,136 +1,214 @@
 from functools import partial
+from time import time
+from typing import Literal
 
-import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from darts import TimeSeries
-from darts.dataprocessing.transformers import StaticCovariatesTransformer
-from darts.models import RegressionModel
-from sklearn.base import BaseEstimator
-from sklearn.linear_model import BayesianRidge, Lasso, LassoLarsIC, LinearRegression
-from sklearn.preprocessing import OneHotEncoder
+from dowhy import CausalModel
+from dowhy.causal_estimators.propensity_score_weighting_estimator import (
+    PropensityScoreWeightingEstimator,
+)
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_recall_fscore_support,
+)
+from tqdm.auto import tqdm
 
 from src.cache import cache
-from src.features.aggregation import naive_all_regions
-from src.models.util.darts_helpers import retrieve_params
-from src.models.util.statsmodels_wrapper import SMWrapper
-
-sk_ols = SMWrapper(
-    sm.OLS, fit_args=dict(cov_type="HC3"), fit_intercept=False
-)  # the intercept can be dropped because the static variable dummies do not drop the first column
+from src.features.aggregation import all_regions
 
 
 @cache
-def regression(
-    lags=0,
-    steps=7,
-    gap=0,
-    cumulative=False,
-    include_controls=True,
-    model=sk_ols,
-):
-    data = naive_all_regions()
-    if not include_controls:
-        # only keep the treatments (occurrence of protests)
-        data.x = [df[[c for c in df.columns if c.startswith("occ_")]] for df in data.x]
-    f = ts_results_cumulative if cumulative else ts_results
-    results = f(data.y, data.x, model=model, lags=lags, steps=steps, gap=gap)
-    return results
-
-
-def get_ts_list_with_statics(dfs: list[pd.DataFrame]) -> list[pd.DataFrame]:
-    for i, df in enumerate(dfs):
-        groups = pd.Series(f"SERIES{i}", index=df.index)
-        df["group"] = groups
-        df.reset_index(inplace=True)
-    df = pd.concat(dfs)
-    ts_list = TimeSeries.from_group_dataframe(df, group_cols="group", time_col="index")
-    ohe = OneHotEncoder(drop=None)
-    transformer = StaticCovariatesTransformer(transformer_cat=ohe)
-    ts_list = transformer.fit_transform(ts_list)
-    return ts_list
-
-
-def ts_results(
-    y: list[pd.DataFrame],
-    x: list[pd.DataFrame],
-    model: BaseEstimator,
-    lags: int,
-    steps: int = 1,
-    gap: int = 0,
-):
-    x = get_ts_list_with_statics(x)  # list of ts
-    y = get_ts_list_with_statics(y)  # list of ts
-    model = RegressionModel(
-        lags=None if lags == 0 else list(range(-lags - gap, -gap)),
-        lags_future_covariates=(lags + gap, 1),
-        model=model,
-        output_chunk_length=steps,
-    )
-    model.fit(y, future_covariates=x)
-    coefs = retrieve_params(model, list(y[0].columns))
-    return coefs
-
-
-def ts_results_cumulative(
-    y: list[pd.DataFrame],
-    x: list[pd.DataFrame],
-    model: BaseEstimator,
-    lags: int,
-    steps: int = 1,
-    gap: int = 0,
-):
-    dfs = []
-    for step in range(0, steps):
-        res = _ts_results_cumulative(y, x, model, lags=lags, step=step, gap=gap)
-        res["lag"] = res["lag"] + step
-        res["step"] = step
-        dfs.append(res)
-    return pd.concat(dfs)
-
-
-def _ts_results_cumulative(
-    y: list[pd.DataFrame],
-    x: list[pd.DataFrame],
-    model: BaseEstimator,
-    lags: int,
+def get_lagged_df(
+    target: str,
+    lags: list[int],
     step: int = 0,
-    gap: int = 0,
+    cumulative: bool = False,
+    ignore_group: bool = False,
 ):
-    x = [dfx.copy() for dfx in x]
-    y = [dfy.copy() for dfy in y]
-    x = get_ts_list_with_statics(x)  # list of ts
-    y_rolling = get_ts_list_with_statics(
-        [dfy.rolling(step + 1).sum().dropna() for dfy in y]
-    )
-    y = get_ts_list_with_statics(y)  # list of ts
-    model = RegressionModel(
-        lags=None,
-        lags_future_covariates=list(range(-lags - gap - step, 1 - step)),
-        lags_past_covariates=None
-        if lags == 0
-        else list(range(-lags - gap - step, -gap - step)),
-        model=model,
-        output_chunk_length=1,
-    )
-    model.fit(y_rolling, future_covariates=x, past_covariates=y if lags > 0 else None)
-    coefs = retrieve_params(model, list(y[0].columns))
-    return coefs
+    lagged_dfs = []
+    for df in all_regions():
+        if df is None:
+            continue
+        if ignore_group:
+            protest_cols = [c for c in df.columns if c.startswith("occ_")]
+            protest = df[protest_cols].any(axis=1).astype(int)
+            df = df.drop(columns=protest_cols).assign(occ_protest=protest)
+        lagged_df = pd.concat(
+            [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1
+        )
+        lagged_df = lagged_df[
+            [
+                c
+                for c in lagged_df.columns
+                if not (c.startswith("media_") and c.endswith("_lag0"))  # no leakage
+                and not (
+                    c.startswith("weekday_") and not c.endswith("_lag0")
+                )  # no weekday lags
+            ]
+        ]
+        y = df[[target]].shift(-step)
+        if cumulative:
+            y = y.rolling(step + 1).sum()
+        df_combined = pd.concat([y, lagged_df], axis=1).dropna()
+        lagged_dfs.append(df_combined)
+    lagged_df = pd.concat(lagged_dfs).reset_index(drop=True)
+    return lagged_df
 
 
-def plot_lagged_impact(results: pd.DataFrame) -> tuple[plt.Figure, plt.Axes]:
-    fig, ax = plt.subplots(figsize=(8, 4))
-    for target in ["protest", "not_protest"]:
-        r = results[results["target"] == target]
-        ax.plot(r["shift"], r["coef"], label=target, linewidth=1.5)
-        if "lower" in r.columns and "upper" in r.columns:
-            ax.fill_between(r["shift"], r["upper"], r["lower"], alpha=0.2)
-    ax.set_xticks(range(-10, 11, 1))
-    ax.set_xlabel("Shift (days)")
-    ax.set_ylabel("Coefficient")
-    ax.set_title("Naive regression coefficients")
-    ax.axhline(0, color="black", linewidth=1)
-    ax.axvline(0, color="black", linewidth=1)
-    ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
-    fig.tight_layout()
-    return fig, ax
+def disambiguate_target(target: str | list[str] | Literal["protest", "goals", "all"]):
+    protest_targets = [
+        "media_online_protest",
+        "media_online_not_protest",
+        "media_print_protest",
+        "media_print_not_protest",
+    ]
+    goal_targets = [
+        "media_online_goal",
+        "media_online_subsidiary_goal",
+        "media_online_framing",
+        "media_print_goal",
+        "media_print_subsidiary_goal",
+        "media_print_framing",
+    ]
+    match target:
+        case [*ts]:
+            return ts
+        case "protest":
+            return protest_targets
+        case "goals":
+            return goal_targets
+        case "all":
+            return protest_targets + goal_targets
+        case _:
+            return [target]
+
+
+# @cache
+def apply_method(
+    method_name: str,
+    target: str | list[str] | Literal["protest", "goals", "all"],
+    lags: list[int],
+    steps: int = 7,
+    cumulative: bool = False,
+    show_progress: bool = True,
+    ignore_group: bool = False,
+    **kwargs,
+):
+    method_dict = dict(
+        regression=_regression,
+        propensity_weighting=_propensity_weighting,
+    )
+    method = method_dict[method_name]
+    params = []
+    models = dict()
+    for target in disambiguate_target(target):
+        for step in tqdm(range(steps), disable=not show_progress):
+            lagged_df = get_lagged_df(target, lags, step, cumulative, ignore_group)
+            model, coefs = method(target=target, lagged_df=lagged_df, **kwargs)
+            coefs["step"] = step
+            coefs["target"] = target
+            params.append(coefs)
+            models[(target, step)] = model
+    params = pd.concat(params).reset_index(drop=True)
+    return models, params
+
+
+def decode_param_names(
+    coefficients: list, feature_names: list[str], data_type: str
+) -> pd.DataFrame:
+    feature_names = [fn + "_lag0" if not "_lag" in fn else fn for fn in feature_names]
+    if data_type == "conf_int":
+        df = pd.DataFrame(
+            {
+                "feature_name": feature_names,
+                "ci_lower": coefficients[0],
+                "ci_upper": coefficients[1],
+            }
+        )
+    elif data_type == "coef":
+        df = pd.DataFrame({"feature_name": feature_names, "coef": coefficients})
+    name_parts = df["feature_name"].str.rsplit("_lag", n=1)
+    df["predictor"] = name_parts.str[0]
+    df["lag"] = name_parts.str[1].astype(int)
+    df = df.drop(columns=["feature_name"])
+    return df
+
+
+@cache
+def _regression(target: str, lagged_df: pd.DataFrame):
+    y = lagged_df[[target]]
+    X = lagged_df.drop(columns=[target])
+    X = sm.add_constant(X)
+    model = sm.OLS(y, X)
+    results = model.fit(cov_type="HC3")
+    coefs = decode_param_names(results.params, X.columns, data_type="coef")
+    conf_int = decode_param_names(results.conf_int(), X.columns, data_type="conf_int")
+    coefs = coefs.merge(conf_int, on=["predictor", "lag"])
+    return model, coefs
+
+
+regression = partial(apply_method, "regression")
+
+
+@cache
+def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
+    treatment_ = treatment + "_lag0"
+    effect_modifiers = [
+        c
+        for c in lagged_df.columns
+        if c.startswith("occ_") and c.endswith("_lag0") and c != treatment_
+    ]
+    common_causes = [
+        c for c in lagged_df.columns if c not in [target, treatment_, effect_modifiers]
+    ]
+    model = CausalModel(
+        data=lagged_df,
+        treatment=treatment_,
+        outcome=[target],
+        common_causes=common_causes,
+        effect_modifiers=effect_modifiers,
+    )
+    estimand = model.identify_effect(method_name="maximal-adjustment")
+    estimator = PropensityScoreWeightingEstimator(
+        estimand, propensity_score_model=LogisticRegression()
+    )
+    estimator.fit(lagged_df)
+    estimate = estimator.estimate_effect(lagged_df, target_units="att")
+    coefs = pd.DataFrame(dict(coef=[estimate.value], predictor=[treatment], lag=[0]))
+    return estimator, coefs
+
+
+propensity_weighting = partial(apply_method, "propensity_weighting")
+
+
+# lags = list(range(-28 * 6, 1))
+# steps = 1
+# treatment = "occ_protest"
+# # target = "protest"
+# target = "media_online_protest"
+# cumulative = False
+# ignore_group = True
+
+# models, results = propensity_weighting(
+#     target=target,
+#     treatment=treatment,
+#     lags=lags,
+#     steps=steps,
+#     cumulative=cumulative,
+#     ignore_group=True,
+# )
+# print(results)
+
+# treatment_ = treatment + "_lag0"
+# estimator = models[(target, 0)]
+# lagged_df = get_lagged_df(target, lags, 0, cumulative, ignore_group)
+# # determine f1 score
+# estimator.estimate_propensity_score_column(lagged_df)
+# treatment_pred = (lagged_df["propensity_score"] > 0.5).astype(int)
+# treatment_true = lagged_df[treatment_]
+# print(classification_report(treatment_true, treatment_pred))

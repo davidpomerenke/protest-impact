@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from darts import TimeSeries
 from darts.utils.timeseries_generation import generate_index
-from munch import Munch
 from tqdm.auto import tqdm
 
 from src import end, start
@@ -114,7 +113,7 @@ def controls(
     date_range = pd.date_range(start=start, end=end, freq="D")
     df = pd.Series(date_range.day_name(), index=date_range)
     df = pd.get_dummies(df, prefix="weekday", drop_first=True)
-    df["is_holiday"] = get_holidays(df.index, region).astype(int)
+    df["holiday"] = get_holidays(df.index, region).astype(int)
     return df
 
 
@@ -157,21 +156,18 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
     return combinations
 
 
-def naive_one_region(region: str, protest_source: str = "acled") -> Munch | None:
+def one_region(region: str, protest_source: str = "acled") -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
         return None
     df_w = treatment(region, protest_source)
     df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
-    df_x = pd.concat([df_w, controls(region)], axis=1)
-    return Munch(y=df_y, x=df_x)
+    df_x = controls(region)
+    # df_z = instruments(region, protest_source)
+    df = pd.concat([df_y, df_w, df_x], axis=1)
+    return df
 
 
-def naive_all_regions(protest_source: str = "acled"):
-    data = [
-        naive_one_region(region.name, protest_source) for region in tqdm(german_regions)
-    ]
-    return Munch(
-        y=[d.y for d in data if d is not None],
-        x=[d.x for d in data if d is not None],
-    )
+@cache
+def all_regions(protest_source: str = "acled") -> list[pd.DataFrame]:
+    return [one_region(region.name, protest_source) for region in tqdm(german_regions)]
