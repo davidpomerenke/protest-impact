@@ -129,6 +129,7 @@ def instruments(region: str, source: str = "acled") -> pd.DataFrame:
     df = interpolate_weather_histories(dfs, weights)
     if df.isna().any().any():
         df = impute_weather_history(df)
+    df = df.add_prefix("weather_")
     return df
 
 
@@ -163,8 +164,8 @@ def one_region(region: str, protest_source: str = "acled") -> pd.DataFrame | Non
     df_w = treatment(region, protest_source)
     df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
     df_x = controls(region)
-    # df_z = instruments(region, protest_source)
-    df = pd.concat([df_y, df_w, df_x], axis=1)
+    df_z = instruments(region, protest_source)
+    df = pd.concat([df_y, df_w, df_x, df_z], axis=1)
     return df
 
 

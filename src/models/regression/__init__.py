@@ -7,6 +7,9 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from dowhy import CausalModel
+from dowhy.causal_estimators.instrumental_variable_estimator import (
+    InstrumentalVariableEstimator,
+)
 from dowhy.causal_estimators.propensity_score_weighting_estimator import (
     PropensityScoreWeightingEstimator,
 )
@@ -103,6 +106,7 @@ def _apply_method(
     method_dict = dict(
         regression=_regression,
         propensity_weighting=_propensity_weighting,
+        instrumental_variable=_instrumental_variable,
     )
     method = method_dict[method_name]
     lagged_df = get_lagged_df(target, lags, step, cumulative, ignore_group)
@@ -115,11 +119,12 @@ def _apply_method(
 def apply_method(
     target: str | list[str] | Literal["protest", "goals", "all"],
     steps: int = 7,
+    n_jobs=8,
     show_progress: bool = True,
     **kwargs,
 ):
     targets_and_steps = list(product(disambiguate_target(target), range(steps)))
-    results = Parallel(n_jobs=8)(
+    results = Parallel(n_jobs=n_jobs)(
         delayed(_apply_method)(target=target, step=step, **kwargs)
         for target, step in tqdm(targets_and_steps, disable=not show_progress)
     )
@@ -151,8 +156,9 @@ def decode_param_names(
 
 @cache
 def _regression(target: str, lagged_df: pd.DataFrame):
+    instruments = [c for c in lagged_df.columns if c.startswith("weather_")]
     y = lagged_df[[target]]
-    X = lagged_df.drop(columns=[target])
+    X = lagged_df.drop(columns=[target] + instruments)
     X = sm.add_constant(X)
     model = sm.OLS(y, X)
     results = model.fit(cov_type="HC3")
@@ -165,7 +171,7 @@ def _regression(target: str, lagged_df: pd.DataFrame):
 regression = partial(apply_method, method_name="regression")
 
 
-# @cache
+@cache
 def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
     treatment_ = treatment + "_lag0"
     effect_modifiers = [
@@ -173,8 +179,11 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
         for c in lagged_df.columns
         if c.startswith("occ_") and c.endswith("_lag0") and c != treatment_
     ]
+    instruments = [c for c in lagged_df.columns if c.startswith("weather_")]
     common_causes = [
-        c for c in lagged_df.columns if c not in [target, treatment_, effect_modifiers]
+        c
+        for c in lagged_df.columns
+        if c not in ([target, treatment_] + effect_modifiers + instruments)
     ]
     model = CausalModel(
         data=lagged_df,
@@ -233,3 +242,63 @@ propensity_weighting = partial(apply_method, method_name="propensity_weighting")
 # treatment_pred = (lagged_df["propensity_score"] > 0.5).astype(int)
 # treatment_true = lagged_df[treatment_]
 # print(classification_report(treatment_true, treatment_pred))
+
+
+def _instrumental_variable(
+    target: str, treatment: str, instrument: str, lagged_df: pd.DataFrame
+):
+    assert (
+        treatment == "occ_protest"
+    ), "general iv cannot control for other protest groups"
+    assert instrument == "weather_prcp"
+    treatment_ = treatment + "_lag0"
+    instrument_ = instrument + "_lag0"
+    lagged_df[instrument_] = lagged_df[instrument_] > 0
+    model = CausalModel(
+        data=lagged_df,
+        treatment=treatment_,
+        outcome=target,
+        instruments=[instrument_],
+    )
+    estimand = model.identify_effect(method_name="maximal-adjustment")
+    estimator = InstrumentalVariableEstimator(
+        estimand,
+        iv_instrument_name=instrument_,
+        confidence_intervals=True,
+    )
+    estimator.fit(lagged_df)
+    estimate = estimator.estimate_effect(lagged_df, target_units="att")
+    ci = estimate.get_confidence_intervals()
+    coefs = pd.DataFrame(
+        dict(
+            coef=[estimate.value],
+            predictor=[treatment],
+            ci_lower=ci[0],
+            ci_upper=ci[1],
+            lag=[0],
+        )
+    )
+    return estimator, coefs
+
+
+instrumental_variable = partial(apply_method, method_name="instrumental_variable")
+
+
+# lags = list(range(0, 1))
+# steps = 7
+# treatment = "occ_protest"
+# outcome = "media_online_protest"
+# instrument = "weather_prcp"
+# cumulative = False
+# ignore_group = True
+
+# _, results1 = instrumental_variable(
+#     target=outcome,
+#     treatment=treatment,
+#     instrument=instrument,
+#     lags=lags,
+#     steps=steps,
+#     cumulative=cumulative,
+#     ignore_group=ignore_group,
+# )
+# print(results1)
