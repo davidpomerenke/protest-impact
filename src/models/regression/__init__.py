@@ -1,4 +1,5 @@
 from functools import partial
+from itertools import product
 from time import time
 from typing import Literal
 
@@ -9,6 +10,7 @@ from dowhy import CausalModel
 from dowhy.causal_estimators.propensity_score_weighting_estimator import (
     PropensityScoreWeightingEstimator,
 )
+from joblib import Parallel, delayed
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     classification_report,
@@ -88,14 +90,13 @@ def disambiguate_target(target: str | list[str] | Literal["protest", "goals", "a
             return [target]
 
 
-# @cache
-def apply_method(
+@cache
+def _apply_method(
     method_name: str,
-    target: str | list[str] | Literal["protest", "goals", "all"],
+    target: str,
     lags: list[int],
-    steps: int = 7,
+    step: int,
     cumulative: bool = False,
-    show_progress: bool = True,
     ignore_group: bool = False,
     **kwargs,
 ):
@@ -104,16 +105,25 @@ def apply_method(
         propensity_weighting=_propensity_weighting,
     )
     method = method_dict[method_name]
-    params = []
-    models = dict()
-    for target in disambiguate_target(target):
-        for step in tqdm(range(steps), disable=not show_progress):
-            lagged_df = get_lagged_df(target, lags, step, cumulative, ignore_group)
-            model, coefs = method(target=target, lagged_df=lagged_df, **kwargs)
-            coefs["step"] = step
-            coefs["target"] = target
-            params.append(coefs)
-            models[(target, step)] = model
+    lagged_df = get_lagged_df(target, lags, step, cumulative, ignore_group)
+    model, coefs = method(target=target, lagged_df=lagged_df, **kwargs)
+    coefs["step"] = step
+    coefs["target"] = target
+    return model, coefs
+
+
+def apply_method(
+    target: str | list[str] | Literal["protest", "goals", "all"],
+    steps: int = 7,
+    show_progress: bool = True,
+    **kwargs,
+):
+    targets_and_steps = list(product(disambiguate_target(target), range(steps)))
+    results = Parallel(n_jobs=8)(
+        delayed(_apply_method)(target=target, step=step, **kwargs)
+        for target, step in tqdm(targets_and_steps, disable=not show_progress)
+    )
+    models, params = zip(*results)
     params = pd.concat(params).reset_index(drop=True)
     return models, params
 
@@ -152,10 +162,10 @@ def _regression(target: str, lagged_df: pd.DataFrame):
     return model, coefs
 
 
-regression = partial(apply_method, "regression")
+regression = partial(apply_method, method_name="regression")
 
 
-@cache
+# @cache
 def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
     treatment_ = treatment + "_lag0"
     effect_modifiers = [
@@ -169,21 +179,32 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
     model = CausalModel(
         data=lagged_df,
         treatment=treatment_,
-        outcome=[target],
+        outcome=target,
         common_causes=common_causes,
         effect_modifiers=effect_modifiers,
     )
     estimand = model.identify_effect(method_name="maximal-adjustment")
     estimator = PropensityScoreWeightingEstimator(
-        estimand, propensity_score_model=LogisticRegression()
+        estimand,
+        confidence_intervals=True,
+        propensity_score_model=LogisticRegression(),
     )
     estimator.fit(lagged_df)
     estimate = estimator.estimate_effect(lagged_df, target_units="att")
-    coefs = pd.DataFrame(dict(coef=[estimate.value], predictor=[treatment], lag=[0]))
+    ci = estimate.get_confidence_intervals()
+    coefs = pd.DataFrame(
+        dict(
+            coef=[estimate.value],
+            predictor=[treatment],
+            ci_lower=ci[0],
+            ci_upper=ci[1],
+            lag=[0],
+        )
+    )
     return estimator, coefs
 
 
-propensity_weighting = partial(apply_method, "propensity_weighting")
+propensity_weighting = partial(apply_method, method_name="propensity_weighting")
 
 
 # lags = list(range(-28 * 6, 1))
