@@ -1,6 +1,5 @@
 from functools import partial
 from itertools import product
-from time import time
 from typing import Literal
 
 import numpy as np
@@ -14,13 +13,9 @@ from dowhy.causal_estimators.propensity_score_weighting_estimator import (
     PropensityScoreWeightingEstimator,
 )
 from joblib import Parallel, delayed
+from linearmodels.iv import IV2SLS, IVGMM, IVGMMCUE, IVLIML
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    classification_report,
-    confusion_matrix,
-    f1_score,
-    precision_recall_fscore_support,
-)
+from sklearn.metrics import classification_report
 from tqdm.auto import tqdm
 
 from src.cache import cache
@@ -34,11 +29,10 @@ def get_lagged_df(
     step: int = 0,
     cumulative: bool = False,
     ignore_group: bool = False,
+    region_dummies: bool = False,
 ):
     lagged_dfs = []
-    for df in all_regions():
-        if df is None:
-            continue
+    for df in all_regions(region_dummies=region_dummies):
         if ignore_group:
             protest_cols = [c for c in df.columns if c.startswith("occ_")]
             protest = df[protest_cols].any(axis=1).astype(int)
@@ -50,10 +44,12 @@ def get_lagged_df(
             [
                 c
                 for c in lagged_df.columns
-                if not (c.startswith("media_") and c.endswith("_lag0"))  # no leakage
-                and not (
-                    c.startswith("weekday_") and not c.endswith("_lag0")
-                )  # no weekday lags
+                # no leakage:
+                if not (c.startswith("media_") and c.endswith("_lag0"))
+                # no weekday lags:
+                and not (c.startswith("weekday_") and not c.endswith("_lag0"))
+                # no region lags:
+                and not (c.startswith("region_") and not c.endswith("_lag0"))
             ]
         ]
         y = df[[target]].shift(-step)
@@ -93,7 +89,6 @@ def disambiguate_target(target: str | list[str] | Literal["protest", "goals", "a
             return [target]
 
 
-@cache
 def _apply_method(
     method_name: str,
     target: str,
@@ -101,15 +96,19 @@ def _apply_method(
     step: int,
     cumulative: bool = False,
     ignore_group: bool = False,
+    region_dummies: bool = False,
     **kwargs,
 ):
     method_dict = dict(
         regression=_regression,
         propensity_weighting=_propensity_weighting,
         instrumental_variable=_instrumental_variable,
+        instrumental_variable_liml=_instrumental_variable_liml,
     )
     method = method_dict[method_name]
-    lagged_df = get_lagged_df(target, lags, step, cumulative, ignore_group)
+    lagged_df = get_lagged_df(
+        target, lags, step, cumulative, ignore_group, region_dummies=region_dummies
+    )
     model, coefs = method(target=target, lagged_df=lagged_df, **kwargs)
     coefs["step"] = step
     coefs["target"] = target
@@ -216,34 +215,7 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
 propensity_weighting = partial(apply_method, method_name="propensity_weighting")
 
 
-# lags = list(range(-28 * 6, 1))
-# steps = 1
-# treatment = "occ_protest"
-# # target = "protest"
-# target = "media_online_protest"
-# cumulative = False
-# ignore_group = True
-
-# models, results = propensity_weighting(
-#     target=target,
-#     treatment=treatment,
-#     lags=lags,
-#     steps=steps,
-#     cumulative=cumulative,
-#     ignore_group=True,
-# )
-# print(results)
-
-# treatment_ = treatment + "_lag0"
-# estimator = models[(target, 0)]
-# lagged_df = get_lagged_df(target, lags, 0, cumulative, ignore_group)
-# # determine f1 score
-# estimator.estimate_propensity_score_column(lagged_df)
-# treatment_pred = (lagged_df["propensity_score"] > 0.5).astype(int)
-# treatment_true = lagged_df[treatment_]
-# print(classification_report(treatment_true, treatment_pred))
-
-
+@cache
 def _instrumental_variable(
     target: str, treatment: str, instrument: str, lagged_df: pd.DataFrame
 ):
@@ -284,21 +256,126 @@ def _instrumental_variable(
 instrumental_variable = partial(apply_method, method_name="instrumental_variable")
 
 
-# lags = list(range(0, 1))
-# steps = 7
-# treatment = "occ_protest"
-# outcome = "media_online_protest"
-# instrument = "weather_prcp"
-# cumulative = False
-# ignore_group = True
+# @cache
+def _instrumental_variable_liml(
+    target: str, treatment: str, instrument: str, lagged_df: pd.DataFrame
+):
+    assert (
+        treatment == "occ_protest"
+    ), "general iv cannot control for other protest groups"
+    assert isinstance(treatment, str)
+    assert isinstance(instrument, str)
+    treatment_ = treatment + "_lag0"
+    instruments = [c for c in lagged_df.columns if c.startswith("weather_")]
+    instrument = instrument + "_lag0"
+    # confounders = [
+    #     c for c in lagged_df.columns if not c in [target, treatment_] + instruments
+    # ]
+    media_online_protest = (
+        lagged_df[
+            [c for c in lagged_df.columns if c.startswith("media_online_protest")]
+        ]
+        .mean(axis=1)
+        .rename("media_online_protest")
+    )
+    media_online_not_protest = (
+        lagged_df[
+            [c for c in lagged_df.columns if c.startswith("media_online_not_protest")]
+        ]
+        .mean(axis=1)
+        .rename("media_online_not_protest")
+    )
+    media_print_protest = (
+        lagged_df[[c for c in lagged_df.columns if c.startswith("media_print_protest")]]
+        .mean(axis=1)
+        .rename("media_print_protest")
+    )
+    media_print_not_protest = (
+        lagged_df[
+            [c for c in lagged_df.columns if c.startswith("media_print_not_protest")]
+        ]
+        .mean(axis=1)
+        .rename("media_print_not_protest")
+    )
+    regions = lagged_df[[c for c in lagged_df.columns if c.startswith("region_")]]
+    weather = (
+        lagged_df[
+            [
+                c
+                for c in lagged_df.columns
+                if c.startswith("weather_prcp") and int(c.split("_lag")[1]) <= -3
+            ]
+        ]
+        .mean(axis=1)
+        .rename("previous_weather_prcp")
+    )
+    weekdays = lagged_df[[c for c in lagged_df.columns if c.startswith("weekday_")]]
+    confounders = pd.concat(
+        [
+            media_online_protest,
+            media_online_not_protest,
+            media_print_protest,
+            media_print_not_protest,
+            regions,
+            weather,
+            # weekdays,
+        ],
+        axis=1,
+    )
+    confounders = sm.add_constant(confounders)
+    assert instrument == "weather_prcp_lag0"
+    lagged_df[instrument] = (lagged_df[instrument] > 0).astype(int)
+    model = IVLIML(
+        dependent=lagged_df[target],
+        exog=confounders,
+        endog=lagged_df[treatment_],
+        instruments=lagged_df[instrument],
+    )
+    results = model.fit()
+    # print(results)
+    ci = results.conf_int()
+    coefs = pd.DataFrame(
+        dict(
+            coef=[results.params[0]],
+            predictor=[treatment],
+            ci_lower=ci["lower"][0],
+            ci_upper=ci["upper"][0],
+            lag=[0],
+        )
+    )
+    return model, coefs
 
-# _, results1 = instrumental_variable(
-#     target=outcome,
-#     treatment=treatment,
-#     instrument=instrument,
-#     lags=lags,
-#     steps=steps,
-#     cumulative=cumulative,
-#     ignore_group=ignore_group,
-# )
-# print(results1)
+
+instrumental_variable_liml = partial(
+    apply_method, method_name="instrumental_variable_liml"
+)
+
+if __name__ == "__main__":
+    lags = list(range(-7, 1))
+    steps = 1
+    treatment = "occ_protest"
+    target = "media_online_protest"
+    cumulative = False
+    ignore_group = True
+
+    models, results = instrumental_variable_liml(
+        target=target,
+        treatment=treatment,
+        instrument="weather_prcp",
+        lags=lags,
+        steps=steps,
+        cumulative=cumulative,
+        ignore_group=True,
+        region_dummies=True,
+        n_jobs=1,
+    )
+    print(results)
+
+    # treatment_ = treatment + "_lag0"
+    # estimator = models[(target, 0)]
+    # lagged_df = get_lagged_df(target, lags, 0, cumulative, ignore_group)
+    # # determine f1 score
+    # estimator.estimate_propensity_score_column(lagged_df)
+    # treatment_pred = (lagged_df["propensity_score"] > 0.5).astype(int)
+    # treatment_true = lagged_df[treatment_]
+    # print(classification_report(treatment_true, treatment_pred))

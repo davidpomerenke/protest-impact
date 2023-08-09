@@ -107,6 +107,7 @@ def location_weights(region: str, source: str = "acled") -> dict[str, float]:
     return weights
 
 
+@cache
 def controls(
     region: str, start: pd.Timestamp = start, end: pd.Timestamp = end
 ) -> pd.DataFrame:
@@ -117,6 +118,7 @@ def controls(
     return df
 
 
+@cache
 def instruments(region: str, source: str = "acled") -> pd.DataFrame:
     dfs = []
     weights = []
@@ -170,5 +172,16 @@ def one_region(region: str, protest_source: str = "acled") -> pd.DataFrame | Non
 
 
 @cache
-def all_regions(protest_source: str = "acled") -> list[pd.DataFrame]:
-    return [one_region(region.name, protest_source) for region in tqdm(german_regions)]
+def all_regions(
+    region_dummies: bool = False, protest_source: str = "acled"
+) -> list[pd.DataFrame]:
+    dfs = [
+        (region.name, one_region(region.name, protest_source))
+        for region in tqdm(german_regions)
+    ]
+    names, dfs = zip(*[(name, df) for name, df in dfs if df is not None])
+    if region_dummies:
+        region_dummies = pd.get_dummies(names, prefix="region", drop_first=True)
+        for i, df in enumerate(dfs):
+            df[region_dummies.columns] = region_dummies.iloc[i]
+    return dfs
