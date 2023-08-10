@@ -9,6 +9,7 @@ from tqdm.auto import tqdm
 from src import end, start
 from src.cache import cache
 from src.data import german_regions
+from src.data.covid_restrictions import load_covid
 from src.data.news import counts_for_region
 from src.data.protests import load_climate_protests_with_labels
 from src.data.protests.keywords import climate_queries
@@ -119,7 +120,7 @@ def controls(
 
 
 @cache
-def instruments(region: str, source: str = "acled") -> pd.DataFrame:
+def weather(region: str, source: str = "acled") -> pd.DataFrame:
     dfs = []
     weights = []
     for city, weight in location_weights(region, source).items():
@@ -132,6 +133,11 @@ def instruments(region: str, source: str = "acled") -> pd.DataFrame:
     if df.isna().any().any():
         df = impute_weather_history(df)
     df = df.add_prefix("weather_")
+    return df
+
+
+def instruments(region: str, source: str = "acled") -> pd.DataFrame:
+    df = pd.concat([weather(region, source), load_covid()], axis=1)
     return df
 
 
@@ -160,7 +166,10 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
 
 
 def one_region(
-    region: str, ignore_group: bool = False, protest_source: str = "acled"
+    region: str,
+    include_instruments: bool = False,
+    ignore_group: bool = False,
+    protest_source: str = "acled",
 ) -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
@@ -170,19 +179,26 @@ def one_region(
     if ignore_group:
         df_w = df_w.any(axis=1).astype(int).to_frame("occ_protest")
     df_x = controls(region)
-    df_z = instruments(region, protest_source)
-    df = pd.concat([df_y, df_w, df_x, df_z], axis=1)
+    if include_instruments:
+        df_z = instruments(region, protest_source)
+        df = pd.concat([df_y, df_w, df_x, df_z], axis=1)
+    else:
+        df = pd.concat([df_y, df_w, df_x], axis=1)
     return df
 
 
 @cache
 def all_regions(
+    include_instruments: bool = False,
     ignore_group: bool = False,
     region_dummies: bool = False,
     protest_source: str = "acled",
 ) -> list[pd.DataFrame]:
     dfs = [
-        (region.name, one_region(region.name, ignore_group, protest_source))
+        (
+            region.name,
+            one_region(region.name, include_instruments, ignore_group, protest_source),
+        )
         for region in tqdm(german_regions)
     ]
     names, dfs = zip(*[(name, df) for name, df in dfs if df is not None])
