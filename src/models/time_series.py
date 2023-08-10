@@ -2,6 +2,7 @@ from functools import partial
 from itertools import product
 from typing import Literal
 
+import matplotlib.pyplot as plt
 import pandas as pd
 from joblib import Parallel, delayed
 from tqdm.auto import tqdm
@@ -60,8 +61,15 @@ def _apply_method(
         instrumental_variable_liml=_instrumental_variable_liml,
     )
     method = method_dict[method_name]
+    instr = method_name in ["instrumental_variable", "instrumental_variable_liml"]
     lagged_df = get_lagged_df(
-        target, lags, step, cumulative, ignore_group, region_dummies=region_dummies
+        target=target,
+        lags=lags,
+        step=step,
+        cumulative=cumulative,
+        ignore_group=ignore_group,
+        region_dummies=region_dummies,
+        include_instruments=instr,
     )
     model, coefs = method(target=target, lagged_df=lagged_df, **kwargs)
     coefs["step"] = step
@@ -86,9 +94,53 @@ def apply_method(
     return models, params
 
 
+regression = partial(apply_method, method_name="regression")
+instrumental_variable = partial(apply_method, method_name="instrumental_variable")
 instrumental_variable_liml = partial(
     apply_method, method_name="instrumental_variable_liml"
 )
-instrumental_variable = partial(apply_method, method_name="instrumental_variable")
 propensity_weighting = partial(apply_method, method_name="propensity_weighting")
-regression = partial(apply_method, method_name="regression")
+
+
+def plot_impact_ts(
+    results: pd.DataFrame,
+    predictor: str,
+    targets: str = "protest",
+    ax: plt.Axes = None,
+    ci: bool = True,
+) -> tuple[plt.Figure, plt.Axes]:
+    if ax is None:
+        _, ax = plt.subplots(figsize=(8, 4))
+    match targets:
+        case "protest":
+            targets = [
+                "media_online_protest",
+                "media_online_not_protest",
+                "media_print_protest",
+                "media_print_not_protest",
+            ]
+        case "goals":
+            targets = [
+                "media_online_goal",
+                "media_online_subsidiary_goal",
+                "media_online_framing",
+                "media_print_goal",
+                "media_print_subsidiary_goal",
+                "media_print_framing",
+            ]
+    for target in targets:
+        r = results[
+            (results["target"] == target)
+            & (results["predictor"] == predictor)
+            & (results["lag"] == 0)
+        ]
+        ax.plot(r["step"], r["coef"], label=target, linewidth=1.5)
+        if ci and "ci_lower" in r.columns and "ci_upper" in r.columns:
+            ax.fill_between(r["step"], r["ci_upper"], r["ci_lower"], alpha=0.2)
+    # ax.set_xticks(range(-10, 11, 1))
+    ax.set_xlabel("Shift (days)")
+    ax.set_ylabel("Coefficient")
+    ax.axhline(0, color="black", linewidth=1)
+    ax.axvline(0, color="black", linewidth=1)
+    ax.legend()
+    return ax
