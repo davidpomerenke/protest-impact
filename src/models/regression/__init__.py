@@ -32,11 +32,9 @@ def get_lagged_df(
     region_dummies: bool = False,
 ):
     lagged_dfs = []
-    for df in all_regions(region_dummies=region_dummies):
-        if ignore_group:
-            protest_cols = [c for c in df.columns if c.startswith("occ_")]
-            protest = df[protest_cols].any(axis=1).astype(int)
-            df = df.drop(columns=protest_cols).assign(occ_protest=protest)
+    for name, df in all_regions(
+        ignore_group=ignore_group, region_dummies=region_dummies
+    ):
         lagged_df = pd.concat(
             [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1
         )

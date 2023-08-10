@@ -159,12 +159,16 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
     return combinations
 
 
-def one_region(region: str, protest_source: str = "acled") -> pd.DataFrame | None:
+def one_region(
+    region: str, ignore_group: bool = False, protest_source: str = "acled"
+) -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
         return None
     df_w = treatment(region, protest_source)
     df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
+    if ignore_group:
+        df_w = df_w.any(axis=1).astype(int).to_frame("occ_protest")
     df_x = controls(region)
     df_z = instruments(region, protest_source)
     df = pd.concat([df_y, df_w, df_x, df_z], axis=1)
@@ -173,10 +177,12 @@ def one_region(region: str, protest_source: str = "acled") -> pd.DataFrame | Non
 
 @cache
 def all_regions(
-    region_dummies: bool = False, protest_source: str = "acled"
+    ignore_group: bool = False,
+    region_dummies: bool = False,
+    protest_source: str = "acled",
 ) -> list[pd.DataFrame]:
     dfs = [
-        (region.name, one_region(region.name, protest_source))
+        (region.name, one_region(region.name, ignore_group, protest_source))
         for region in tqdm(german_regions)
     ]
     names, dfs = zip(*[(name, df) for name, df in dfs if df is not None])
@@ -184,4 +190,4 @@ def all_regions(
         region_dummies = pd.get_dummies(names, prefix="region", drop_first=True)
         for i, df in enumerate(dfs):
             df[region_dummies.columns] = region_dummies.iloc[i]
-    return dfs
+    return list(zip(names, dfs))
