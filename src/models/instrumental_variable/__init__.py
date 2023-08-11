@@ -19,15 +19,18 @@ from src.features.time_series import get_lagged_df
 from src.paths import models
 
 
-def binarize_optimally(X, y):
+def binarize_optimally(x, y):
+    x = x.to_numpy().reshape(-1, 1)
+    y = y.to_numpy().reshape(-1, 1)
     best_threshold, best_cov = None, None
-    for threshold in np.linspace(X.min(), X.max(), 1000):
-        X_bin = Binarizer(threshold=threshold).fit_transform(X)
+    for threshold in np.linspace(x.min(), x.max(), 1000):
+        X_bin = Binarizer(threshold=threshold).fit_transform(x)
         cov = np.cov(X_bin.flatten(), y.flatten())[0, 1]
         if best_cov is None or abs(cov) > abs(best_cov):
             best_threshold = threshold
             best_cov = cov
-    return Binarizer(threshold=best_threshold).fit_transform(X), best_threshold
+        x_bin = Binarizer(threshold=best_threshold).fit_transform(x).flatten()
+    return x_bin, best_threshold
 
 
 def get_data(instrument_prefix="weather_"):
@@ -78,11 +81,9 @@ def get_covariances(instrument_prefix="weather_"):
 
     # discretize all instruments optimally
     for instrument in instruments:
-        X = df[instrument].to_numpy().reshape(-1, 1)
-        y = df[treatment].to_numpy().reshape(-1, 1)
-        X_bin, threshold = binarize_optimally(X, y)
+        X_bin, threshold = binarize_optimally(df[instrument], df[treatment])
         print(f"{instrument}: {threshold:.3f}")
-        bin_df[instrument] = X_bin.flatten()
+        bin_df[instrument] = X_bin
 
     # get covariances between instruments and treatment
     covs = bin_df[instruments + [treatment]].cov()
@@ -254,7 +255,11 @@ def _instrumental_variable(
 
 # @cache
 def _instrumental_variable_liml(
-    target: str, treatment: str, instrument: str, lagged_df: pd.DataFrame
+    target: str,
+    treatment: str,
+    instruments: list[str],
+    lagged_df: pd.DataFrame,
+    binarize: bool = False,
 ):
     """
     WIP.
@@ -264,16 +269,20 @@ def _instrumental_variable_liml(
         treatment == "occ_protest"
     ), "general iv cannot control for other protest groups"
     assert isinstance(treatment, str)
-    assert isinstance(instrument, str)
     treatment_ = treatment + "_lag0"
-    instruments = [
+    all_instruments = [
         c
         for c in lagged_df.columns
         if c.startswith("weather_") or c.startswith("covid_")
     ]
-    instrument = instrument + "_lag0"
+    instruments = [f"{instr}_lag0" for instr in instruments]
+    if binarize:
+        for instrument in instruments:
+            lagged_df[instrument] = binarize_optimally(
+                lagged_df[instrument], lagged_df[treatment_]
+            )[0]
     # confounders = [
-    #     c for c in lagged_df.columns if not c in [target, treatment_] + instruments
+    #     c for c in lagged_df.columns if not c in [target, treatment_] + all_instruments
     # ]
     media_week_means = [
         (
@@ -311,13 +320,11 @@ def _instrumental_variable_liml(
         axis=1,
     )
     confounders = sm.add_constant(confounders)
-    # assert instrument == "weather_prcp_lag0"
-    # lagged_df[instrument] = (lagged_df[instrument] > 0).astype(int)
     model = IVLIML(
         dependent=lagged_df[target],
         exog=confounders,
         endog=lagged_df[treatment_],
-        instruments=lagged_df[instrument],
+        instruments=lagged_df[instruments],
     )
     results = model.fit()
     ci = results.conf_int()
