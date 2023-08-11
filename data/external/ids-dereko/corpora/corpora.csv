@@ -1,7 +1,7 @@
 Corpus;Sigle;Titel;von_;bis_;von;bis;Lizenz;Stadt;Region;National;Leitmedium
 W1;bmp;Berliner Morgenpost;;;1997;2022;NA;Berlin;BE;;
 W1;brz;Braunschweiger Zeitung;;;2005;2013;NA;Braunschweig;NI;;
-W1;bvz;Burgenländische Volkszeitung;;;2007;2015;NA;St. Pölten;B;;
+W1;bvz;Burgenländische Volkszeitung;;;2007;2015;NA;St. Pölten;AT;;
 W1;bzt-pub;Berliner Zeitung;;;2009;2022;NA;Berlin;BE;;
 W1;dpr;Die Presse;;;1991;2022;NA;;;AT;
 W1;flt;Falter;;;2000;2022;NA;;;AT;
@@ -71,7 +71,7 @@ W2;hzz;Hohenzollerische Zeitung;;;2014;2022;NA;Hechingen;BW;;
 W2;kaz;Kreis-Anzeiger;;;2004;2022;NA;Nidda;HE;;
 W2;klz;Kleine Zeitung;;;2002;2022;NA;Graz;AT;;
 W2;ksa;Kölner-Stadtanzeiger;;;2000;2022;NA;Köln;NW;;
-W2;ktz;Neue Kärntner Tageszeitung;;;2004;2014;NA;Klagenfurt;;;
+W2;ktz;Neue Kärntner Tageszeitung;;;2004;2014;NA;Klagenfurt;AT;;
 W2;kur;Kurier (Österreich);;;2002;2022;NA;;AT;;
 W2;lan;Lauterbacher Anzeiger;;;2004;2022;NA;Lauterbach;HE;;
 W2;laz;Lampertheimer Zeitung;;;2007;2022;NA;Lampertheim;HE;;
@@ -141,7 +141,7 @@ W3;sbn;Salzburger Nachrichten;;;2001;2022;NA;;;AT;
 W3;smp;Solinger Morgenpost;;;2013;2022;NA;Solingen;NW;;
 W4;bkr;Bersenbrücker Kreisblatt;;;2012;2019;NA;Bersenbrück;NI;;
 W4;sta;Der Standard;;;2000;2022;NA;;;AT;
-W4;tsp;Der Tagesspiegel;;;2000;2022;NA;;;DE;
+W4;tsp;Der Tagesspiegel;;;2000;2022;NA;Berlin;BE;DE;
 W4;fpc;Freie Presse;;;2011;2022;NA;Chemnitz;SN;;
 W4;giz;Giessener Anzeiger;;;2004;2022;NA;Gießen;HE;;
 W4;haa;Hamburger Abendblatt;;;1999;2022;NA;Hamburg;HH;;

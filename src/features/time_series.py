@@ -11,7 +11,9 @@ def get_lagged_df(
     step: int = 0,
     cumulative: bool = False,
     include_instruments: bool = False,
+    include_texts: bool = False,
     ignore_group: bool = False,
+    text_cutoff: int | None = None,
     region_dummies: bool = False,
 ):
     """
@@ -21,7 +23,9 @@ def get_lagged_df(
     lagged_dfs = []
     for name, df in all_regions(
         include_instruments=include_instruments,
+        include_texts=include_texts,
         ignore_group=ignore_group,
+        text_cutoff=text_cutoff,
         region_dummies=region_dummies,
     ):
         lagged_df = pd.concat(

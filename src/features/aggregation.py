@@ -10,6 +10,7 @@ from src import end, start
 from src.cache import cache
 from src.data import german_regions
 from src.data.covid_restrictions import load_covid
+from src.data.fulltexts import fulltexts
 from src.data.news import counts_for_region
 from src.data.protests import load_climate_protests_with_labels
 from src.data.protests.keywords import climate_queries
@@ -18,7 +19,7 @@ from src.data.weather import (
     impute_weather_history,
     interpolate_weather_histories,
 )
-from src.features.time_series.holidays import get_holidays
+from src.features.holidays import get_holidays
 
 
 @cache
@@ -168,7 +169,9 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
 def one_region(
     region: str,
     include_instruments: bool = False,
+    include_texts: bool = False,
     ignore_group: bool = False,
+    text_cutoff: int | None = None,
     protest_source: str = "acled",
 ) -> pd.DataFrame | None:
     df_y = outcome(region)
@@ -179,25 +182,37 @@ def one_region(
     if ignore_group:
         df_w = df_w.any(axis=1).astype(int).to_frame("occ_protest")
     df_x = controls(region)
+    dfs = [df_y, df_w, df_x]
     if include_instruments:
         df_z = instruments(region, protest_source)
-        df = pd.concat([df_y, df_w, df_x, df_z], axis=1)
-    else:
-        df = pd.concat([df_y, df_w, df_x], axis=1)
+        dfs.append(df_z)
+    if include_texts:
+        df_t = fulltexts(region, text_cutoff)
+        dfs.append(df_t)
+    df = pd.concat(dfs, axis=1)
     return df
 
 
 @cache
 def all_regions(
     include_instruments: bool = False,
+    include_texts: bool = False,
     ignore_group: bool = False,
+    text_cutoff: int | None = None,
     region_dummies: bool = False,
     protest_source: str = "acled",
 ) -> list[pd.DataFrame]:
     dfs = [
         (
             region.name,
-            one_region(region.name, include_instruments, ignore_group, protest_source),
+            one_region(
+                region.name,
+                include_instruments,
+                include_texts,
+                ignore_group,
+                text_cutoff,
+                protest_source,
+            ),
         )
         for region in tqdm(german_regions)
     ]
