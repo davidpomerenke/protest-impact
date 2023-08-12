@@ -65,6 +65,7 @@ huggingface = "^0.0.1"
 accelerate = "^0.21.0"
 peft = "^0.4.0"
 gensim = "^4.3.1"
+econml = "^0.14.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"

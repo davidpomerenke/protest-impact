@@ -1,17 +1,29 @@
+from functools import partial
+
 import pandas as pd
 from dowhy import CausalModel
+from dowhy.causal_estimator import CausalEstimator
+from dowhy.causal_estimators.econml import Econml
 from dowhy.causal_estimators.propensity_score_weighting_estimator import (
     PropensityScoreWeightingEstimator,
 )
-from sklearn.linear_model import LogisticRegression
+from econml.dr import LinearDRLearner
+from econml.sklearn_extensions.linear_model import StatsModelsLinearRegression
+from sklearn.linear_model import LogisticRegressionCV
 
 from src.cache import cache
 
 
 @cache
-def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
+def _dowhy_model_estimation(
+    estimator: CausalEstimator,
+    target: str,
+    treatment: str,
+    lagged_df: pd.DataFrame,
+) -> tuple[list, pd.DataFrame]:
     """
-    For use with src/models/time_series.py.
+    Wraps propensity score dowhy estimators, see below.
+    For use with models.time_series.apply_method.
     """
     treatment_ = treatment + "_lag0"
     effect_modifiers = [
@@ -33,11 +45,7 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
         effect_modifiers=effect_modifiers,
     )
     estimand = model.identify_effect(method_name="maximal-adjustment")
-    estimator = PropensityScoreWeightingEstimator(
-        estimand,
-        confidence_intervals=True,
-        propensity_score_model=LogisticRegression(),
-    )
+    estimator = estimator(estimand)
     estimator.fit(lagged_df)
     estimate = estimator.estimate_effect(lagged_df, target_units="att")
     ci = estimate.get_confidence_intervals()
@@ -51,3 +59,30 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
         )
     )
     return estimator, coefs
+
+
+propensity_model = LogisticRegressionCV(
+    solver="saga", max_iter=1000, class_weight="balanced"
+)
+
+_propensity_weighting = partial(
+    _dowhy_model_estimation,
+    estimator=partial(
+        PropensityScoreWeightingEstimator,
+        confidence_intervals=True,
+        propensity_score_model=propensity_model,
+    ),
+)
+
+_doubly_robust = partial(
+    _dowhy_model_estimation,
+    estimator=partial(
+        Econml,
+        econml_estimator=partial(
+            LinearDRLearner,
+            model_propensity=propensity_model,
+            model_regression=StatsModelsLinearRegression(),
+        ),
+        confidence_intervals=True,
+    ),
+)
