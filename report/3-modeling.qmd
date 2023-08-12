@@ -283,12 +283,15 @@ $$
 
 \endgroup
 
-<!-- ###
+<!-- ### Evaluation
 
 - bootstrapping for comparable standard errors
-- placebo tests to assess bias and variance
+- placebo tests
+  - negative outcome, esp. lagged outcome: Ding ch. 16.2.1
+  - negative exposure: Ding ch. 16.2.2
 - cross-validation (ood with one year gap) of
   - regression -> prediction mse
   - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage)) -- or just directly the outcome?
   - synth -> predictive quality within different pre-fit areas
-  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust) -->
+  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust)
+- (E-values): how large would hidden confounding need to be? Ding ch. 17 -->
