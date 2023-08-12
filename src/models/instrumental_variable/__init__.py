@@ -334,6 +334,7 @@ def _instrumental_variable_liml(
             predictor=[treatment],
             ci_lower=ci["lower"][0],
             ci_upper=ci["upper"][0],
+            sargan=results.sargan.pval,
             lag=[0],
         )
     )
