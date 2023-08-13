@@ -14,8 +14,8 @@ path = processed_data / "propensity_scores/nlp/embeddings"
 
 
 @cache
-def train_embeddings():
-    d = get_data()
+def train_embeddings(cutoff):
+    d = get_data(cutoff=cutoff)
     X = d._X_text["text_lag0"].sample(4000)
     documents = [
         TaggedDocument(simple_preprocess(doc), [tag]) for tag, doc in tqdm(enumerate(X))
@@ -35,9 +35,9 @@ def train_embeddings():
 
 
 @cache
-def get_embeddings():
-    d = get_data()
-    model = train_embeddings()
+def get_embeddings(cutoff):
+    d = get_data(cutoff=cutoff)
+    model = train_embeddings(cutoff=cutoff)
     embeddings = [
         model.infer_vector(simple_preprocess(doc))
         for doc in tqdm(d._X_text["text_lag0"].iloc[:4000])
@@ -45,17 +45,17 @@ def get_embeddings():
     return embeddings
 
 
-def f1_embeddings():
-    X = get_embeddings()
-    d = get_data()
+def f1_embeddings(cutoff):
+    X = get_embeddings(cutoff=cutoff)
+    d = get_data(cutoff=cutoff)
     clf = LogisticRegression(random_state=0, max_iter=1000, class_weight="balanced")
     cvs = cross_val_score(clf, X, d.y.iloc[:4000], cv=d.tscv, scoring="f1")
     print(f"Cross-validated F1 score: {cvs.mean():.3f} +/- {cvs.std():.3f}")
 
 
-def precision_recall_curve():
-    d = get_data()
-    X = get_embeddings()
+def precision_recall_curve(cutoff):
+    d = get_data(cutoff=cutoff)
+    X = get_embeddings(cutoff=cutoff)
     import matplotlib.pyplot as plt
     import numpy as np
     from sklearn.linear_model import LogisticRegression
