@@ -19,7 +19,8 @@ def get_lagged_df(
     positive_queries: bool = True,
     text_cutoff: int | None = None,
     region_dummies: bool = False,
-    random_treatment: int | None = None,
+    random_treatment_regional: int | None = None,
+    random_treatment_global: int | None = None,
 ):
     """
     Include time-series lags, that is, past values of the various variables.
@@ -60,7 +61,7 @@ def get_lagged_df(
         ignore_medium=ignore_medium,
         text_cutoff=text_cutoff,
         region_dummies=region_dummies,
-        random_treatment=random_treatment,
+        random_treatment_regional=random_treatment_regional,
     ):
         lagged_df = pd.concat(
             [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1
@@ -83,4 +84,10 @@ def get_lagged_df(
         df_combined = pd.concat([y, lagged_df], axis=1).dropna()
         lagged_dfs.append(df_combined)
     lagged_df = pd.concat(lagged_dfs).sort_index().reset_index(drop=True)
+    if random_treatment_global is not None:
+        w_cols = [c for c in lagged_df.columns if c.startswith("occ_")]
+        for i, col in enumerate(w_cols):
+            lagged_df[col] = lagged_df[col].sample(
+                frac=1, replace=True, random_state=random_treatment_global + i
+            ).values
     return lagged_df

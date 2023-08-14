@@ -12,6 +12,7 @@ from tqdm.auto import tqdm
 
 from src.cache import cache
 from src.features.aggregation import all_regions
+from src.features.time_series import get_lagged_df
 from src.paths import processed_data
 
 
@@ -118,7 +119,8 @@ def compute_synthetic_controls(
     treatment: str = "occ_protest",
     ignore_group: bool = True,
     ignore_medium: bool = False,
-    random_treatment: bool = False,
+    random_treatment_regional: bool = False,
+    random_treatment_global: bool = False,
     n_jobs: int = 4,
 ):
     dfs = all_regions(
@@ -126,8 +128,14 @@ def compute_synthetic_controls(
         protest_source="acled",
         positive_queries=True,
         ignore_medium=ignore_medium,
-        random_treatment=random_treatment,
+        random_treatment_regional=random_treatment_regional,
     )
+    if random_treatment_global is not None:
+        lagged_df = get_lagged_df(
+            target=treatment, lags=[-1], ignore_group=ignore_group
+        )
+        for i, (name, df) in enumerate(dfs):
+            df[treatment] = lagged_df[treatment].sample(n=len(df), replace=True, random_state=random_treatment_global + i).values
     protest_dates = []
     for name, df in dfs:
         dates = df[df[treatment] == 1].index
@@ -172,16 +180,16 @@ def synthetic_control(
     ignore_group: bool = False,
     ignore_medium: bool = False,
     positive_queries: bool = True,
-    random_treatment: bool = False,
+    random_treatment_regional: bool = False,
+    random_treatment_global: bool = False,
     n_jobs: int = 4,
 ) -> pd.DataFrame:
-    # assert treatment == "occ_protest"
-    # assert ignore_group
     ys, y_cs = compute_synthetic_controls(
         treatment=treatment,
         ignore_group=ignore_group,
         ignore_medium=ignore_medium,
-        random_treatment=random_treatment,
+        random_treatment_regional=random_treatment_regional,
+        random_treatment_global=random_treatment_global,
         n_jobs=n_jobs,
     )
     col_dfs = dict()

@@ -248,7 +248,7 @@ def all_regions(
     text_cutoff: int | None = None,
     region_dummies: bool = False,
     protest_source: str = "acled",
-    random_treatment: int | None = None,
+    random_treatment_regional: int | None = None,
 ) -> list[pd.DataFrame]:
     dfs = [
         (
@@ -262,7 +262,7 @@ def all_regions(
                 positive_queries=positive_queries,
                 text_cutoff=text_cutoff,
                 protest_source=protest_source,
-                random_treatment=random_treatment,
+                random_treatment=random_treatment_regional,
             ),
         )
         for region in tqdm(german_regions)

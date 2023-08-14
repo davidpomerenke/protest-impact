@@ -53,7 +53,8 @@ def _apply_method(
     ignore_medium: bool = False,
     positive_queries: bool = True,
     region_dummies: bool = False,
-    random_treatment: int | None = None,
+    random_treatment_regional: int | None = None,
+    random_treatment_global: int | None = None,
     **kwargs,
 ):
     """
@@ -81,7 +82,8 @@ def _apply_method(
         positive_queries=positive_queries,
         region_dummies=region_dummies,
         include_instruments=instr,
-        random_treatment=random_treatment,
+        random_treatment_regional=random_treatment_regional,
+        random_treatment_global=random_treatment_global,
     )
     coefs = method(target=target, lagged_df=lagged_df, **kwargs)
     coefs["step"] = step

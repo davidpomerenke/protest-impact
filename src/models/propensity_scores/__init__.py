@@ -72,10 +72,10 @@ def _dowhy_model_estimation(
     )
 
 
-propensity_model = LogisticRegressionCV(solver="newton-cholesky", max_iter=1000)
-# LogisticRegression(
-#     solver="liblinear", max_iter=1000, class_weight="balanced"
-# )
+propensity_model = LogisticRegressionCV(
+    solver="newton-cholesky",
+    max_iter=1000
+)
 
 
 @cache
