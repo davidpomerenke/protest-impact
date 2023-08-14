@@ -174,9 +174,8 @@ def synthetic_control(
         y_df = pd.concat([y[col] for y in ys], axis=1)
         y_c_df = pd.concat([y_c[col] for y_c in y_cs], axis=1)
         diff = y_df - y_c_df
-        diff = diff[diff.index >= 0]
         if cumulative:
-            diff = diff.cumsum()
+            diff = diff[diff.index >= 0].cumsum()
         col_dfs[col] = diff
     if not positive_queries:
         for medium in ["online", "print", "combined"]:

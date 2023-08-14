@@ -52,25 +52,21 @@ propensity_weighting=    propensity_weighting,
 doubly_robust=    doubly_robust,
 )
 
-def plot_trends(cumulative: bool=False):
+def plot_trends(cumulative: bool=False, lags=range(-14, 1), steps=range(0, 15)):
     fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=True, sharex=True)
     treatment = "occ_protest"
     targets = ["media_combined_protest", "media_combined_not_protest"]
     params = dict(
         target= targets,
         treatment=treatment,
-        lags=range(-14, 1),
-        steps=range(0, 15),
+        lags=lags,
+        steps=steps,
         cumulative=cumulative,
         ignore_group=True,
         ignore_medium=True,
         positive_queries=False,
     )
-    fig_params = dict(
-        predictor=treatment,
-        targets=targets,
-    )
-
+    fig_params = dict(predictor=treatment,targets=targets)
     for i, (mname, m) in enumerate(_methods.items()):
         ax = axes[i]
         plot_impact_ts(m(**params), ax=ax, **fig_params)
@@ -148,3 +144,5 @@ def plot_groups(step, kind):
             return alt.layer(bars, error_bars, data=results).facet(
                 column=alt.Column("method:N", title="", sort=all_method_names),
             )
+
+plot_trends(cumulative=False, lags=range(-7,1), steps=range(-5,5))

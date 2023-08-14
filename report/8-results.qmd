@@ -2,6 +2,20 @@
 
 ### Methods
 
+### Placebo
+
+```{python}
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
+fig, axes = plot_trends(cumulative=False, lags=range(-7,1), steps=range(-28,8))
+fig.suptitle("Placebo test: estimating the causal impact on past outcomes")
+axes[0].set_ylim(-3, 5)
+axes[0].set_xticks(range(-28, 8, 7))
+plt.show()
+```
 
 ### Protest impact
 
