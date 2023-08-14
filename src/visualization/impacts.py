@@ -11,6 +11,7 @@ from src.models.time_series import (
     regression,
 )
 
+all_method_names = ["regression", "synthetic_control", "propensity_weighting", "doubly_robust"]
 
 def plot_impact_ts(
     results: pd.DataFrame,
@@ -54,7 +55,7 @@ doubly_robust=    doubly_robust,
 def plot_trends(cumulative: bool=False):
     fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=True, sharex=True)
     treatment = "occ_protest"
-    targets = ["media_combined_not_protest", "media_combined_protest"]
+    targets = ["media_combined_protest", "media_combined_not_protest"]
     params = dict(
         target= targets,
         treatment=treatment,
@@ -106,22 +107,27 @@ def compute_groups(methods, step):
     results = pd.concat(data)
     return results
 
-def plot_groups(step):
-    # Causal effects for the individual protest groups differ substantially between regression and inverse propensity weighting and are not statistically significant at p=0.05 for the doubly robust estimator.
-    methods = ["synthetic_control"]
+
+
+def plot_groups(step, kind):
+    match kind:
+        case "groups":
+            groups = ["occ_FFF",
+                #   "occ_FFFX",
+                "occ_ALG", "occ_XR", "occ_EG", "occ_GP"
+                ]
+            methods = ["synthetic_control"]
+        case "methods":
+            groups = ["occ_protest"]
+            methods = all_method_names
     results = compute_groups(methods, step)
-    groups = ["occ_FFF",
-            #   "occ_FFFX",
-              "occ_ALG", "occ_XR", "occ_EG", "occ_GP"
-              # "occ_protest"
-              ]
     results = results[results["treatment"].isin(groups)]
-
     results["target"] = results["target"].str.replace("media_combined_", "")
-
+    x = alt.X("target:N", title="", sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"])
+    yname = "ATT estimate (#articles)"
     bars = alt.Chart().mark_bar().encode(
-            x=alt.X("target:N", title="", sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"]),
-            y=alt.Y("coef:Q", title="Causal effect", scale=alt.Scale(domain=[-10, 10])),
+            x=x,
+            y=alt.Y("coef:Q", title=yname, scale=alt.Scale(domain=[-10, 10])),
             color=alt.Color("target:N", title="", sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"]),
         ).properties(
             width=100,
@@ -129,15 +135,16 @@ def plot_groups(step):
         )
 
     error_bars = alt.Chart().mark_errorbar().encode(
-            alt.Y("ci_lower:Q", title="Causal effect"),
-            alt.Y2("ci_upper:Q", title="Causal effect"),
-            x=alt.X("target:N", title="", sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"]),
+            alt.Y("ci_lower:Q", title=yname),
+            alt.Y2("ci_upper:Q", title=yname),
+            x=x,
         )
-    return alt.layer(bars, error_bars, data=results).facet(
-        column=alt.Column("treatment:N", title="", sort=groups),
-        row=alt.Row("method:N", title="", sort=["regression", "synthetic_control", "propensity_weighting", "doubly_robust"]),
-        # increase font size:
-        # config={"axis": {"labelFontSize": 14, "titleFontSize": 14}},
-    )
-
-plot_trends(cumulative=False)
+    match kind:
+        case "groups":
+            return alt.layer(bars, error_bars, data=results).facet(
+                column=alt.Column("treatment:N", title="", sort=groups),
+            )
+        case "methods":
+            return alt.layer(bars, error_bars, data=results).facet(
+                column=alt.Column("method:N", title="", sort=all_method_names),
+            )

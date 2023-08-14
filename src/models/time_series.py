@@ -105,10 +105,10 @@ def disambiguate_target(target: str | list[str] | Literal["protest", "goals", "a
         "media_print_all",
     ]
     protest_targets = [
-        "media_online_not_protest",
         "media_online_protest",
-        "media_print_not_protest",
+        "media_online_not_protest",
         "media_print_protest",
+        "media_print_not_protest",
     ]
     goal_targets = [
         "media_online_goal",

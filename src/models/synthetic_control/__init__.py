@@ -162,8 +162,8 @@ def synthetic_control(
     # assert treatment == "occ_protest"
     # assert ignore_group
     ys, y_cs = compute_synthetic_controls(
-        pre_period=len([s for s in lags if s < 0]),
-        post_period=len([s for s in steps if s >= 0]),
+        # pre_period=len([s for s in lags if s < 0]),
+        # post_period=len([s for s in steps if s >= 0]),
         treatment=treatment,
         ignore_group=ignore_group,
         ignore_medium=ignore_medium,

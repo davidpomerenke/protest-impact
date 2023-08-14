@@ -25,6 +25,8 @@ axes[0].set_ylim(-10, 50)
 plt.show()
 ```
 
+Causal effects for the individual protest groups differ substantially between regression and inverse propensity weighting and are not statistically significant at p=0.05 for the doubly robust estimator.
+
 ```{python}
 # | fig-caption: Error bars are 95% confidence intervals.
 # | column: page
@@ -34,7 +36,7 @@ import altair as alt
 from src.visualization.impacts import plot_groups
 
 alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(step=1)
+plot_groups(kind="groups", step=1)
 ```
 
 ```{python}
@@ -46,5 +48,17 @@ import altair as alt
 from src.visualization.impacts import plot_groups
 
 alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(step=6)
+plot_groups(kind="groups", step=6)
+```
+
+```{python}
+# | fig-caption: Error bars are 95% confidence intervals.
+# | column: page
+# | echo: false
+
+import altair as alt
+from src.visualization.impacts import plot_groups
+
+alt.renderers.enable('altair_saver', fmts=["html", "svg"])
+plot_groups(kind="methods", step=1)
 ```
