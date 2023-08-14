@@ -26,9 +26,21 @@ import altair as alt
 from src.visualization.impacts import plot_groups
 
 alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(kind="methods", step=1)
+plot_groups(kind="methods", step=1, random_treatment=True)
 ```
 
+```{python}
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
+fig, axes = plot_trends(cumulative=False, lags=range(-7,1), steps=range(-15,15), random_treatment=37)
+fig.suptitle("Placebo test: estimating the causal impact on past outcomes")
+# axes[0].set_ylim(-3, 5)
+# axes[0].set_xticks(range(-28, 8, 7))
+plt.show()
+```
 
 ### Protest impact
 

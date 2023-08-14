@@ -206,6 +206,7 @@ def one_region(
     positive_queries: bool = True,
     text_cutoff: int | None = None,
     protest_source: str = "acled",
+    random_treatment: int | None = None,
 ) -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
@@ -218,6 +219,13 @@ def one_region(
     df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
     if ignore_group:
         df_w = df_w.any(axis=1).astype(int).to_frame("occ_protest")
+    if random_treatment is not None:
+        # derive fixed random state from region name
+        # make sure that the int is < 2**32
+        random_state = (int.from_bytes(region.encode(), "little") + random_treatment) % (
+            2 ** 32
+        )
+        df_w = df_w.sample(frac=1, replace=True, ignore_index=True, random_state=random_state).set_index(df_w.index)
     df_x = controls(region)
     dfs = [df_y, df_w, df_x]
     if include_instruments:
@@ -240,6 +248,7 @@ def all_regions(
     text_cutoff: int | None = None,
     region_dummies: bool = False,
     protest_source: str = "acled",
+    random_treatment: int | None = None,
 ) -> list[pd.DataFrame]:
     dfs = [
         (
@@ -253,6 +262,7 @@ def all_regions(
                 positive_queries=positive_queries,
                 text_cutoff=text_cutoff,
                 protest_source=protest_source,
+                random_treatment=random_treatment,
             ),
         )
         for region in tqdm(german_regions)

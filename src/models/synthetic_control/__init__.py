@@ -64,19 +64,12 @@ def synthetic_control_single(
     region: str,
     date_: pd.Timestamp,
     rolling: int = 1,
-    scale: Literal["demean", "demean_end", "log", "diff", None] = "demean",
+    scale: Literal["demean", "demean_end", "log", "diff", None] = None,
     pre_period: int = 28,
     post_period: int = 28,
     treatment: str = "occ_protest",
-    ignore_group: bool = True,
-    ignore_medium: bool = False,
+    dfs: list[tuple[str, pd.DataFrame]] = None,
 ) -> tuple[pd.Series, pd.Series] | None:
-    dfs = all_regions(
-        ignore_group=ignore_group,
-        protest_source="acled",
-        positive_queries=True,
-        ignore_medium=ignore_medium,
-    )
     df_w = [df for name, df in dfs if name == region][0]
     control_regions = [
         (name, df) for name, df in dfs if df[df.index == date_].iloc[0][treatment] == 0
@@ -102,6 +95,9 @@ def synthetic_control_single(
         axis=1,
     )
     X = sm.add_constant(X)
+    if len(y) == 0 or len(X) == 0:
+        print(f"No data for {region} on {date_}")
+        return None
     weights = get_w_by_regression(X, y)
     y_all = df_w[idx_all]
     y_c_all = pd.DataFrame()
@@ -118,10 +114,11 @@ def compute_synthetic_controls(
     pre_period: int = 28,
     post_period: int = 28,
     rolling: int = 1,
-    scale: str | None = "demean",
+    scale: str | None = None,
     treatment: str = "occ_protest",
     ignore_group: bool = True,
     ignore_medium: bool = False,
+    random_treatment: bool = False,
     n_jobs: int = 4,
 ):
     dfs = all_regions(
@@ -129,12 +126,14 @@ def compute_synthetic_controls(
         protest_source="acled",
         positive_queries=True,
         ignore_medium=ignore_medium,
+        random_treatment=random_treatment,
     )
     protest_dates = []
     for name, df in dfs:
         dates = df[df[treatment] == 1].index
         for date_ in dates:
-            protest_dates.append((name, date_))
+            if date_ - pd.Timedelta(days=pre_period) in df.index:
+                protest_dates.append((name, date_))
     # maybe actually use lags and steps as pre_period and post_period?
     results = Parallel(n_jobs=n_jobs)(
         delayed(synthetic_control_single)(
@@ -143,8 +142,9 @@ def compute_synthetic_controls(
             rolling=rolling,
             scale=scale,
             treatment=treatment,
-            ignore_group=ignore_group,
-            ignore_medium=ignore_medium,
+            pre_period=pre_period,
+            post_period=post_period,
+            dfs=dfs,
         )
         for name, date_ in tqdm(protest_dates)
     )
@@ -172,16 +172,16 @@ def synthetic_control(
     ignore_group: bool = False,
     ignore_medium: bool = False,
     positive_queries: bool = True,
+    random_treatment: bool = False,
     n_jobs: int = 4,
 ) -> pd.DataFrame:
     # assert treatment == "occ_protest"
     # assert ignore_group
     ys, y_cs = compute_synthetic_controls(
-        # pre_period=len([s for s in lags if s < 0]),
-        # post_period=len([s for s in steps if s >= 0]),
         treatment=treatment,
         ignore_group=ignore_group,
         ignore_medium=ignore_medium,
+        random_treatment=random_treatment,
         n_jobs=n_jobs,
     )
     col_dfs = dict()

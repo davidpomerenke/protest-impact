@@ -19,6 +19,7 @@ def get_lagged_df(
     positive_queries: bool = True,
     text_cutoff: int | None = None,
     region_dummies: bool = False,
+    random_treatment: int | None = None,
 ):
     """
     Include time-series lags, that is, past values of the various variables.
@@ -47,6 +48,8 @@ def get_lagged_df(
         Shortens the full texts. See there for details.
     region_dummies : bool, optional
         The lagged_df combines data from multiple regions. When region_dummies is True, the applicable region is encoded as a dummy variable (that is, 14 dummies for the 14 regions).
+    random_treatment : bool, optional
+        When True, the treatments are randomly assigned (sampling with replacement, per region), while all other variables remain the same. This is useful for placebo tests.
     """
     lagged_dfs = []
     for name, df in all_regions(
@@ -57,6 +60,7 @@ def get_lagged_df(
         ignore_medium=ignore_medium,
         text_cutoff=text_cutoff,
         region_dummies=region_dummies,
+        random_treatment=random_treatment,
     ):
         lagged_df = pd.concat(
             [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1
