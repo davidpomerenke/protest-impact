@@ -2,8 +2,6 @@ from itertools import chain
 
 import numpy as np
 import pandas as pd
-from darts import TimeSeries
-from darts.utils.timeseries_generation import generate_index
 from tqdm.auto import tqdm
 
 from src import end, start
@@ -25,7 +23,7 @@ from src.features.holidays import get_holidays
 @cache
 def outcome(
     region: str, start: pd.Timestamp = start, end: pd.Timestamp = end
-) -> TimeSeries:
+) -> pd.DataFrame | None:
     aspects = dict()
     for source_name, source in [("online", "mediacloud"), ("print", "dereko")]:
         for qname, query in climate_queries(short=True).items():
@@ -95,7 +93,7 @@ def treatment(region: str, source: str = "acled") -> pd.DataFrame:
     for col in bool_cols:
         df[col] = df[col].astype(int)
     # create index for the whole time range and fill missing values with 0
-    index = generate_index(start=start, end=end, freq="D")
+    index = pd.date_range(start=start, end=end, freq="D")
     df = df.reindex(index, fill_value=0)
     return df
 
@@ -165,18 +163,47 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
                 combinations.append((region, actor))
     return combinations
 
+def make_queries_positive(df: pd.DataFrame) -> pd.DataFrame:
+    for medium in ["online", "print"]:
+        df[f"media_{medium}_all"] = (
+            df[f"media_{medium}_protest"] + df[f"media_{medium}_not_protest"]
+        )
+        df = df.drop(
+            columns=[
+                f"media_{medium}_not_protest",
+            ]
+        )
+    return df
+
+def ignore_medium_(df: pd.DataFrame) -> pd.DataFrame:
+    for dimension in ["all", "protest", "not_protest", "goal", "subsidiary_goal", "framing"]:
+        onl = f"media_online_{dimension}"
+        if onl in df.columns: # depending on `positive_queries` only some of the dimensions are present
+            df[f"media_combined_{dimension}"] = (
+                df[onl] + df[f"media_print_{dimension}"]
+            )
+            # keep one of the old columns for controlling
+            # together with the new column it should yield the same information for linear models
+            df = df.drop(columns=[f"media_print_{dimension}"])
+    return df
 
 def one_region(
     region: str,
     include_instruments: bool = False,
     include_texts: bool = False,
     ignore_group: bool = False,
+    ignore_medium: bool = False,
+    positive_queries:bool = True,
     text_cutoff: int | None = None,
     protest_source: str = "acled",
 ) -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
         return None
+    if positive_queries:
+        df_y = make_queries_positive(df_y)
+    if ignore_medium:
+        df_y = ignore_medium_(df_y)
     df_w = treatment(region, protest_source)
     df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
     if ignore_group:
@@ -198,6 +225,8 @@ def all_regions(
     include_instruments: bool = False,
     include_texts: bool = False,
     ignore_group: bool = False,
+    ignore_medium: bool = False,
+    positive_queries:bool = True,
     text_cutoff: int | None = None,
     region_dummies: bool = False,
     protest_source: str = "acled",
@@ -206,12 +235,14 @@ def all_regions(
         (
             region.name,
             one_region(
-                region.name,
-                include_instruments,
-                include_texts,
-                ignore_group,
-                text_cutoff,
-                protest_source,
+                region=region.name,
+                include_instruments=include_instruments,
+                include_texts=include_texts,
+                ignore_group=ignore_group,
+                ignore_medium=ignore_medium,
+                positive_queries=positive_queries,
+                text_cutoff=text_cutoff,
+                protest_source=protest_source,
             ),
         )
         for region in tqdm(german_regions)

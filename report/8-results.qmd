@@ -1,41 +1,50 @@
 ## Results
 
-WIP
+### Methods
 
-<!-- ### Regression
+
+### Protest impact
 
 ```{python}
-# | label: fig-regression-lagged-multiple
-# | fig-cap: Results for regressing regional online/print newspaper coverage on Fridays For Future protest occurrence, controlling for weekdays and holidays and lagged values of media coverage and protest occurrence (n_lags=1). Increasing the number of lags does not substantially change the results.
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
+fig, _ = plot_trends(cumulative=False)
+fig.suptitle("Time series of the causal impact by method and coverage dimension")
+plt.show()
+```
+
+```{python}
+# | column: page
+# | echo: false
+fig, axes = plot_trends(cumulative=True)
+fig.suptitle("Cumulative time series of the causal impact by method and coverage dimension")
+axes[0].set_ylim(-10, 50)
+plt.show()
+```
+
+```{python}
+# | fig-caption: Error bars are 95% confidence intervals.
 # | column: page
 # | echo: false
 
-import matplotlib.pyplot as plt
-from src.features.time_series.lagged_impact import plot_lagged_impact
-from src.models.regression import regression
+import altair as alt
+from src.visualization.impacts import plot_groups
 
-lags = 14
-steps = 7
-gap = 3
-var = "occ_FFFX"
-cum = True
+alt.renderers.enable('altair_saver', fmts=["html", "svg"])
+plot_groups(step=1)
+```
 
-fig, axes = plt.subplots(2, 2, figsize=(10, 8))
-results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
-plot_lagged_impact(results, var, "protest", ax=axes[0, 0])
-axes[0, 0].set_title("Online newspapers")
+```{python}
+# | fig-caption: Error bars are 95% confidence intervals.
+# | column: page
+# | echo: false
 
-results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
-plot_lagged_impact(results, var, "protest", ax=axes[0, 1])
-axes[0, 1].set_title("Print newspapers")
+import altair as alt
+from src.visualization.impacts import plot_groups
 
-results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
-plot_lagged_impact(results, var, "goals", ax=axes[1, 0])
-axes[1, 0].set_title("Online newspapers: goals and framing")
-
-results = regression(lags=lags, steps=steps, gap=gap, cumulative=cum)
-plot_lagged_impact(results, var, "goals", ax=axes[1, 1])
-axes[1, 1].set_title("Print newspapers: goals and framing")
-fig.tight_layout()
-plt.show()
-``` -->
+alt.renderers.enable('altair_saver', fmts=["html", "svg"])
+plot_groups(step=6)
+```

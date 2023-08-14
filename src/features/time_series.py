@@ -15,6 +15,8 @@ def get_lagged_df(
     include_instruments: bool = False,
     include_texts: bool = False,
     ignore_group: bool = False,
+    ignore_medium: bool = False,
+    positive_queries: bool = True,
     text_cutoff: int | None = None,
     region_dummies: bool = False,
 ):
@@ -51,6 +53,8 @@ def get_lagged_df(
         include_instruments=include_instruments,
         include_texts=include_texts,
         ignore_group=ignore_group,
+        positive_queries=positive_queries,
+        ignore_medium=ignore_medium,
         text_cutoff=text_cutoff,
         region_dummies=region_dummies,
     ):

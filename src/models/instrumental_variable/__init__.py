@@ -124,7 +124,7 @@ def get_coefficients(instrument_prefix):
     params_combi = params_combi[params_combi.index.str.startswith(instrument_prefix)]
     params = pd.concat([params_single, params_combi], axis=1, keys=["single", "combi"])
 
-    params.sort_values(by=("single", "coef"), key=abs, ascending=False)
+    params = params.sort_values(by=("single", "coef"), key=abs, ascending=False)
     return params
 
 
@@ -247,13 +247,12 @@ def _instrumental_variable(
             predictor=[treatment],
             ci_lower=ci[0],
             ci_upper=ci[1],
-            lag=[0],
         )
     )
     return estimator, coefs
 
 
-# @cache
+@cache
 def _instrumental_variable_liml(
     target: str,
     treatment: str,
@@ -281,44 +280,9 @@ def _instrumental_variable_liml(
             lagged_df[instrument] = binarize_optimally(
                 lagged_df[instrument], lagged_df[treatment_]
             )[0]
-    # confounders = [
-    #     c for c in lagged_df.columns if not c in [target, treatment_] + all_instruments
-    # ]
-    media_week_means = [
-        (
-            lagged_df[[c for c in lagged_df.columns if c.startswith(dimension)]]
-            .mean(axis=1)
-            .rename(dimension)
-        )
-        for dimension in [
-            "media_online_protest",
-            "media_online_not_protest",
-            "media_print_protest",
-            "media_print_not_protest",
-        ]
-    ]
-    regions = lagged_df[[c for c in lagged_df.columns if c.startswith("region_")]]
-    # weather = (
-    #     lagged_df[
-    #         [
-    #             c
-    #             for c in lagged_df.columns
-    #             if c.startswith("weather_prcp") and int(c.split("_lag")[1]) <= -3
-    #         ]
-    #     ]
-    #     .mean(axis=1)
-    #     .rename("previous_weather_prcp")
-    # )
-    weekdays = lagged_df[[c for c in lagged_df.columns if c.startswith("weekday_")]]
-    confounders = pd.concat(
-        [
-            *media_week_means,
-            regions,
-            # weather,
-            # weekdays,
-        ],
-        axis=1,
-    )
+    confounders = lagged_df[[
+        c for c in lagged_df.columns if not c in [target, treatment_] + all_instruments
+    ]]
     confounders = sm.add_constant(confounders)
     model = IVLIML(
         dependent=lagged_df[target],
@@ -335,7 +299,6 @@ def _instrumental_variable_liml(
             ci_lower=ci["lower"][0],
             ci_upper=ci["upper"][0],
             sargan=results.sargan.pval,
-            lag=[0],
         )
     )
-    return model, coefs
+    return None, coefs

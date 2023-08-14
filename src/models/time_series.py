@@ -6,6 +6,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 from tqdm.auto import tqdm
 
+from src.cache import cache
 from src.features.time_series import get_lagged_df
 from src.models.instrumental_variable import (
     _instrumental_variable,
@@ -15,10 +16,11 @@ from src.models.propensity_scores import _doubly_robust, _propensity_weighting
 from src.models.regression import _regression
 
 
+@cache
 def apply_method(
     target: str | list[str] | Literal["protest", "goals", "all"],
     steps: Iterable[int] = range(7),
-    n_jobs=8,
+    n_jobs=4,
     show_progress: bool = True,
     **kwargs,
 ):
@@ -38,9 +40,7 @@ def apply_method(
         delayed(_apply_method)(target=target, step=step, **kwargs)
         for target, step in tqdm(targets_and_steps, disable=not show_progress)
     )
-    models, params = zip(*results)
-    params = pd.concat(params).reset_index(drop=True)
-    return models, params
+    return pd.concat(results).reset_index(drop=True)
 
 
 def _apply_method(
@@ -50,6 +50,8 @@ def _apply_method(
     step: int,
     cumulative: bool = False,
     ignore_group: bool = False,
+    ignore_medium: bool = False,
+    positive_queries: bool = True,
     region_dummies: bool = False,
     **kwargs,
 ):
@@ -74,13 +76,15 @@ def _apply_method(
         step=step,
         cumulative=cumulative,
         ignore_group=ignore_group,
+        ignore_medium=ignore_medium,
+        positive_queries=positive_queries,
         region_dummies=region_dummies,
         include_instruments=instr,
     )
-    model, coefs = method(target=target, lagged_df=lagged_df, **kwargs)
+    coefs = method(target=target, lagged_df=lagged_df, **kwargs)
     coefs["step"] = step
     coefs["target"] = target
-    return model, coefs
+    return coefs
 
 
 regression = partial(apply_method, method_name="regression")
@@ -89,17 +93,22 @@ instrumental_variable_liml = partial(
     apply_method, method_name="instrumental_variable_liml"
 )
 propensity_weighting = partial(apply_method, method_name="propensity_weighting")
+doubly_robust = partial(apply_method, method_name="doubly_robust")
 
 
 def disambiguate_target(target: str | list[str] | Literal["protest", "goals", "all"]):
     """
     Just a helper that allows more concise definition of desired target variables.
     """
+    general_targets = [
+        "media_online_all",
+        "media_print_all",
+    ]
     protest_targets = [
-        "media_online_protest",
         "media_online_not_protest",
-        "media_print_protest",
+        "media_online_protest",
         "media_print_not_protest",
+        "media_print_protest",
     ]
     goal_targets = [
         "media_online_goal",
@@ -112,11 +121,13 @@ def disambiguate_target(target: str | list[str] | Literal["protest", "goals", "a
     match target:
         case [*ts]:
             return ts
+        case "general":
+            return general_targets
         case "protest":
             return protest_targets
         case "goals":
             return goal_targets
         case "all":
-            return protest_targets + goal_targets
+            return protest_targets + goal_targets + general_targets
         case _:
             return [target]

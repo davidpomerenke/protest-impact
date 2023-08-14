@@ -5,7 +5,7 @@ from src.cache import cache
 
 
 @cache
-def _regression(target: str, lagged_df: pd.DataFrame):
+def _regression(target: str, lagged_df: pd.DataFrame, treatment=None):
     """
     For use with src/models/time_series.py.
     """
@@ -18,7 +18,9 @@ def _regression(target: str, lagged_df: pd.DataFrame):
     coefs = decode_param_names(results.params, X.columns, data_type="coef")
     conf_int = decode_param_names(results.conf_int(), X.columns, data_type="conf_int")
     coefs = coefs.merge(conf_int, on=["predictor", "lag"])
-    return model, coefs
+    coefs = coefs[(coefs.lag == 0) & (coefs.predictor == treatment)]
+    coefs = coefs.drop(columns=["lag"])
+    return coefs
 
 
 def decode_param_names(

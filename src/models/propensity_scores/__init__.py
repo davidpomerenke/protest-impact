@@ -1,5 +1,7 @@
+import warnings
 from functools import partial
 
+import numpy as np
 import pandas as pd
 from dowhy import CausalModel
 from dowhy.causal_estimator import CausalEstimator
@@ -7,23 +9,32 @@ from dowhy.causal_estimators.econml import Econml
 from dowhy.causal_estimators.propensity_score_weighting_estimator import (
     PropensityScoreWeightingEstimator,
 )
-from econml.dr import LinearDRLearner
-from econml.sklearn_extensions.linear_model import StatsModelsLinearRegression
-from sklearn.linear_model import LogisticRegressionCV
+from econml.sklearn_extensions.linear_model import (
+    StatsModelsLinearRegression,
+    StatsModelsRLM,
+    WeightedLassoCV,
+)
+from numba.core.errors import NumbaDeprecationWarning
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 from src.cache import cache
 
+# Suppress numba warnings from econml import, see https://github.com/py-why/EconML/issues/807
 
-@cache
+
+warnings.simplefilter('ignore', category=NumbaDeprecationWarning)
+
+from econml.dr import DRLearner, ForestDRLearner, LinearDRLearner, SparseLinearDRLearner
+
+
 def _dowhy_model_estimation(
     estimator: CausalEstimator,
     target: str,
     treatment: str,
     lagged_df: pd.DataFrame,
-) -> tuple[list, pd.DataFrame]:
+) -> pd.DataFrame:
     """
     Wraps propensity score dowhy estimators, see below.
-    For use with models.time_series.apply_method.
     """
     treatment_ = treatment + "_lag0"
     effect_modifiers = [
@@ -49,40 +60,45 @@ def _dowhy_model_estimation(
     estimator.fit(lagged_df)
     estimate = estimator.estimate_effect(lagged_df, target_units="att")
     ci = estimate.get_confidence_intervals()
-    coefs = pd.DataFrame(
+    if isinstance(ci, np.ndarray):
+        ci = ci.flatten()
+    return pd.DataFrame(
         dict(
             coef=[estimate.value],
             predictor=[treatment],
-            ci_lower=ci[0],
-            ci_upper=ci[1],
-            lag=[0],
+            ci_lower=[ci[0]],
+            ci_upper=[ci[1]],
         )
     )
-    return estimator, coefs
 
+propensity_model = LogisticRegressionCV(solver="newton-cholesky", max_iter=1000)
+# LogisticRegression(
+#     solver="liblinear", max_iter=1000, class_weight="balanced"
+# )
 
-propensity_model = LogisticRegressionCV(
-    solver="saga", max_iter=1000, class_weight="balanced"
-)
-
-_propensity_weighting = partial(
-    _dowhy_model_estimation,
-    estimator=partial(
+@cache
+def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
+    """
+    For use with models.time_series.apply_method.
+    """
+    estimator = partial(
         PropensityScoreWeightingEstimator,
         confidence_intervals=True,
         propensity_score_model=propensity_model,
-    ),
-)
+    )
+    return _dowhy_model_estimation(estimator, target, treatment, lagged_df)
 
-_doubly_robust = partial(
-    _dowhy_model_estimation,
-    estimator=partial(
+@cache
+def _doubly_robust(target: str, treatment: str, lagged_df: pd.DataFrame):
+    """
+    For use with models.time_series.apply_method.
+    """
+    estimator = partial(
         Econml,
-        econml_estimator=partial(
-            LinearDRLearner,
+        econml_estimator=LinearDRLearner(
             model_propensity=propensity_model,
             model_regression=StatsModelsLinearRegression(),
         ),
         confidence_intervals=True,
-    ),
-)
+    )
+    return _dowhy_model_estimation(estimator, target, treatment, lagged_df)
