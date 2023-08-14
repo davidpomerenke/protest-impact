@@ -4,6 +4,7 @@ import pandas as pd
 
 # HELPER FUNCTIONS
 
+
 def kill_umlauts_without_mercy(s: str) -> str:
     # pointless bloodshedding
     # just for the cause of normalization
@@ -17,6 +18,7 @@ def kill_umlauts_without_mercy(s: str) -> str:
         .replace("Ü", "U")
     )
 
+
 def function_name(f):
     """
     Returns the name of either a function or a partial function.
@@ -25,6 +27,7 @@ def function_name(f):
         return f.func.__name__
     else:
         return f.__name__
+
 
 start = pd.Timestamp("2020-01-01")
 end = pd.Timestamp("2022-12-31")

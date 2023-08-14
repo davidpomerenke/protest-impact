@@ -22,7 +22,7 @@ from src.cache import cache
 # Suppress numba warnings from econml import, see https://github.com/py-why/EconML/issues/807
 
 
-warnings.simplefilter('ignore', category=NumbaDeprecationWarning)
+warnings.simplefilter("ignore", category=NumbaDeprecationWarning)
 
 from econml.dr import DRLearner, ForestDRLearner, LinearDRLearner, SparseLinearDRLearner
 
@@ -71,10 +71,12 @@ def _dowhy_model_estimation(
         )
     )
 
+
 propensity_model = LogisticRegressionCV(solver="newton-cholesky", max_iter=1000)
 # LogisticRegression(
 #     solver="liblinear", max_iter=1000, class_weight="balanced"
 # )
+
 
 @cache
 def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
@@ -87,6 +89,7 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
         propensity_score_model=propensity_model,
     )
     return _dowhy_model_estimation(estimator, target, treatment, lagged_df)
+
 
 @cache
 def _doubly_robust(target: str, treatment: str, lagged_df: pd.DataFrame):

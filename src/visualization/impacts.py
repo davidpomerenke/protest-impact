@@ -11,7 +11,13 @@ from src.models.time_series import (
     regression,
 )
 
-all_method_names = ["regression", "synthetic_control", "propensity_weighting", "doubly_robust"]
+all_method_names = [
+    "regression",
+    "synthetic_control",
+    "propensity_weighting",
+    "doubly_robust",
+]
+
 
 def plot_impact_ts(
     results: pd.DataFrame,
@@ -27,10 +33,7 @@ def plot_impact_ts(
     if ax is None:
         _, ax = plt.subplots(figsize=(8, 4))
     for target in disambiguate_target(targets):
-        r = results[
-            (results["target"] == target)
-            & (results["predictor"] == predictor)
-        ]
+        r = results[(results["target"] == target) & (results["predictor"] == predictor)]
         ax.plot(r["step"], r["coef"], label=target, linewidth=1.5)
         if ci and "ci_lower" in r.columns and "ci_upper" in r.columns:
             ax.fill_between(r["step"], r["ci_upper"], r["ci_lower"], alpha=0.2)
@@ -45,19 +48,21 @@ def plot_impact_ts(
     ax.grid(axis="y", alpha=0.3)
     return ax
 
+
 _methods = dict(
     regression=regression,
     synthetic_control=synthetic_control,
-propensity_weighting=    propensity_weighting,
-doubly_robust=    doubly_robust,
+    propensity_weighting=propensity_weighting,
+    doubly_robust=doubly_robust,
 )
 
-def plot_trends(cumulative: bool=False, lags=range(-14, 1), steps=range(0, 15)):
+
+def plot_trends(cumulative: bool = False, lags=range(-14, 1), steps=range(0, 15)):
     fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=True, sharex=True)
     treatment = "occ_protest"
     targets = ["media_combined_protest", "media_combined_not_protest"]
     params = dict(
-        target= targets,
+        target=targets,
         treatment=treatment,
         lags=lags,
         steps=steps,
@@ -66,20 +71,38 @@ def plot_trends(cumulative: bool=False, lags=range(-14, 1), steps=range(0, 15)):
         ignore_medium=True,
         positive_queries=False,
     )
-    fig_params = dict(predictor=treatment,targets=targets)
+    fig_params = dict(predictor=treatment, targets=targets)
     for i, (mname, m) in enumerate(_methods.items()):
         ax = axes[i]
         plot_impact_ts(m(**params), ax=ax, **fig_params)
         ax.set_title(mname)
     handles, labels = ax.get_legend_handles_labels()
-    labels = ["articles mentioning climate change AND protest", "articles mentioning climate change AND NOT protest"]
+    labels = [
+        "articles mentioning climate change AND protest",
+        "articles mentioning climate change AND NOT protest",
+    ]
     fig.legend(handles, labels, loc="lower center", ncol=2, bbox_to_anchor=(0.5, -0.1))
     return fig, axes
 
+
 @cache
 def compute_groups(methods, step):
-    targets = ["media_combined_protest", "media_combined_not_protest", "media_combined_framing", "media_combined_goal", "media_combined_subsidiary_goal"]
-    treatments = ["occ_FFF", "occ_FFFX", "occ_ALG", "occ_XR", "occ_EG", "occ_GP", "occ_protest"]
+    targets = [
+        "media_combined_protest",
+        "media_combined_not_protest",
+        "media_combined_framing",
+        "media_combined_goal",
+        "media_combined_subsidiary_goal",
+    ]
+    treatments = [
+        "occ_FFF",
+        "occ_FFFX",
+        "occ_ALG",
+        "occ_XR",
+        "occ_EG",
+        "occ_GP",
+        "occ_protest",
+    ]
     cumulative = True
     data = []
     for treatment in treatments:
@@ -104,14 +127,17 @@ def compute_groups(methods, step):
     return results
 
 
-
 def plot_groups(step, kind):
     match kind:
         case "groups":
-            groups = ["occ_FFF",
-                #   "occ_FFFX",
-                "occ_ALG", "occ_XR", "occ_EG", "occ_GP"
-                ]
+            groups = [
+                "occ_FFF",
+                # "occ_FFFX",
+                "occ_ALG",
+                "occ_XR",
+                "occ_EG",
+                "occ_GP",
+            ]
             methods = ["synthetic_control"]
         case "methods":
             groups = ["occ_protest"]
@@ -119,22 +145,39 @@ def plot_groups(step, kind):
     results = compute_groups(methods, step)
     results = results[results["treatment"].isin(groups)]
     results["target"] = results["target"].str.replace("media_combined_", "")
-    x = alt.X("target:N", title="", sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"])
+    x = alt.X(
+        "target:N",
+        title="",
+        sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"],
+    )
     yname = "ATT estimate (#articles)"
-    bars = alt.Chart().mark_bar().encode(
+    bars = (
+        alt.Chart()
+        .mark_bar()
+        .encode(
             x=x,
             y=alt.Y("coef:Q", title=yname, scale=alt.Scale(domain=[-10, 10])),
-            color=alt.Color("target:N", title="", sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"]),
-        ).properties(
+            color=alt.Color(
+                "target:N",
+                title="",
+                sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"],
+            ),
+        )
+        .properties(
             width=100,
             height=150,
         )
+    )
 
-    error_bars = alt.Chart().mark_errorbar().encode(
+    error_bars = (
+        alt.Chart()
+        .mark_errorbar()
+        .encode(
             alt.Y("ci_lower:Q", title=yname),
             alt.Y2("ci_upper:Q", title=yname),
             x=x,
         )
+    )
     match kind:
         case "groups":
             return alt.layer(bars, error_bars, data=results).facet(
@@ -145,4 +188,5 @@ def plot_groups(step, kind):
                 column=alt.Column("method:N", title="", sort=all_method_names),
             )
 
-plot_trends(cumulative=False, lags=range(-7,1), steps=range(-5,5))
+
+plot_trends(cumulative=False, lags=range(-7, 1), steps=range(-5, 5))

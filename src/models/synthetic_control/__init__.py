@@ -71,7 +71,12 @@ def synthetic_control_single(
     ignore_group: bool = True,
     ignore_medium: bool = False,
 ) -> tuple[pd.Series, pd.Series] | None:
-    dfs = all_regions(ignore_group=ignore_group, protest_source="acled", positive_queries=True, ignore_medium=ignore_medium)
+    dfs = all_regions(
+        ignore_group=ignore_group,
+        protest_source="acled",
+        positive_queries=True,
+        ignore_medium=ignore_medium,
+    )
     df_w = [df for name, df in dfs if name == region][0]
     control_regions = [
         (name, df) for name, df in dfs if df[df.index == date_].iloc[0][treatment] == 0
@@ -119,8 +124,12 @@ def compute_synthetic_controls(
     ignore_medium: bool = False,
     n_jobs: int = 4,
 ):
-    dfs = all_regions(ignore_group=ignore_group, protest_source="acled", positive_queries=True,
-                       ignore_medium=ignore_medium)
+    dfs = all_regions(
+        ignore_group=ignore_group,
+        protest_source="acled",
+        positive_queries=True,
+        ignore_medium=ignore_medium,
+    )
     protest_dates = []
     for name, df in dfs:
         dates = df[df[treatment] == 1].index
@@ -128,9 +137,15 @@ def compute_synthetic_controls(
             protest_dates.append((name, date_))
     # maybe actually use lags and steps as pre_period and post_period?
     results = Parallel(n_jobs=n_jobs)(
-        delayed(synthetic_control_single)(name, date_, rolling=rolling, scale=scale, treatment=treatment,
-                                          ignore_group=ignore_group,
-                                           ignore_medium=ignore_medium)
+        delayed(synthetic_control_single)(
+            name,
+            date_,
+            rolling=rolling,
+            scale=scale,
+            treatment=treatment,
+            ignore_group=ignore_group,
+            ignore_medium=ignore_medium,
+        )
         for name, date_ in tqdm(protest_dates)
     )
     ys, y_cs = [], []
@@ -180,15 +195,21 @@ def synthetic_control(
     if not positive_queries:
         for medium in ["online", "print", "combined"]:
             if f"media_{medium}_protest" in col_dfs:
-                df1 = col_dfs[f"media_{medium}_all"].rename(columns=lambda c: c.removesuffix("_all"))
-                df2 = col_dfs[f"media_{medium}_protest"].rename(columns=lambda c: c.removesuffix("_protest"))
+                df1 = col_dfs[f"media_{medium}_all"].rename(
+                    columns=lambda c: c.removesuffix("_all")
+                )
+                df2 = col_dfs[f"media_{medium}_protest"].rename(
+                    columns=lambda c: c.removesuffix("_protest")
+                )
                 col_dfs[f"media_{medium}_not_protest"] = df1 - df2
     targets = [target] if isinstance(target, str) else target
     rows = []
     for target in targets:
         for step in steps:
             df = col_dfs[target].loc[step]
-            ci_low, ci_high = stats.t.interval(0.95, len(df)-1, loc=df.mean(), scale=stats.sem(df.dropna()))
+            ci_low, ci_high = stats.t.interval(
+                0.95, len(df) - 1, loc=df.mean(), scale=stats.sem(df.dropna())
+            )
             rows.append(
                 dict(
                     step=step,

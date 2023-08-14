@@ -115,7 +115,6 @@ def clean_city_name(city: str):
     return city.split(" - ")[0]
 
 
-
 fn = "2020-01-01-2023-06-30-Europe-Austria-Germany-Switzerland.csv"
 
 

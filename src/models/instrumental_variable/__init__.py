@@ -280,9 +280,13 @@ def _instrumental_variable_liml(
             lagged_df[instrument] = binarize_optimally(
                 lagged_df[instrument], lagged_df[treatment_]
             )[0]
-    confounders = lagged_df[[
-        c for c in lagged_df.columns if not c in [target, treatment_] + all_instruments
-    ]]
+    confounders = lagged_df[
+        [
+            c
+            for c in lagged_df.columns
+            if not c in [target, treatment_] + all_instruments
+        ]
+    ]
     confounders = sm.add_constant(confounders)
     model = IVLIML(
         dependent=lagged_df[target],

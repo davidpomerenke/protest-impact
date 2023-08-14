@@ -17,6 +17,19 @@ axes[0].set_xticks(range(-28, 8, 7))
 plt.show()
 ```
 
+```{python}
+# | fig-caption: Error bars are 95% confidence intervals.
+# | column: page
+# | echo: false
+
+import altair as alt
+from src.visualization.impacts import plot_groups
+
+alt.renderers.enable('altair_saver', fmts=["html", "svg"])
+plot_groups(kind="methods", step=1)
+```
+
+
 ### Protest impact
 
 ```{python}

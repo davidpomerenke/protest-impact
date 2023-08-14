@@ -163,6 +163,7 @@ def region_actor_combinations(source: str = "acled", min_protest_days: int = 0):
                 combinations.append((region, actor))
     return combinations
 
+
 def make_queries_positive(df: pd.DataFrame) -> pd.DataFrame:
     for medium in ["online", "print"]:
         df[f"media_{medium}_all"] = (
@@ -175,17 +176,26 @@ def make_queries_positive(df: pd.DataFrame) -> pd.DataFrame:
         )
     return df
 
+
 def ignore_medium_(df: pd.DataFrame) -> pd.DataFrame:
-    for dimension in ["all", "protest", "not_protest", "goal", "subsidiary_goal", "framing"]:
+    for dimension in [
+        "all",
+        "protest",
+        "not_protest",
+        "goal",
+        "subsidiary_goal",
+        "framing",
+    ]:
         onl = f"media_online_{dimension}"
-        if onl in df.columns: # depending on `positive_queries` only some of the dimensions are present
-            df[f"media_combined_{dimension}"] = (
-                df[onl] + df[f"media_print_{dimension}"]
-            )
+        if (
+            onl in df.columns
+        ):  # depending on `positive_queries` only some of the dimensions are present
+            df[f"media_combined_{dimension}"] = df[onl] + df[f"media_print_{dimension}"]
             # keep one of the old columns for controlling
             # together with the new column it should yield the same information for linear models
             df = df.drop(columns=[f"media_print_{dimension}"])
     return df
+
 
 def one_region(
     region: str,
@@ -193,7 +203,7 @@ def one_region(
     include_texts: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
-    positive_queries:bool = True,
+    positive_queries: bool = True,
     text_cutoff: int | None = None,
     protest_source: str = "acled",
 ) -> pd.DataFrame | None:
@@ -226,7 +236,7 @@ def all_regions(
     include_texts: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
-    positive_queries:bool = True,
+    positive_queries: bool = True,
     text_cutoff: int | None = None,
     region_dummies: bool = False,
     protest_source: str = "acled",
