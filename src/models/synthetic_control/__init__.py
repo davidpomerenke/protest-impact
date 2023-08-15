@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from joblib.parallel import Parallel, delayed
+from matplotlib import pyplot as plt
 from scipy import stats
 from scipy.optimize import fmin_slsqp
 from sklearn.linear_model import LinearRegression
@@ -190,6 +191,10 @@ def synthetic_control(
     random_treatment_global: bool = False,
     n_jobs: int = 4,
 ) -> pd.DataFrame:
+    """
+    Compute the synthetic control for a given target and treatment.
+    For use with `src.models.time_series.apply_method`.
+    """
     ys, y_cs = compute_synthetic_controls(
         treatment=treatment,
         ignore_group=ignore_group,
@@ -235,3 +240,34 @@ def synthetic_control(
                 )
             )
     return pd.DataFrame(rows)
+
+def sc_plot(**kwargs):
+    y, y_c = compute_synthetic_controls(ignore_medium=True, **kwargs)
+    ys, y_cs = dict(), dict()
+    for outcome in y[0].columns:
+        ys[outcome] = pd.concat([df[outcome] for df in y], axis=1)
+        y_cs[outcome] = pd.concat([df[outcome] for df in y_c], axis=1)
+    ys["media_combined_not_protest"] = pd.DataFrame(
+        ys["media_combined_all"].values - ys["media_combined_protest"].values,
+        columns=ys["media_combined_all"].columns,
+        index=ys["media_combined_all"].index,
+    )
+    y_cs["media_combined_not_protest"] = pd.DataFrame(
+        y_cs["media_combined_all"].values - y_cs["media_combined_protest"].values,
+        columns=y_cs["media_combined_all"].columns,
+        index=y_cs["media_combined_all"].index,
+    )
+    for (name, y), (name_c, y_c) in zip(ys.items(), y_cs.items()):
+        if "online" in name:
+            continue
+        fig, ax = plt.subplots(figsize=(6, 2))
+        ax.plot(y.index, y.mean(axis=1), label="Actual")
+        ax.plot(y_c.index, y_c.mean(axis=1), label="Synthetic")
+        # ax.plot(y.index, y.mean(axis=1) - y_c.mean(axis=1), label="Diff")
+        ax.legend()
+        ax.set_title(f"Synthetic Control for {name}")
+        ax.set_ylabel("Media Attention")
+        ax.set_xlabel("Days since protest")
+        ax.axvline(0, color="black", linestyle="--")
+        plt.tight_layout()
+        plt.show()
