@@ -135,7 +135,13 @@ def compute_synthetic_controls(
             target=treatment, lags=[-1], ignore_group=ignore_group
         )
         for i, (name, df) in enumerate(dfs):
-            df[treatment] = lagged_df[treatment].sample(n=len(df), replace=True, random_state=random_treatment_global + i).values
+            df[treatment] = (
+                lagged_df[treatment]
+                .sample(
+                    n=len(df), replace=True, random_state=random_treatment_global + i
+                )
+                .values
+            )
     protest_dates = []
     for name, df in dfs:
         dates = df[df[treatment] == 1].index
