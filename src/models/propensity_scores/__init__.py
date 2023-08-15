@@ -15,6 +15,7 @@ from econml.sklearn_extensions.linear_model import (
     WeightedLassoCV,
 )
 from numba.core.errors import NumbaDeprecationWarning
+from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 from src.cache import cache
@@ -72,9 +73,57 @@ def _dowhy_model_estimation(
     )
 
 
-propensity_model = LogisticRegressionCV(
-    solver="newton-cholesky",
-    max_iter=1000
+@cache
+def get_propensity_scores(
+    train_X: pd.DataFrame,
+    train_y: pd.Series,
+    test_X: pd.DataFrame,
+    solver,
+    max_iter,
+    class_weight,
+) -> pd.Series:
+    """
+    Returns propensity scores for each row in X, based on y.
+    """
+    # model = LogisticRegression(
+    #     solver="newton-cholesky",
+    #     max_iter=1000
+    # )
+    model = LogisticRegression(
+        solver=solver,
+        max_iter=max_iter,
+        class_weight=class_weight,
+    )
+    model.fit(train_X, train_y)
+    return model.predict_proba(test_X)
+
+
+class CachedLogisticRegression(BaseEstimator, ClassifierMixin):
+    def __init__(self, solver, max_iter, class_weight):
+        self.solver = solver
+        self.max_iter = max_iter
+        self.class_weight = class_weight
+
+    def fit(self, X, y):
+        self.train_X = X
+        self.train_y = y
+        return self
+
+    def predict_proba(self, X):
+        return get_propensity_scores(
+            self.train_X, self.train_y, X, self.solver, self.max_iter, self.class_weight
+        )
+
+    def predict(self, X):
+        probas = self.predict_proba(X)[:, 1]
+        return (probas > 0.5).astype(int)
+
+
+propensity_model = CachedLogisticRegression(
+    solver="liblinear", # alternative: newton-cholesky
+    max_iter=1000,
+    # class_weight="balanced",
+    class_weight=None,
 )
 
 
