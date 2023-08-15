@@ -1,3 +1,11 @@
+<!--
+
+Product / code runs well without flaws. It is well written and is commented in such a way that an external party can easily extend it.
++ the code contains features that makes it valuable for publishing it in an open source repository  / apply in business use. Some attempt to optimize has been done.
++ the code is highly optimized.
+
+-->
+
 > ### Can we use causal inference and natural language processing to quantify the impact of protest movements on public discourse?
 
 Master thesis project (in progress) by David Pomerenke

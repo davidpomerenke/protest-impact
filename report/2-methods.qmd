@@ -1,3 +1,10 @@
+<!--
+
+Research methods and justification:
+Excellent description of data or methods, excellent methodological understanding, research is reproducible.
+
+ -->
+
 ## Data {#sec-data}
 
 All data is retrieved for the timespan from 2020 to 2022. This is because the _ACLED_ data is not available earlier, and the _DeReKo_ data is only released yearly with some delay, and not yet available for 2023 at the time of writing. All data sources are expected to be available for the next years, with the exception of data related to the COVID-19 pandemic.

@@ -1,3 +1,12 @@
+<!--
+
+Analysis of the results with graphics like bargraphs and boxplots has been made. Statistical methods have been employed to compare different results. AUCs have been obtained. Minimal verification.
++ Attention has been paid to the distribution of the data. Verification has been carried out. Attention is paid to overfitting.
++ Results have been analysed with proper statistics. Model assumptions of statistical methods are verified or methods that do not make assumptions were employed for non-Gaussian data. Checks were made to avoid hidden overfitting.
++ Best approach for obtaining significant results was taken while refraining from p-value hacking.
+
+ -->
+
 ## Results
 
 ### Methods

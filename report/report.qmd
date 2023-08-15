@@ -39,5 +39,11 @@ toc-depth: 3
 
 ## References
 
+<!--
+
+References and bibliography cover all relevant publications and state-of-the-art. Citing is done at appropriate points in the text.
+
+ -->
+
 ::: {#refs}
 :::

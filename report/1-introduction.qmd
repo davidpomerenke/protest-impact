@@ -1,3 +1,49 @@
+<!--
+
+The difference between the goals and/or context of the thesis with existing solutions (e.g. found in literature) were studied and clearly described to support the problem definition, clearly indicating the innovative part of the thesis task.
+
+the introduction defines the problem, sets it in terms of the state-of-the-art and clearly indicates what the contribution of the thesis is
+
+ -->
+
+## Introduction
+
+__Problem statement.__ ... following research questions:
+
+<!--
+
+At least three research questions are present and relevant.
++ research questions are well-positioned in the research context.
++ research questions are well-positioned in the literature.
+
+ -->
+
+- q1
+- q2
+- q3
+
+__Protest event analysis.__
+
+__Protest impact.__
+
+__Causal impact evaluation.__
+
+<!--
+
+Research has advanced state of the art. Described thesis research would lead to a publication in an international peer-reviewed journal or an international peer-reviewed conference.
+
+ -->
+
+__Contribution.__
+
+<!--
+
+The research itself is very theoretical or highly interdisciplinary requiring the student to read into both challenging and theoretical material well beyond the scope of the programme.
++ this attitude is constructive and well-balanced.
+
+ -->
+
+
 <!-- ## Abstracti
 
 Protests appear as an effective course of action for pushing climate policies in the face of governmental inertia. But how does one make an effective protest, and especially not one that is counterproductive to its cause / runs counter/contrary to its cause? I investigate the impact of protest events on the number of published articles relating to the climate crisis in regional and national newspapers, as a proxy for political focus/salience/attention. In order to remove the impact of confounders such as political discourse itself or external events, I employ and compare three causal inference techniques: synthetic control regions, instrumental variables, and doubly robust regression with propensity scores. Focusing on Germany, one of the worst polluters with a rich landscape of climate protest movements, I find that XYZ.

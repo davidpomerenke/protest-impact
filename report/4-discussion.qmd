@@ -1,3 +1,12 @@
+<!--
+
+Discussion interprets the results and places them in terms of the state-of-the-art.
+
+Interpretation of findings (e.g. in terms of a) research ethics b) limitation of the research methodology):
+Excellent and critical discussion and or reflection on all findings vis-a-vis existing research. Attention for research limitations and concrete suggestions for further research. Conclusions have been based on results, and have been taken to a higher level.
+
+ -->
+
 ## Discussion
 
 <!-- - the large variation (with negative impact for many individual protests) could either be a measurement error (then there would actually be only positive impacts), or it could be due to unobserved factors, and there might actually be negative impact. Reducing the error or finding the other factors is crucial for future work to enable recommendations for protesters.

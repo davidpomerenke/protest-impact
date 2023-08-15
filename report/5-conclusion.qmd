@@ -1,3 +1,13 @@
+<!--
+
+Conclusions answer the research questions and are sharply defined.
+
+Arguing on societal implications and recommendations (if applicable):
+Managerial/societal recommendations are well-derived from findings, original and actionable.
+
+ -->
+
+
 ## Conclusion
 
 ### Future work
