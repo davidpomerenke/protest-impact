@@ -63,8 +63,9 @@ plt.show()
 import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
-fig, _ = plot_trends(cumulative=False)
+fig, axes = plot_trends(cumulative=False)
 fig.suptitle("Time series of the causal impact by method and coverage dimension")
+axes[0].set_ylim(-10, 10)
 plt.show()
 ```
 

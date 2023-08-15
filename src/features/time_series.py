@@ -21,6 +21,7 @@ def get_lagged_df(
     region_dummies: bool = False,
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
+    add_features: list[str] | None = None,
 ):
     """
     Include time-series lags, that is, past values of the various variables.
@@ -62,6 +63,7 @@ def get_lagged_df(
         text_cutoff=text_cutoff,
         region_dummies=region_dummies,
         random_treatment_regional=random_treatment_regional,
+        add_features=add_features,
     ):
         lagged_df = pd.concat(
             [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1
@@ -70,12 +72,16 @@ def get_lagged_df(
             [
                 c
                 for c in lagged_df.columns
-                # no leakage:
+                # no leakage of outcome:
                 if not (c.startswith("media_") and c.endswith("_lag0"))
+                # no leakage of protest sizes:
+                if not (c.startswith("size_") and c.endswith("_lag0"))
                 # no weekday lags:
                 and not (c.startswith("weekday_") and not c.endswith("_lag0"))
                 # no region lags:
                 and not (c.startswith("region_") and not c.endswith("_lag0"))
+                # only lag -1 for moving average:
+                and not ("_ewm" in c and not c.endswith("_lag-1"))
             ]
         ]
         y = df[[target]].shift(-step)
@@ -87,7 +93,9 @@ def get_lagged_df(
     if random_treatment_global is not None:
         w_cols = [c for c in lagged_df.columns if c.startswith("occ_")]
         for i, col in enumerate(w_cols):
-            lagged_df[col] = lagged_df[col].sample(
-                frac=1, replace=True, random_state=random_treatment_global + i
-            ).values
+            lagged_df[col] = (
+                lagged_df[col]
+                .sample(frac=1, replace=True, random_state=random_treatment_global + i)
+                .values
+            )
     return lagged_df

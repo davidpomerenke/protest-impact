@@ -2,7 +2,10 @@ import pandas as pd
 from munch import Munch
 from nltk.corpus import stopwords
 from scipy.sparse import csr_matrix, hstack
+from sklearn.ensemble import RandomForestClassifier, StackingClassifier
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.metrics import f1_score
 from sklearn.model_selection import (
     KFold,
     TimeSeriesSplit,
@@ -16,30 +19,73 @@ from src.features.time_series import get_lagged_df
 
 
 @cache
-def get_data(cutoff: int | None = None):
+def get_data(
+    cutoff: int | None = None,
+    include_texts: bool = True,
+    add_features: list[str] | None = None,
+    treatment="occ_protest",
+) -> Munch:
     df = get_lagged_df(
-        "occ_protest",
-        lags=range(-7, 1),
-        ignore_group=True,
+        target=treatment,
+        lags=[-1, 0],
+        ignore_group=treatment == "occ_protest",
         text_cutoff=cutoff,
-        region_dummies=True,
-        include_texts=True,
+        region_dummies=False,
+        include_texts=include_texts,
+        add_features=add_features,
     )
-    y = df.occ_protest
-    X_ts = df.drop(columns=["occ_protest", "occ_protest_lag0"])
-    X_ts = X_ts[[c for c in X_ts.columns if not c.startswith("text_")]]
+    if treatment == "occ_ALG":
+        # this group only occurs from 2022
+        # therefore training on earlier splits is not possible
+        df = df.iloc[9_000:]
+    y = df[treatment]
+    df["weekday_Friday_lag0"] = df[[c for c in df.columns if c.startswith("weekday_")]].astype(bool).any(axis=1)
+    df = df[[c for c in df.columns if (not c.startswith("weekday_") or c == "weekday_Friday_lag0") and not c.startswith("holiday_")]]
+
+    X_ts = df.drop(columns=[treatment, f"{treatment}_lag0", f"{treatment}_lag-1"])
+    X_ts = X_ts[
+        [
+            c
+            for c in X_ts.columns
+            if not c.startswith("text_") and not c.startswith("media_")
+        ]
+    ]
     text_cols = [c for c in df.columns if c.startswith("text_")]
     X_text = df[text_cols]
-    tscv = TimeSeriesSplit(n_splits=20)
+    tscv = TimeSeriesSplit(n_splits=5)
     clf = ComplementNB()
     return Munch(
         X_ts=X_ts, _X_text=X_text, y=y, tscv=tscv, clf=clf, text_cols=text_cols
     )
 
+@cache
+def f1_random(treatment):
+    # calculate expected f1 score for random guessing
+    y = get_data(treatment=treatment).y
+    f1 = f1_score(y, [1] * len(y))
+    print(f"F1 for random guessing:   {f1:.3f}")
 
-def f1_ts():
-    d = get_data()
+def f1_ts(add_features: list[str] | None = None, treatment="occ_protest"):
+    d = get_data(include_texts=False, add_features=add_features, treatment=treatment)
     cvs = cross_val_score(d.clf, d.X_ts, d.y, cv=d.tscv, scoring="f1")
+    print(f"Cross-validated F1 score: {cvs.mean():.3f} +/- {cvs.std():.3f}")
+
+
+def f1_lr(
+    balanced=False, add_features: list[str] | None = None, treatment="occ_protest"
+):
+    d = get_data(include_texts=False, add_features=add_features, treatment=treatment)
+    cvs = cross_val_score(
+        LogisticRegression(
+            max_iter=1000,
+            class_weight="balanced" if balanced else None,
+            solver="liblinear",
+        ),
+        d.X_ts,
+        d.y,
+        cv=d.tscv,
+        scoring="f1",
+    )
     print(f"Cross-validated F1 score: {cvs.mean():.3f} +/- {cvs.std():.3f}")
 
 
@@ -102,7 +148,7 @@ def f1_augmented(cutoff: int | None = None):
     X_text_proba = get_text_probas(cutoff=cutoff)
     X_text_proba = pd.Series(X_text_proba[:, 1], name="text_proba")
     X_augmented = pd.concat([d.X_ts, X_text_proba], axis=1)
-    cvs = cross_val_score(ComplementNB(), X_augmented, d.y, cv=d.tscv, scoring="f1")
+    cvs = cross_val_score(d.clf, X_augmented, d.y, cv=d.tscv, scoring="f1")
     print(f"Cross-validated F1 score: {cvs.mean():.3f} +/- {cvs.std():.3f}")
 
 

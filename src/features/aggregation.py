@@ -207,6 +207,7 @@ def one_region(
     text_cutoff: int | None = None,
     protest_source: str = "acled",
     random_treatment: int | None = None,
+    add_features: list[str] | None = None,
 ) -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
@@ -222,10 +223,30 @@ def one_region(
     if random_treatment is not None:
         # derive fixed random state from region name
         # make sure that the int is < 2**32
-        random_state = (int.from_bytes(region.encode(), "little") + random_treatment) % (
-            2 ** 32
-        )
-        df_w = df_w.sample(frac=1, replace=True, ignore_index=True, random_state=random_state).set_index(df_w.index)
+        random_state = (
+            int.from_bytes(region.encode(), "little") + random_treatment
+        ) % (2**32)
+        df_w = df_w.sample(
+            frac=1, replace=True, ignore_index=True, random_state=random_state
+        ).set_index(df_w.index)
+    if add_features is not None:
+        if "size" in add_features:
+            df_w_ = treatment(region, protest_source)
+            df_w_size = df_w_[[c for c in df_w_.columns if c.startswith("size_")]]
+            df_w_size = np.arcsinh(df_w_size)
+            df_w = pd.concat([df_w, df_w_size], axis=1)
+        if "ewm" in add_features:
+            # add (exponential) moving averages of protests
+            df_w = pd.concat(
+                [
+                    df_w,
+                    df_w.ewm(span=7).mean().add_suffix("_ewm7"),
+                    df_w.ewm(span=28).mean().add_suffix("_ewm28"),
+                    df_w.ewm(span=112).mean().add_suffix("_ewm112"),
+                    df_w.ewm(span=224).mean().add_suffix("_ewm224"),
+                ],
+                axis=1,
+            )
     df_x = controls(region)
     dfs = [df_y, df_w, df_x]
     if include_instruments:
@@ -249,6 +270,7 @@ def all_regions(
     region_dummies: bool = False,
     protest_source: str = "acled",
     random_treatment_regional: int | None = None,
+    add_features: list[str] | None = None,
 ) -> list[pd.DataFrame]:
     dfs = [
         (
@@ -263,6 +285,7 @@ def all_regions(
                 text_cutoff=text_cutoff,
                 protest_source=protest_source,
                 random_treatment=random_treatment_regional,
+                add_features=add_features,
             ),
         )
         for region in tqdm(german_regions)

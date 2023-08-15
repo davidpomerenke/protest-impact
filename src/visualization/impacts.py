@@ -55,8 +55,14 @@ _methods = dict(
 )
 
 
-def plot_trends(cumulative: bool = False, lags=range(-14, 1), steps=range(0, 15), random_treatment_regional=None,
-                random_treatment_global=None):
+def plot_trends(
+    cumulative: bool = False,
+    lags=range(-1, 1),
+    steps=range(0, 15),
+    random_treatment_regional=None,
+    random_treatment_global=None,
+    n_jobs=4,
+):
     fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=True, sharex=True)
     treatment = "occ_protest"
     targets = ["media_combined_protest", "media_combined_not_protest"]
@@ -71,6 +77,8 @@ def plot_trends(cumulative: bool = False, lags=range(-14, 1), steps=range(0, 15)
         positive_queries=False,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
+        add_features=["size", "ewm"],
+        n_jobs=n_jobs,
     )
     fig_params = dict(predictor=treatment, targets=targets)
     for i, (mname, m) in enumerate(_methods.items()):
@@ -87,7 +95,9 @@ def plot_trends(cumulative: bool = False, lags=range(-14, 1), steps=range(0, 15)
 
 
 @cache
-def compute_groups(methods, step, random_treatment_regional=None, random_treatment_global=None):
+def compute_groups(
+    methods, step, random_treatment_regional=None, random_treatment_global=None
+):
     targets = [
         "media_combined_protest",
         "media_combined_not_protest",
@@ -130,7 +140,9 @@ def compute_groups(methods, step, random_treatment_regional=None, random_treatme
     return results
 
 
-def plot_groups(step, kind, random_treatment_regional=None, random_treatment_global=None):
+def plot_groups(
+    step, kind, random_treatment_regional=None, random_treatment_global=None
+):
     match kind:
         case "groups":
             groups = [
@@ -145,7 +157,12 @@ def plot_groups(step, kind, random_treatment_regional=None, random_treatment_glo
         case "methods":
             groups = ["occ_protest"]
             methods = all_method_names
-    results = compute_groups(methods, step, random_treatment_regional=random_treatment_regional, random_treatment_global=random_treatment_global)
+    results = compute_groups(
+        methods,
+        step,
+        random_treatment_regional=random_treatment_regional,
+        random_treatment_global=random_treatment_global,
+    )
     results = results[results["treatment"].isin(groups)]
     results["target"] = results["target"].str.replace("media_combined_", "")
     x = alt.X(
@@ -191,4 +208,10 @@ def plot_groups(step, kind, random_treatment_regional=None, random_treatment_glo
                 column=alt.Column("method:N", title="", sort=all_method_names),
             )
 
-plot_trends(cumulative=False, lags=range(-7,1), steps=range(-15,15), random_treatment_global=56)
+
+plot_trends(
+    cumulative=False,
+    lags=range(-7, 1),
+    steps=range(-15, 15),
+    random_treatment_global=56,
+)
