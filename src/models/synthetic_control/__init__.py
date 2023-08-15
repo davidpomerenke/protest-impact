@@ -56,7 +56,7 @@ def get_features(df: pd.DataFrame, scale, rolling, idx_pre, date_) -> pd.DataFra
         # and is also defined for smaller values
         df = np.arcsinh(df)
     if scale == "diff":
-        df = np.arcsinh(df).diff(1)
+        df = df.diff(1)
     return df
 
 
@@ -119,8 +119,8 @@ def compute_synthetic_controls(
     treatment: str = "occ_protest",
     ignore_group: bool = True,
     ignore_medium: bool = False,
-    random_treatment_regional: bool = False,
-    random_treatment_global: bool = False,
+    random_treatment_regional: int|None = None,
+    random_treatment_global:int|None = None,
     n_jobs: int = 4,
 ):
     dfs = all_regions(
