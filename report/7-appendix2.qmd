@@ -16,8 +16,6 @@ $$
 \tau_{g,d} = E(Y_d|W_g=1) - E(Y_d(0) | W_g=1)
 $$
 
-\endgroup
-
 ### Regression {#sec-reg-math}
 
 The following assumptions allow us to use regression to determine the ATT:
@@ -129,7 +127,7 @@ __Including covariates:__ Instrumental variable methods do not generally require
 
 __Weak instrumental variables:__ When the instruments are weak, indirect and two-stage least squares become biased. There are adaptations specifically for weak instruments. Instead of indirect least squares, the _Weak IV_ estimator can be used [@dingFirstCourseCausal2023, ch. 21 & 23]; and an alternative to two-stage least squares is _limited information maximum likelihood_ [LIML; see @pischkeLabourEconomicsPhD2019, slides on weak instruments].
 
-#### LATE
+#### Local treatment effects
 
 A subtlety is that all of the above methods do not actually give us the ATT or ATE, but rather the _Local_ Average Treatment Effect LATE, that is, the effect of those days where the instrument actually had an impact on the outcome. This can be intuitively explained by deducing the estimator from the notions of _compliers_, _defiers_, _always-takers_, and _never-takers_: Using the example of rainfall as a binary instrument for protest days, we have
 

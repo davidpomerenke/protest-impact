@@ -5,7 +5,9 @@ Excellent description of data or methods, excellent methodological understanding
 
  -->
 
-## Data {#sec-data}
+## Methods
+
+### Data sources and preprocessing {#sec-data}
 
 All data is retrieved for the timespan from 2020 to 2022. This is because the _ACLED_ data is not available earlier, and the _DeReKo_ data is only released yearly with some delay, and not yet available for 2023 at the time of writing. All data sources are expected to be available for the next years, with the exception of data related to the COVID-19 pandemic.
 
@@ -28,7 +30,7 @@ protests = load_protests().query(query)
 climate_protests = load_climate_protests_with_labels().query(query)
 ```
 
-### Protest events
+#### Protest events {#sec-acled}
 
 There are generally two source types for protest events:
 
@@ -63,13 +65,12 @@ df.plot(
 plt.show()
 ```
 
-#### ACLED and other existing protest datasets {#sec-acled}
 
-My main data source for protest events is the [_Armed Conflict Location and Event Dataset_](https://acleddata.com/) (ACLED; @raleighIntroducingACLEDArmed2010a). ACLED is a grand effort that keeps track not only of violent conflicts and riots, but also of ordinary protest events. The data is human-curated based on newspaper reports, and contains coded information on dates, locations, actor groups, police interventions, and more, as well as a short free-text summary for each event, containing an estimate of the size as per the newspaper data source. Data for Germany is available starting from 2020 and is continuously updated. For the period from 2020-2022, it contains 13235 protest events, 1314 of which are organized by climate protest groups or mention the climate in their description.
+__ACLED.__ My main data source for protest events is the [_Armed Conflict Location and Event Dataset_](https://acleddata.com/) (ACLED; @raleighIntroducingACLEDArmed2010a). ACLED is a grand effort that keeps track not only of violent conflicts and riots, but also of ordinary protest events. The data is human-curated based on newspaper reports, and contains coded information on dates, locations, actor groups, police interventions, and more, as well as a short free-text summary for each event, containing an estimate of the size as per the newspaper data source. Data for Germany is available starting from 2020 and is continuously updated. For the period from 2020-2022, it contains 13235 protest events, 1314 of which are organized by climate protest groups or mention the climate in their description.
 
 <!-- For the period from 2020-2022, it contains `{python} len(protests.query("source == 'acled'"))` protest events, `{python} len(climate_protests.query("source == 'acled'"))` of which are organized by climate protest groups or mention the climate in their description. -->
 
-Alternative existing sources of German or international protest data comprise [ProDat](https://www.wzb.eu/de/forschung/beendete-forschungsprogramme/zivilgesellschaft-und-politische-mobilisierung/projekte/prodat-dokumentation-und-analyse-von-protestereignissen-in-der-bundesrepublik)^[See also [Protestlandschaft Deutschland](https://protestdata.eu/methods). for additional data and interactive visualizations], [PolDem](https://poldem.eui.eu/download/protest-events/), the [Mass Mobilization Project](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HTTWYL), and the event database [GDELT](https://www.gdeltproject.org/). They do not cover recent years or are not very complete, and therefore inferior to ACLED for my purposes.
+__Other existing protest datasets.__ Alternative existing sources of German or international protest data comprise [ProDat](https://www.wzb.eu/de/forschung/beendete-forschungsprogramme/zivilgesellschaft-und-politische-mobilisierung/projekte/prodat-dokumentation-und-analyse-von-protestereignissen-in-der-bundesrepublik)^[See also [Protestlandschaft Deutschland](https://protestdata.eu/methods). for additional data and interactive visualizations], [PolDem](https://poldem.eui.eu/download/protest-events/), the [Mass Mobilization Project](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/HTTWYL), and the event database [GDELT](https://www.gdeltproject.org/). They do not cover recent years or are not very complete, and therefore inferior to ACLED for my purposes.
 
 #### The German Protest Registrations dataset
 
@@ -187,35 +188,11 @@ In a first labeling phase, I annotate 650 random articles for training and 500 r
 \color{Red}TODO: Extraction of dates, locations, protest groups.
 \endgroup
 
-### Public discourse {#sec-data-discourse}
+#### Newspaper coverage
 
-This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query.
+Public discourse {#sec-data-discourse}
 
-__Queries:__ I use queries that allow to examine how many mentions of climate change occur in newspaper articles overall, and how this is further subdivided. I formulate 5 sub-queries (the full word lists are found in @sec-app-queries):
-
-- _Topic:_ Whether an article mentions climate change or climate policy.
-- _Protest:_ Whether an article mentions protest activity (including both general terms, and terms and organization names that are specific to the climate movement).
-- _Framing:_ Whether more dramatic words than "climate change" are used, such as "climate crisis", "climate catastrophy", etc.
-- _Goals_: Whether long-term goals of the climate movement such as carbon neutrality are mentioned.
-- _Subsidiary goals:_ Whether more concrete measures such as a speed limit for cars, or a citizen's assembly on climate change are mentioned.
-
-From these sub-queries, I use the _topic_ query as a standalone query, and combine each of the other queries with the _topic_ query to make sure that the terms are actually used in the context of climate change. (Many of the terms have an unambiguous relation to climate change anyway, but some, such as the protest forms or specific solutions, could also appear in other contexts.) I retrieve absolute article counts for each query, aggregated daily on the regional or on the national level.
-
-The queries allow me to study not only research question 2 (how much overall coverage of climate change is affected); but also (to some extent) to investigate research question 3 (whether this does not backfire by focusing the discussion on the protests rather than the policy issues):
-
-- If the article counts for the _topic `and not` protest_^[This query can be derived from the other queries logically.] query remain constant or even increase due to protests, then this is strong evidence that the protests do not backfire; and if it increases, then their effect is very strong such that they cause more discussion even when the protests are not themselves a topic. A decrease of the article count for this query does not tell us much, since it could still be, or not be, that relevant contents are transported as part of he articles that also mention protests.
-
-- The other queries (_topic `and` framing_, _topic `and` goal_, _topic `and` subisidiary goal_) aim to look at topics where it would be a success for the protests if they occur more in public discourse. If their article counts increase due to protests, then backfiring is unlikely (but still possible in other topic niches that I am not querying for); and if they decrease, it is strong evidence that the protests are indeed backfiring. A result where the counts for some of these queries increase, while they decrease for others may indicate more complicated effects of protests that warrant further research.
-
-- The _topic `and` protest_ query can serve as a sanity check: It would be very surprising if protest events did not cause the counts for this query to markedly increase. This is even more true for the _ACLED_ and _GPRep_ datasets, where the events are (manually or automatically) extracted from newspaper articles.
-
-![The queries produce different lenses on the mass of articles about climate change. The left lens has the disadvantage that we do not know how much the articles that also mention the protests contribute to the discourse about the topic. The right lens has the disadvantage that it ignores aspects that we do not explicitly query for.](figures/queries.svg){.column-margin}
-
-__Limitations:__ The querying approach that I employ for this study is very coarse, and will deliver clear conclusions only in some cases. It would also be very interesting to see how much room is typically given to the discussion of climate policy in an article that also mentions protests. Moreover, one could measure how prominent the various keywords are within each article, and what other words they cooccur with most, and what sentiments they are accompanied by. Another approach would use topic models to create topics in an unsupervised manner, and observe how their prevalence shifts in the face of protests; this has already been done by @chenHowClimateMovement2023a for the climate protest movement. All of these techniques require full-text data. For newspaper articles, full-text data is in principle available, but relatively hard to obtain (see the notes on fulltext availability in @sec-mediacloud, @sec-dereko); so I have not used full-texts here, in order to focus more on the causal aspect.
-
-__Other types of public discourse__ could also be explored in future work. This includes Twitter data (@kratzkeMonthlySamplesGerman2023: a sample of full texts from Germany on a daily basis 2019-2022), [Google Trends](https://trends.google.com/) data (search query counts on a weekly and regional basis starting from 2005), or parliamentary speech (@abramiGermanParliamentaryCorpus2022: speeches from regional German parliaments from the nineties until 2021). Twitter data does not come with geographical annotations, and Google Trends and parliamentary speech are not available on a continuous daily basis, so I focus on newspaper articles here.
-
-#### Online newspapers {#sec-mediacloud}
+__Online newspapers.__ {#sec-mediacloud}
 
 ```{python}
 # | label: fig-mediacloud-history
@@ -240,7 +217,7 @@ plt.show()
 
 [Media Cloud](https://www.mediacloud.org/) is an open data platform that continuously crawls newspaper websites around the world and stores article metadata and word counts in a database. Full texts are in principle available by following the links and scraping the websites oneself, but this is very slow and often hampered by anti-scraping measures of the websites. I use the [`api/v2/stories_public/count`](https://github.com/mediacloud/backend/blob/master/doc/api_2_0_spec/api_2_0_spec.md#apiv2stories_publiccount) endpoint of their API. I query for tags from the [regional and national collections about Germany](https://search.mediacloud.org/collections/news/geographic). Baden-Württemberg and Mecklenburg-Vorpommern are missing from the collection. There has been a (partial) outage in January 2022 resulting in (near-)zero counts for that timespan. I do not exclude this timespan because it would be complicated and error-prone with respect to time-series analysis. This may lead to an under-estimation of eventual causal effect sizes of up to $\frac{1}{36}\approx 0.028$, but I do not expect it to influence my results in any other systematic way.
 
-#### Print newspapers {#sec-dereko}
+__Print newspapers__ {#sec-dereko}
 
 ```{python}
 # | label: fig-derekp-history
@@ -268,33 +245,55 @@ I extract an overview table of all newspapers from the corpora W1-W4, remove new
 
 I retrieve daily article counts for all queries and all thus filtered newspapers, and aggregate them by day on the regional level as well as into a category of national newspapers.
 
-#### Press releases
+This thesis focuses on media coverage as an indicator, that is: How many articles are published on a certain date in a certain region that satisfy a certain search query.
 
-As a source for events related to the climate crisis, I consider press release full texts. They contain unstructured textual information that can be made useful for the computation of propensity scores via text classifiers.
+__Queries:__ I use queries that allow to examine how many mentions of climate change occur in newspaper articles overall, and how this is further subdivided. I formulate 5 sub-queries (the full word lists are found in @sec-app-queries):
 
-I retrieve press release full texts from the commercial _Nexis Uni_ database, querying for `klima*`, and restricting the results to German-language press releases from the _dpa-AFX ProFeed_, yielding 29,052 articles for 2020-2022.
+- _Topic:_ Whether an article mentions climate change or climate policy.
+- _Protest:_ Whether an article mentions protest activity (including both general terms, and terms and organization names that are specific to the climate movement).
+- _Framing:_ Whether more dramatic words than "climate change" are used, such as "climate crisis", "climate catastrophy", etc.
+- _Goals_: Whether long-term goals of the climate movement such as carbon neutrality are mentioned.
+- _Subsidiary goals:_ Whether more concrete measures such as a speed limit for cars, or a citizen's assembly on climate change are mentioned.
 
-### Regional sociodemographics
+From these sub-queries, I use the _topic_ query as a standalone query, and combine each of the other queries with the _topic_ query to make sure that the terms are actually used in the context of climate change. (Many of the terms have an unambiguous relation to climate change anyway, but some, such as the protest forms or specific solutions, could also appear in other contexts.) I retrieve absolute article counts for each query, aggregated daily on the regional or on the national level.
 
-I consult the [Regionalatlas](https://regionalatlas.statistikportal.de) by the German statistical bureau, and select 29 variables from 2022 that are available on a regional level and do not incorporate or directly depend on the absolute areas or population sizes of the regions, so that they are more comparable. The variables are selected to cover diverse areas from demographics, economics, and sociology. Apart from the immigration/emigration balance, all variables are nonnegative. The full list of variables is included in @sec-app-sociodem.
+The queries allow me to study not only research question 2 (how much overall coverage of climate change is affected); but also (to some extent) to investigate research question 3 (whether this does not backfire by focusing the discussion on the protests rather than the policy issues):
 
-### Weather
+- If the article counts for the _topic `and not` protest_^[This query can be derived from the other queries logically.] query remain constant or even increase due to protests, then this is strong evidence that the protests do not backfire; and if it increases, then their effect is very strong such that they cause more discussion even when the protests are not themselves a topic. A decrease of the article count for this query does not tell us much, since it could still be, or not be, that relevant contents are transported as part of he articles that also mention protests.
+
+- The other queries (_topic `and` framing_, _topic `and` goal_, _topic `and` subisidiary goal_) aim to look at topics where it would be a success for the protests if they occur more in public discourse. If their article counts increase due to protests, then backfiring is unlikely (but still possible in other topic niches that I am not querying for); and if they decrease, it is strong evidence that the protests are indeed backfiring. A result where the counts for some of these queries increase, while they decrease for others may indicate more complicated effects of protests that warrant further research.
+
+- The _topic `and` protest_ query can serve as a sanity check: It would be very surprising if protest events did not cause the counts for this query to markedly increase. This is even more true for the _ACLED_ and _GPRep_ datasets, where the events are (manually or automatically) extracted from newspaper articles.
+
+![The queries produce different lenses on the mass of articles about climate change. The left lens has the disadvantage that we do not know how much the articles that also mention the protests contribute to the discourse about the topic. The right lens has the disadvantage that it ignores aspects that we do not explicitly query for.](figures/queries.svg){.column-margin}
+
+__Limitations:__ The querying approach that I employ for this study is very coarse, and will deliver clear conclusions only in some cases. It would also be very interesting to see how much room is typically given to the discussion of climate policy in an article that also mentions protests. Moreover, one could measure how prominent the various keywords are within each article, and what other words they cooccur with most, and what sentiments they are accompanied by. Another approach would use topic models to create topics in an unsupervised manner, and observe how their prevalence shifts in the face of protests; this has already been done by @chenHowClimateMovement2023a for the climate protest movement. All of these techniques require full-text data. For newspaper articles, full-text data is in principle available, but relatively hard to obtain (see the notes on fulltext availability in @sec-mediacloud, @sec-dereko); so I have not used full-texts here, in order to focus more on the causal aspect.
+
+__Other types of public discourse__ could also be explored in future work. This includes Twitter data (@kratzkeMonthlySamplesGerman2023: a sample of full texts from Germany on a daily basis 2019-2022), [Google Trends](https://trends.google.com/) data (search query counts on a weekly and regional basis starting from 2005), or parliamentary speech (@abramiGermanParliamentaryCorpus2022: speeches from regional German parliaments from the nineties until 2021). Twitter data does not come with geographical annotations, and Google Trends and parliamentary speech are not available on a continuous daily basis, so I focus on newspaper articles here.
+
+<!-- ### Regional sociodemographics
+
+I consult the [Regionalatlas](https://regionalatlas.statistikportal.de) by the German statistical bureau, and select 29 variables from 2022 that are available on a regional level and do not incorporate or directly depend on the absolute areas or population sizes of the regions, so that they are more comparable. The variables are selected to cover diverse areas from demographics, economics, and sociology. Apart from the immigration/emigration balance, all variables are nonnegative. The full list of variables is included in @sec-app-sociodem. -->
+
+#### Instruments
+
+__Weather__
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
 
-### Pandemic restrictions
+__Pandemic restrictions__
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-covid-19-time-series >}}
 
 Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.
 
-TODO: Needs control for COVID word counts.
+<!-- todo Needs control for COVID word counts. -->
 
----
+### Data aggregation
 
-### NEW Regional and national data
+Regional and national data
 
 My setting throughout all methods is that I estimate models based on regional data. However, I do not fit separate models for each region, but always a single model on a dataset that includes all regions. This has the benefits that __(a)__ it leads to more generalizable results and __(b)__ it increases the size of the dataset by a factor of 14 (in comparison to using national data, or to estimating single regional models), and thereby increases statistical power.
 
@@ -304,31 +303,17 @@ The __differences between the regions__ -- especially in size, population size, 
 
 On the other hand, the __national impact__ of protests is politically more interesting, so I also estimate a model on the national level, which has the structure as any of the regional models, but with aggregated treatment variables and newspaper coverage from national rather than regional newspapers.
 
-### NEW Delayed and cumulative impact
+### Time series modeling
 
 Protests may have an impact on newspaper converage not only on the day that they occur but also in the following days and weeks. For estimating these delayed impacts, I do _not_ extend the lags of the outcome further into the future, because the amount of coverage on or after the protest date likely mediates the impact on future coverage. These mediated impacts are hard to isolate. By not including potential mediators in the predictors, I make sure that all indirect impacts are also clearly attributable to the treatment. I do _not_ extend the lags of the treatment further into the future either (mostly motivated by efficiency gains that are related to implementation details), so indirect impacts that are mediated by future protests (if they exist) are also included in the impact estimate.
 
 Next to the impact for each single day, the cumulative impact is of interest. Point estimates (expected values) can be computed by summing the effects from multiple days. This is not so easy for the variance (and thus standard errors and confidence intervals), since the variance of the sum of the effects depends on their covariance. In regression models the covariance could be determined using multivariate regression, but `scikit-learn` does not support standard errors and the `statsmodels` library does not support multivariate regression, and the author is too lazy to learn `R`. Instead, I estimate separate models for each cumulative outcome variable; that is, a model for the 1-day impact, for the 2-day impact, for the 3-day impact, and so on.
 
+### Causal impact estimation
 
+#### Regression
 
-<!-- ### Evaluation
-
-- bootstrapping for comparable standard errors
-- placebo tests
-  - negative outcome, esp. lagged outcome: Ding ch. 16.2.1
-  - negative exposure: Ding ch. 16.2.2
-- cross-validation (ood with one year gap) of
-  - regression -> prediction mse
-  - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage)) -- or just directly the outcome?
-  - synth -> predictive quality within different pre-fit areas
-  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust)
-- (E-values): how large would hidden confounding need to be? Ding ch. 17 -->
-
-
----
-
-## NEW Instrumental variables {#sec-instrumental}
+#### Instrumental variables {#sec-instrumental}
 
 The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. Like in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.
 
@@ -337,9 +322,7 @@ The idea of the _instrumental variable_ approach is to look for _natural experim
 - https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.two_stage_regression_estimator
 -->
 
-### Weather as an instrument
-
-#### Validity of weather as an instrument
+##### Weather as an instrument
 
 While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing.
 
@@ -352,7 +335,7 @@ __Indirect paths:__ @mellonRainRainGo2023 find 195 variables that have been link
 __Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables.
 <!-- , and only affect the exogenous climate variables. -->
 
-##### Seasonality
+<!-- ##### Seasonality
 
 WIP
 
@@ -360,13 +343,13 @@ WIP
 
 WIP
 
-#### The impact of the weather on protests
+##### The impact of the weather on protests
 
-WIP
+WIP -->
 
 <!-- For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information. -->
 
-##### Precipitation
+<!-- ##### Precipitation -->
 
 <!-- I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
 
@@ -376,20 +359,14 @@ embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipy
 \endgroup
 
 Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them. -->
-
+<!--
 ##### Other weather variables
 
-WIP
-
-##### Principal components
-
-WIP
-
-#### Making the weather more random
+##### Making the weather more random -->
 
 <!-- Describe the problem and show the impact on the BLM movement data. Explain that _controlling_ can help a lot here, or rather that IV is a nice addition to controlling. -->
 
-##### Separating short-term and long-term weather components
+<!-- ##### Separating short-term and long-term weather components
 
 An additional concern that has been identified and adjusted for by some previous studies (see @sec-weatherlit) is that weather contains a non-random component that is correlated both temporally with annual seasonality (which may be linked, for example, to media attention cycles, and many other variables), and geographically with places with generally nice or bad weather (which may be linked, for example, to economic indicators, or also to previous protest activity). This is in violation of condition (1.) on valid instruments from above. Therefore I try to split each weather variable into a long-term non-random variable and a short-term almost-random variable.
 
@@ -397,7 +374,7 @@ I follow @negroWhichSideAre2019 in using 10-year averages for each day of the ye
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series-2 >}}
 
-The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which may be due to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument.
+The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which may be due to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument. -->
 
 <!-- __Aside: First-stage validity in previous work__
 
@@ -456,11 +433,9 @@ And results for the 2nd stage (the actually interesting thing):
 embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
 \endgroup -->
 
-### Pandemic restrictions as an instrument
+##### Pandemic restrictions as an instrument
 
 The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020 and 2021, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
-
-#### Validity of restrictions as an instrument
 
 I see 3 reasons why pandemic restrictions may not be a valid instrument:
 
@@ -470,7 +445,7 @@ I see 3 reasons why pandemic restrictions may not be a valid instrument:
 
 
 <!--
-### Placebo tests for instrumental variables
+ Placebo tests for instrumental variables
 
 To further strengthen the evidence that the _precipitation_ variable has a significant impact on protest occurrence and size, I perform placebo tests where I try to predict protest occurrence and size not from the weather of the respective day, but from other days before and after the protest. I expect:
 
@@ -489,26 +464,24 @@ e. When performing regression with only the instruments and no control variables
 It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
 <!--
 
-### Evaluation
+Evaluation
 
 - Placebo
 - first stage Placebo
 - statistical tests -->
 
-## NEW Synthetic control {#sec-synth}
+#### Synthetic control {#sec-synth}
 
 The synthetic control method [@abadieSyntheticControlMethods2010; @cunninghamCausalInferenceMixtape2021, ch. 10] leverages the idea of comparing a region where a protest happens with other regions where no protest happens on the same day. However it goes beyond a simple comparison. Instead it constructs a _synthetic region_ from all the control regions that is as close as possible to the treatment region. The synthetic region can then be used to model the counterfactual of no protest for the treatment region.
 
 
 <!--
 
-cite Abadie, Cunningham
-
-### Selecting control regions based on the distance
+Selecting control regions based on the distance
 
 - reverse and effect
 
-### Selecting control regions based on sociodemographics
+Selecting control regions based on sociodemographics
 
 Variables
 
@@ -523,32 +496,26 @@ visualize "maps of Germany" based on first 2 components
 
 select n_components based on cross-validation
 
-### Selecting control regions based on high predictive quality
+Selecting control regions based on high predictive quality
 
-#### manually
+manually
 
-#### using tf-causalimpact
+using tf-causalimpact
 
-### Bias from incomplete protest data
-
-#### Difficulties with small protest events
-
-#### Difficulties with large protest events -->
-
-<!-- ### Evaluation
+Evaluation
 
 - Placebo
 - balance of the covariates (=how good are the synthetic units in fundamental terms?)
 - pre-treatment fit?
 - (p-values) -->
 
-## NEW Propensity scores
+#### Propensity scores
 
 Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events.
 
 
 
-### Propensity scores from press release texts
+##### Propensity scores from full texts
 
 TODO
 
@@ -564,3 +531,16 @@ possible models:
 - llama 2 german https://huggingface.co/flozi00/Llama-2-7b-german-assistant-v2
 
 faster finetuning: https://github.com/huggingface/peft -->
+
+<!-- ### Evaluation
+
+- bootstrapping for comparable standard errors
+- placebo tests
+  - negative outcome, esp. lagged outcome: Ding ch. 16.2.1
+  - negative exposure: Ding ch. 16.2.2
+- cross-validation (ood with one year gap) of
+  - regression -> prediction mse
+  - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage)) -- or just directly the outcome?
+  - synth -> predictive quality within different pre-fit areas
+  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust)
+- (E-values): how large would hidden confounding need to be? Ding ch. 17 -->

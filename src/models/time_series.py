@@ -53,6 +53,7 @@ def _apply_method(
     ignore_medium: bool = False,
     positive_queries: bool = True,
     region_dummies: bool = False,
+    add_features: list[str] | None = None,
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
     **kwargs,
@@ -82,6 +83,7 @@ def _apply_method(
         positive_queries=positive_queries,
         region_dummies=region_dummies,
         include_instruments=instr,
+        add_features=add_features,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
     )

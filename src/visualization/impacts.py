@@ -11,11 +11,6 @@ from src.models.time_series import (
     regression,
 )
 
-all_method_names = [
-    "regression",
-    # "synthetic_co
-]
-
 
 def plot_impact_ts(
     results: pd.DataFrame,
@@ -50,8 +45,8 @@ def plot_impact_ts(
 _methods = dict(
     regression=regression,
     synthetic_control=synthetic_control,
-    propensity_weighting=propensity_weighting,
-    doubly_robust=doubly_robust,
+    # propensity_weighting=propensity_weighting,
+    # doubly_robust=doubly_robust,
 )
 
 
@@ -126,7 +121,7 @@ def compute_groups(
             ignore_group=treatment == "occ_protest",
             ignore_medium=True,
             positive_queries=False,
-            random_treatment=random_treatment_regional,
+            random_treatment_regional=random_treatment_regional,
             random_treatment_global=random_treatment_global,
         )
         for mname, m in _methods.items():
@@ -156,7 +151,7 @@ def plot_groups(
             methods = ["synthetic_control"]
         case "methods":
             groups = ["occ_protest"]
-            methods = all_method_names
+            methods = list(_methods.keys())
     results = compute_groups(
         methods,
         step,
@@ -205,7 +200,7 @@ def plot_groups(
             )
         case "methods":
             return alt.layer(bars, error_bars, data=results).facet(
-                column=alt.Column("method:N", title="", sort=all_method_names),
+                column=alt.Column("method:N", title="", sort=list(_methods.keys())),
             )
 
 

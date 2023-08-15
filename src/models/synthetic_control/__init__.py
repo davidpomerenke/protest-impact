@@ -120,6 +120,7 @@ def compute_synthetic_controls(
     treatment: str = "occ_protest",
     ignore_group: bool = True,
     ignore_medium: bool = False,
+    add_features: list[str]|None = None,
     random_treatment_regional: int|None = None,
     random_treatment_global:int|None = None,
     n_jobs: int = 4,
@@ -129,6 +130,7 @@ def compute_synthetic_controls(
         protest_source="acled",
         positive_queries=True,
         ignore_medium=ignore_medium,
+        add_features=add_features,
         random_treatment_regional=random_treatment_regional,
     )
     if random_treatment_global is not None:
@@ -186,6 +188,7 @@ def synthetic_control(
     cumulative: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
+    add_features: list[str]|None = None,
     positive_queries: bool = True,
     random_treatment_regional: bool = False,
     random_treatment_global: bool = False,
@@ -199,6 +202,7 @@ def synthetic_control(
         treatment=treatment,
         ignore_group=ignore_group,
         ignore_medium=ignore_medium,
+        add_features=add_features,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
         n_jobs=n_jobs,

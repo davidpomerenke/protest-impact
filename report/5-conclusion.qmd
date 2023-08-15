@@ -10,6 +10,14 @@ Managerial/societal recommendations are well-derived from findings, original and
 
 ## Conclusion
 
-### Future work
+__Answer to Q1.__
+
+__Answer to Q2.__
+
+__Answer to Q3.__
+
+### Societal implications
+
+### Limitations and future work
 
 - incorporate the topic models from @chenHowClimateMovement2023a
