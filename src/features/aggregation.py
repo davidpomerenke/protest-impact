@@ -247,6 +247,16 @@ def one_region(
                 ],
                 axis=1,
             )
+        if "diff" in add_features:
+            df_y = pd.concat(
+                [
+                    df_y,
+                    df_y.diff(1).add_suffix("_diff1"),
+                    df_y.diff(7).add_suffix("_diff7"),
+                    df_y.diff(28).add_suffix("_diff28"),
+                ],
+                axis=1,
+            )
     df_x = controls(region)
     dfs = [df_y, df_w, df_x]
     if include_instruments:
