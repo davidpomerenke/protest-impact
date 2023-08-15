@@ -1,11 +1,11 @@
 ---
-subtitle: Investigating the causal impact of protest events on newspaper coverage of protests and protest matter
+subtitle: Investigating the causal impact of protest events on newspaper coverage of the protest concern
 author: David Pomerenke
 toc: true
 toc-depth: 3
 ---
 
-# _Work in progress:_ Do climate protests lead to more attention to the climate crisis?
+# Do climate protests lead to more attention to the climate crisis?
 
 {{< pagebreak >}}
 
@@ -13,43 +13,27 @@ toc-depth: 3
 
 {{< pagebreak >}}
 
-{{< include 2-data.qmd >}}
+{{< include 2-methods.qmd >}}
 
 {{< pagebreak >}}
 
-{{< include 3-modeling.qmd >}}
+{{< include 3-results.qmd >}}
 
 {{< pagebreak >}}
 
-{{< include 4-regression.qmd >}}
+{{< include 4-discussion.qmd >}}
 
 {{< pagebreak >}}
 
-{{< include 5-instrumental-variable.qmd >}}
+{{< include 5-conclusion.qmd >}}
 
 {{< pagebreak >}}
 
-{{< include 6-synthetic-control.qmd >}}
+{{< include 6-appendix1.qmd >}}
 
 {{< pagebreak >}}
 
-{{< include 7-propensity-scores.qmd >}}
-
-{{< pagebreak >}}
-
-{{< include 8-results.qmd >}}
-
-<!-- {{< pagebreak >}} -->
-
-{{< include 9-discussion.qmd >}}
-
-<!-- {{< pagebreak >}} -->
-
-## Nontechnical summary
-
-{{< pagebreak >}}
-
-{{< include 12-appendix.qmd >}}
+{{< include 7-appendix2.qmd >}}
 
 {{< pagebreak >}}
 

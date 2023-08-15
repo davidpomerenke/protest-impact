@@ -28,7 +28,5 @@ format:
     toc-depth: 5
     mainfont: "Lato Light"
     sansfont: "Lato Black"
+    mathfont: "Lato Math"
     lang: en
-  md:
-    toc: true
-    toc-depth: 5

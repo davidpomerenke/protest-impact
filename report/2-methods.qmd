@@ -284,3 +284,276 @@ Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) pro
 Available data includes the _stringency index_ calculated by the [Oxford Coronavirus Government Response Tracker](https://www.bsg.ox.ac.uk/research/covid-19-government-response-tracker) and provided by [Our World in Data](https://ourworldindata.org/covid-stringency-index)^[TODO: Plot this as well.]; and _Google Mobility Trends_ data, also provided by [Our World in Data](https://ourworldindata.org/covid-google-mobility-trends) [@fig-covid-19-time-series]. Both datasets are only on the national level for Germany, which eliminates concern (1.) above but also leads to lower resolution of the data. While the stringency index is rather static, the mobility trends data contains more randomness. The randomness may indirectly be influenced by the weather, which is neither a problem, nor an advantage, since I already use the weather variables directly.
 
 TODO: Needs control for COVID word counts.
+
+---
+
+### NEW Regional and national data
+
+My setting throughout all methods is that I estimate models based on regional data. However, I do not fit separate models for each region, but always a single model on a dataset that includes all regions. This has the benefits that __(a)__ it leads to more generalizable results and __(b)__ it increases the size of the dataset by a factor of 14 (in comparison to using national data, or to estimating single regional models), and thereby increases statistical power.
+
+To integrate multiple time series from the various regions into a single dataset, I add static __dummy variables__ for each region, as is common practice for time series data. To capture the effect of regional differences properly, it would be necessary to also add interaction terms of all 14 region dummies and all 5 treatment variables, as well as potentially some of the control variables. This would lead to at least 70 interaction terms, which would make the interpretation of the results much harder.
+
+The __differences between the regions__ -- especially in size, population size, and number of newspapers -- are potentially problematic for the estimation of a global model. I minimize this problem by (a) including previous amounts of coverage and (b) using absolute rather than relative coverage. While the relative coverage of a protest event will presumably be lower in larger regions (because a smaller proportion of the region is affected by any event), this will not be the case in absolute terms. However, it may be the case that there are major protest events with a strong relation to regional politics, and that they have an impact throughout the whole region, and in that case the size of the region might matter. This would not be captured by the model and could lead to a high variance the treatment effect estimates.
+
+On the other hand, the __national impact__ of protests is politically more interesting, so I also estimate a model on the national level, which has the structure as any of the regional models, but with aggregated treatment variables and newspaper coverage from national rather than regional newspapers.
+
+### NEW Delayed and cumulative impact
+
+Protests may have an impact on newspaper converage not only on the day that they occur but also in the following days and weeks. For estimating these delayed impacts, I do _not_ extend the lags of the outcome further into the future, because the amount of coverage on or after the protest date likely mediates the impact on future coverage. These mediated impacts are hard to isolate. By not including potential mediators in the predictors, I make sure that all indirect impacts are also clearly attributable to the treatment. I do _not_ extend the lags of the treatment further into the future either (mostly motivated by efficiency gains that are related to implementation details), so indirect impacts that are mediated by future protests (if they exist) are also included in the impact estimate.
+
+Next to the impact for each single day, the cumulative impact is of interest. Point estimates (expected values) can be computed by summing the effects from multiple days. This is not so easy for the variance (and thus standard errors and confidence intervals), since the variance of the sum of the effects depends on their covariance. In regression models the covariance could be determined using multivariate regression, but `scikit-learn` does not support standard errors and the `statsmodels` library does not support multivariate regression, and the author is too lazy to learn `R`. Instead, I estimate separate models for each cumulative outcome variable; that is, a model for the 1-day impact, for the 2-day impact, for the 3-day impact, and so on.
+
+
+
+<!-- ### Evaluation
+
+- bootstrapping for comparable standard errors
+- placebo tests
+  - negative outcome, esp. lagged outcome: Ding ch. 16.2.1
+  - negative exposure: Ding ch. 16.2.2
+- cross-validation (ood with one year gap) of
+  - regression -> prediction mse
+  - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage)) -- or just directly the outcome?
+  - synth -> predictive quality within different pre-fit areas
+  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust)
+- (E-values): how large would hidden confounding need to be? Ding ch. 17 -->
+
+
+---
+
+## NEW Instrumental variables {#sec-instrumental}
+
+The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. Like in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.
+
+<!--
+- https://bashtage.github.io/linearmodels/iv/index.html
+- https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.two_stage_regression_estimator
+-->
+
+### Weather as an instrument
+
+#### Validity of weather as an instrument
+
+While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing.
+
+Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data. For each region I determine the 10 cities with the most protests and average their weather data, weighted by the number of protests in each city.
+
+Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
+
+__Indirect paths:__ @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
+
+__Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables.
+<!-- , and only affect the exogenous climate variables. -->
+
+##### Seasonality
+
+WIP
+
+##### Detecting invalid instruments
+
+WIP
+
+#### The impact of the weather on protests
+
+WIP
+
+<!-- For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information. -->
+
+##### Precipitation
+
+<!-- I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
+\endgroup
+
+Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them. -->
+
+##### Other weather variables
+
+WIP
+
+##### Principal components
+
+WIP
+
+#### Making the weather more random
+
+<!-- Describe the problem and show the impact on the BLM movement data. Explain that _controlling_ can help a lot here, or rather that IV is a nice addition to controlling. -->
+
+##### Separating short-term and long-term weather components
+
+An additional concern that has been identified and adjusted for by some previous studies (see @sec-weatherlit) is that weather contains a non-random component that is correlated both temporally with annual seasonality (which may be linked, for example, to media attention cycles, and many other variables), and geographically with places with generally nice or bad weather (which may be linked, for example, to economic indicators, or also to previous protest activity). This is in violation of condition (1.) on valid instruments from above. Therefore I try to split each weather variable into a long-term non-random variable and a short-term almost-random variable.
+
+I follow @negroWhichSideAre2019 in using 10-year averages for each day of the year, additionally smoothing them. I find a $\pm 14$-day window using Bayesian smoothing to deliver more satisfactory results, that is, smoother climate variables, than the $\pm 3$-day moving average applied by the authors. Using this as a long-term variable, I construct the short-term variable by subtracting the long-term variable from the original weather weather variable. Results for the short-term weather variables are displayed in @fig-weather-time-series-2.
+
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series-2 >}}
+
+The results still show some amount of seasonality across all years for the short-term variable -- especially for the _precipitation_ variable --, which may be due to the effects of climate change. Using a smoothing window on the current weather rather than on historic averages may be a more appropriate strategy, but is not pursued further here. The snow variable is still obviously seasonal after this procedure and should not be further considered a potential instrument.
+
+<!-- __Aside: First-stage validity in previous work__
+
+To underline the problems that I encounter, I apply my method to a case study from the literature, where an instrumental variables approach using the weather to instrument protest size has been successfully conducted. I choose the _Black Lives Matter_ movement in 2020 in the United States, which has recently received much scholarly attention and has been studied independently by both @kleinteeselinkWeatherProtestEffect2021 and @carenBlackLivesMatter2023, employing a similar methodical setting which may have been inspired by @wasowAgendaSeedingHow2020.
+
+I use rainfall ... and protests from the ACLED dataset.
+
+I only investigate the first stage.
+
+Fig: Placebo test for monthly average. Conclusion: separate climate and weather! -->
+
+##### Leveraging the gap between pre-registered and observed protest size
+
+WIP
+
+<!--
+Predicting the change for all Berlin data:
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-all >}}
+\endgroup
+
+Placebo:
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/gap/gap.ipynb#fig-change-regression-placebo >}}
+\endgroup
+
+First stage for the climate protests, reasonable:
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-reasonable >}}
+\endgroup
+
+and more suitable for 2-stage:
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful >}}
+\endgroup
+
+and aggregated:
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful-aggregated >}}
+\endgroup
+
+And results for the 2nd stage (the actually interesting thing):
+
+\begingroup
+\scriptsize\selectfont
+embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
+\endgroup -->
+
+### Pandemic restrictions as an instrument
+
+The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020 and 2021, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
+
+#### Validity of restrictions as an instrument
+
+I see 3 reasons why pandemic restrictions may not be a valid instrument:
+
+1. Just like the weather, the spread of the coronavirus is to some extent a natural event. It is, however, to some extent controlled by the behaviour of humans, and especially the restrictions due to COVID-19 have a large political component. I worry especially about geographical confounding: Restrictions in Germany have in large part been up to the regional legislators and governments, and perhaps those governing parties whose climate policy causes outrage tend to impose especially strict (or loose) COVID-19 restrictions for one reason or another.
+2. Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally or systematically correlated with political processes and with media attention cycles.
+3. There is a potential direct impact of COVID-19 on media coverage: Stricter restrictions may correlate with a more intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics.
+
+
+<!--
+### Placebo tests for instrumental variables
+
+To further strengthen the evidence that the _precipitation_ variable has a significant impact on protest occurrence and size, I perform placebo tests where I try to predict protest occurrence and size not from the weather of the respective day, but from other days before and after the protest. I expect:
+
+a. The weather after the protest should not have any effect on the treatment. For very few days after the protest there might still be a correlation because the weather on one day is correlated with the weather on the next day. This correlation should rapidly decline over the course of a few days and permanently go down to $0$.
+b. For days before the protest, I expect a similar amount of correlation. In addition, I expect some small causal effects, because organizers and attendees may decide a few days before the protest whether it should take place or whether they want to attend, and might be influenced in their decision by the current weather, and not only the weather forecast; and even the weather forecast depends not only on the actual weather on the day, but substantially on the weather a few days earlier. In addition, the previous weather may have an impact on previous protests, which may in turn have an impact on the protest on the current date. Therefore I expect coefficients and significances before the protest date to also shrink to 0 in the long term, but on a much slower timescale, say, multiple days or weeks.
+c. I expect these declines both before and after the protest dates to be smooth.
+d. In similar manner to the coefficients of the relevant variables, I expect the overall predictive power of the regression (adjusted $Rˆ2$ / f-statistic) to continuously decline before and after the protest date, and much faster after the protest.
+e. When performing regression with only the instruments and no control variables, I expect the predictive power to decline to 0 in both directions.
+
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-first-stage-time-series >}}
+
+@fig-first-stage-time-series and @fig-fstat show the results of the two time series of placebo tests.
+
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
+
+It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
+<!--
+
+### Evaluation
+
+- Placebo
+- first stage Placebo
+- statistical tests -->
+
+## NEW Synthetic control {#sec-synth}
+
+The synthetic control method [@abadieSyntheticControlMethods2010; @cunninghamCausalInferenceMixtape2021, ch. 10] leverages the idea of comparing a region where a protest happens with other regions where no protest happens on the same day. However it goes beyond a simple comparison. Instead it constructs a _synthetic region_ from all the control regions that is as close as possible to the treatment region. The synthetic region can then be used to model the counterfactual of no protest for the treatment region.
+
+
+<!--
+
+cite Abadie, Cunningham
+
+### Selecting control regions based on the distance
+
+- reverse and effect
+
+### Selecting control regions based on sociodemographics
+
+Variables
+
+Methods:
+- correlation
+- linear regression
+- PC regression
+- PLS regression
+- NMF regression
+
+visualize "maps of Germany" based on first 2 components
+
+select n_components based on cross-validation
+
+### Selecting control regions based on high predictive quality
+
+#### manually
+
+#### using tf-causalimpact
+
+### Bias from incomplete protest data
+
+#### Difficulties with small protest events
+
+#### Difficulties with large protest events -->
+
+<!-- ### Evaluation
+
+- Placebo
+- balance of the covariates (=how good are the synthetic units in fundamental terms?)
+- pre-treatment fit?
+- (p-values) -->
+
+## NEW Propensity scores
+
+Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events.
+
+
+
+### Propensity scores from press release texts
+
+TODO
+
+<!-- cite Wager, and causal NLP overview
+
+Predicting propensity scores from text: cite causalNLP overviews
+For example, @bundeskriminalamtbkaLagebildLetzteGeneration2023 hypothesize that "Die Fallzahlen unterliegen einem „wellenartigen“ Verlauf, welcher sich vornehmlich durch (das Ausbleiben von) Großveranstaltungen im gleichen Kontext erklären lässt."
+
+possible models:
+
+- gelectra: 100-300M parameters https://huggingface.co/deepset/gelectra-base
+- igel: 6B parameters https://huggingface.co/philschmid/instruct-igel-001
+- llama 2 german https://huggingface.co/flozi00/Llama-2-7b-german-assistant-v2
+
+faster finetuning: https://github.com/huggingface/peft -->
