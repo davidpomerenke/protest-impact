@@ -2,6 +2,7 @@ from itertools import chain
 
 import numpy as np
 import pandas as pd
+from statsmodels.tsa.seasonal import seasonal_decompose
 from tqdm.auto import tqdm
 
 from src import end, start
@@ -119,7 +120,7 @@ def controls(
 
 
 @cache
-def weather(region: str, source: str = "acled") -> pd.DataFrame:
+def weather(region: str, seasonal=str | None, source: str = "acled") -> pd.DataFrame:
     dfs = []
     weights = []
     for city, weight in location_weights(region, source).items():
@@ -132,6 +133,15 @@ def weather(region: str, source: str = "acled") -> pd.DataFrame:
     if df.isna().any().any():
         df = impute_weather_history(df)
     df = df.add_prefix("weather_")
+    if seasonal is not None:
+        for col in df.columns:
+            sd = seasonal_decompose(
+                df[col],
+                period=365,
+                extrapolate_trend="freq",
+                model="additive",
+            )
+            df[col] = getattr(sd, seasonal)
     return df
 
 
@@ -255,10 +265,24 @@ def one_region(
     df_x = controls(region)
     dfs = [df_y, df_w, df_x]
     if instruments is not None:
+        seasonal = None
+        if "season" in instruments:
+            if "resid" in instruments:
+                seasonal = "resid"
+            elif "trend" in instruments:
+                seasonal = "trend"
+            elif "seasonal" in instruments:
+                seasonal = "seasonal"
         if "weather" in instruments and "covid" in instruments:
-            df_z = pd.concat([weather(region, protest_source), load_covid()], axis=1)
+            df_z = pd.concat(
+                [
+                    weather(region, source=protest_source, seasonal=seasonal),
+                    load_covid(),
+                ],
+                axis=1,
+            )
         elif "weather" in instruments:
-            df_z = weather(region, protest_source)
+            df_z = weather(region, source=protest_source, seasonal=seasonal)
         elif "covid" in instruments:
             df_z = load_covid()
         dfs.append(df_z)
