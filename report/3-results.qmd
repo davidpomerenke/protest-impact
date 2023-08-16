@@ -13,7 +13,7 @@ Analysis of the results with graphics like bargraphs and boxplots has been made.
 
 #### Regression {#sec-res-reg}
 
-Hyperparameter optimization shows that the best OLS regression model uses 7 time-series lags of all variables and no additional features. On 5 time-series cross-validation splits, it achieves a predictive performance with a root mean squared error (RMSE) of 36.5±6.2. (The dimension is the sum of the number of climate articles published within a given date and the following day.) This is almost identical to a similarly tuned Bayesian Ridge regression model, which achieves an RMSE of 36.5±6.3. A detailed regression table for the best OLS model can be found in @sec-app1-reg.
+Hyperparameter optimization shows that the best OLS regression model uses 7 time-series lags of all variables and no additional features. On 5 time-series cross-validation splits, it achieves a predictive performance with a root mean squared error (RMSE) of 36.5±6.2 and a (cross-validated) R² of 0.88±0.02. (The dimension is the sum of the number of climate articles published within a given date and the following day.) This is almost identical to a similarly tuned Bayesian Ridge regression model, which achieves an RMSE of 36.5±6.3 and the same R² value. A detailed regression table for the best OLS model can be found in @sec-app1-reg.
 
 ```{python}
 # | echo: False
