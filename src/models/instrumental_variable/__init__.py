@@ -1,4 +1,5 @@
 import json
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -12,54 +13,41 @@ from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, cross_val_score
-from sklearn.preprocessing import Binarizer
 
 from src.cache import cache
 from src.features.time_series import get_lagged_df
 from src.paths import models
 
-
-def binarize_optimally(x, y):
-    x = x.to_numpy().reshape(-1, 1)
-    y = y.to_numpy().reshape(-1, 1)
-    best_threshold, best_cov = None, None
-    for threshold in np.linspace(x.min(), x.max(), 1000):
-        X_bin = Binarizer(threshold=threshold).fit_transform(x)
-        cov = np.cov(X_bin.flatten(), y.flatten())[0, 1]
-        if best_cov is None or abs(cov) > abs(best_cov):
-            best_threshold = threshold
-            best_cov = cov
-        x_bin = Binarizer(threshold=best_threshold).fit_transform(x).flatten()
-    return x_bin, best_threshold
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-def get_data(instrument_prefix="weather_"):
+def get_data(instruments_):
     df = get_lagged_df(
-        "media_print_protest",
-        include_instruments=True,
+        "media_combined_protest",
+        instruments=instruments_,
         lags=range(-7, 1),
+        step=1,
+        cumulative=True,
         ignore_group=True,
+        ignore_medium=True,
+        region_dummies=True,
     )
     instruments = [
-        c for c in df.columns if c.startswith(instrument_prefix) and c.endswith("lag0")
-    ]
-    treatment = "occ_protest_lag0"
-    outcome = "media_print_protest"
-    confounders = [
         c
         for c in df.columns
-        if c not in [outcome, treatment] + instruments
-        and not c.startswith("weather_")
-        and not c.startswith("covid_")
+        if c.startswith("weather_") or c.startswith("covid_") or c.startswith("pca_")
     ]
+    treatment = "occ_protest_lag0"
+    outcome = "media_combined_protest"
+    confounders = [c for c in df.columns if c not in [outcome, treatment] + instruments]
     # normalize all instruments
     for instrument in instruments:
         df[instrument] = (df[instrument] - df[instrument].mean()) / df[instrument].std()
     return df, instruments, treatment, outcome, confounders
 
 
-def get_covariances(instrument_prefix="weather_"):
-    df, instruments, treatment, outcome, _ = get_data(instrument_prefix)
+def get_covariances(instruments="weather_"):
+    df, instruments, treatment, outcome, _ = get_data(instruments)
 
     # 1. with continuous instruments
 
@@ -73,59 +61,39 @@ def get_covariances(instrument_prefix="weather_"):
 
     covs = pd.concat([covs_w, covs_y], axis=1, keys=["cov_w", "cov_y"])
     covs["wald"] = covs["cov_y"] / covs["cov_w"]
-    covs_cont = covs
 
-    bin_df = pd.DataFrame({treatment: df[treatment], outcome: df[outcome]})
-
-    # 2. with binary instruments
-
-    # discretize all instruments optimally
-    for instrument in instruments:
-        X_bin, threshold = binarize_optimally(df[instrument], df[treatment])
-        print(f"{instrument}: {threshold:.3f}")
-        bin_df[instrument] = X_bin
-
-    # get covariances between instruments and treatment
-    covs = bin_df[instruments + [treatment]].cov()
-    covs_w = covs.loc[instruments, treatment]
-
-    # get covariances between instruments and outcome
-    covs = bin_df[instruments + [outcome]].cov()
-    covs_y = covs.loc[instruments, outcome]
-
-    covs = pd.concat([covs_w, covs_y], axis=1, keys=["cov_w", "cov_y"])
-    covs["wald"] = covs["cov_y"] / covs["cov_w"]
-    covs_bin = covs
-
-    # 3. overview
-
-    covs = pd.concat([covs_cont, covs_bin], axis=1, keys=["cont", "bin"])
-
-    covs = covs.sort_values(ascending=False, key=abs, by=("cont", "cov_w"))
+    covs = covs.sort_values(ascending=False, key=abs, by="cov_w")
     return covs
 
 
-def get_coefficients(instrument_prefix):
-    df, instruments, treatment, outcome, confounders = get_data(instrument_prefix)
-    params = dict()
+def get_coefficients(instruments_):
+    df, instruments, treatment, outcome, confounders = get_data(instruments_)
+    loadings_df = None
+    params = []
+    pvals = []
     for instr in instruments:
-        params[instr] = (
-            sm.OLS(df[treatment], sm.add_constant(df[confounders + [instr]]))
-            .fit()
-            .params[instr]
-        )
-    params_single = pd.DataFrame.from_dict(params, orient="index", columns=["coef"])
+        results = sm.OLS(
+            df[treatment], sm.add_constant(df[confounders + [instr]])
+        ).fit()
+        params.append((results.params[instr]))
+        pvals.append((results.pvalues[instr]))
+    params_single = pd.DataFrame(dict(coef=params, pval=pvals), index=instruments)
+    results_combi = sm.OLS(
+        df[treatment], sm.add_constant(df[confounders + instruments])
+    ).fit()
     params_combi = pd.DataFrame(
-        sm.OLS(df[treatment], sm.add_constant(df[confounders + instruments]))
-        .fit()
-        .params,
-        columns=["coef"],
+        dict(coef=results_combi.params, pval=results_combi.pvalues),
+        index=results_combi.params.index,
     )
-    params_combi = params_combi[params_combi.index.str.startswith(instrument_prefix)]
+    params_combi = params_combi[
+        params_combi.index.str.startswith(
+            "pca_" if "pc_" in instruments_ else instruments_
+        )
+    ]
     params = pd.concat([params_single, params_combi], axis=1, keys=["single", "combi"])
 
-    params = params.sort_values(by=("single", "coef"), key=abs, ascending=False)
-    return params
+    params = params.sort_values(by=("single", "pval"))
+    return params, loadings_df
 
 
 def get_rf_params():
@@ -256,30 +224,22 @@ def _instrumental_variable(
 def _instrumental_variable_liml(
     target: str,
     treatment: str,
-    instruments: list[str],
+    instruments_: list[str],
     lagged_df: pd.DataFrame,
-    binarize: bool = False,
 ):
     """
     WIP.
     For use with src/models/time_series.py.
     """
-    assert (
-        treatment == "occ_protest"
-    ), "general iv cannot control for other protest groups"
     assert isinstance(treatment, str)
     treatment_ = treatment + "_lag0"
     all_instruments = [
         c
         for c in lagged_df.columns
-        if c.startswith("weather_") or c.startswith("covid_")
+        if c.startswith("weather_") or c.startswith("covid_") or c.startswith("pca_")
     ]
-    instruments = [f"{instr}_lag0" for instr in instruments]
-    if binarize:
-        for instrument in instruments:
-            lagged_df[instrument] = binarize_optimally(
-                lagged_df[instrument], lagged_df[treatment_]
-            )[0]
+    # instruments = [f"{instr}_lag0" for instr in instruments_]
+    instruments = instruments_
     confounders = lagged_df[
         [
             c
@@ -305,4 +265,4 @@ def _instrumental_variable_liml(
             sargan=results.sargan.pval,
         )
     )
-    return None, coefs
+    return coefs

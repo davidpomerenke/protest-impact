@@ -135,11 +135,6 @@ def weather(region: str, source: str = "acled") -> pd.DataFrame:
     return df
 
 
-def instruments(region: str, source: str = "acled") -> pd.DataFrame:
-    df = pd.concat([weather(region, source), load_covid()], axis=1)
-    return df
-
-
 def regions(source: str = "acled"):
     df = treatment_unaggregated(source)
     return df.region.unique
@@ -199,7 +194,7 @@ def ignore_medium_(df: pd.DataFrame) -> pd.DataFrame:
 
 def one_region(
     region: str,
-    include_instruments: bool = False,
+    instruments: str | None = None,
     include_texts: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
@@ -259,8 +254,13 @@ def one_region(
             )
     df_x = controls(region)
     dfs = [df_y, df_w, df_x]
-    if include_instruments:
-        df_z = instruments(region, protest_source)
+    if instruments is not None:
+        if "weather" in instruments and "covid" in instruments:
+            df_z = pd.concat([weather(region, protest_source), load_covid()], axis=1)
+        elif "weather" in instruments:
+            df_z = weather(region, protest_source)
+        elif "covid" in instruments:
+            df_z = load_covid()
         dfs.append(df_z)
     if include_texts:
         df_t = fulltexts(region, text_cutoff)
@@ -271,7 +271,7 @@ def one_region(
 
 @cache
 def all_regions(
-    include_instruments: bool = False,
+    instruments: str | None = None,
     include_texts: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
@@ -287,7 +287,7 @@ def all_regions(
             region.name,
             one_region(
                 region=region.name,
-                include_instruments=include_instruments,
+                instruments=instruments,
                 include_texts=include_texts,
                 ignore_group=ignore_group,
                 ignore_medium=ignore_medium,

@@ -39,8 +39,17 @@ def get_data(
         # therefore training on earlier splits is not possible
         df = df.iloc[9_000:]
     y = df[treatment]
-    df["weekday_Friday_lag0"] = df[[c for c in df.columns if c.startswith("weekday_")]].astype(bool).any(axis=1)
-    df = df[[c for c in df.columns if (not c.startswith("weekday_") or c == "weekday_Friday_lag0") and not c.startswith("holiday_")]]
+    df["weekday_Friday_lag0"] = (
+        df[[c for c in df.columns if c.startswith("weekday_")]].astype(bool).any(axis=1)
+    )
+    df = df[
+        [
+            c
+            for c in df.columns
+            if (not c.startswith("weekday_") or c == "weekday_Friday_lag0")
+            and not c.startswith("holiday_")
+        ]
+    ]
 
     X_ts = df.drop(columns=[treatment, f"{treatment}_lag0", f"{treatment}_lag-1"])
     X_ts = X_ts[
@@ -58,12 +67,14 @@ def get_data(
         X_ts=X_ts, _X_text=X_text, y=y, tscv=tscv, clf=clf, text_cols=text_cols
     )
 
+
 @cache
 def f1_random(treatment):
     # calculate expected f1 score for random guessing
     y = get_data(treatment=treatment).y
     f1 = f1_score(y, [1] * len(y))
     print(f"F1 for random guessing:   {f1:.3f}")
+
 
 def f1_ts(add_features: list[str] | None = None, treatment="occ_protest"):
     d = get_data(include_texts=False, add_features=add_features, treatment=treatment)

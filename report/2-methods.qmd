@@ -279,6 +279,31 @@ I consult the [Regionalatlas](https://regionalatlas.statistikportal.de) by the G
 
 __Weather__
 
+from src.data.covid_restrictions import load_mobility, load_stringency
+
+df = load_mobility()
+
+fig, ax = plt.subplots(3, 2, figsize=(15, 10), sharex=True, sharey=True)
+i = 0
+for col in df.columns:
+    # z-score standardization
+    y = (df[col] - df[col].mean()) / df[col].std()
+    ax[i // 2, i % 2].plot(df.index, y)
+    ax[i // 2, i % 2].set_title(col)
+    ax[i // 2, i % 2].set_ylabel("Change in visitors")
+    ax[i // 2, i % 2].set_xlabel("Date")
+    ax[i // 2, i % 2].axhline(0, color="black", linestyle="-", linewidth=1)
+    i += 1
+fig.autofmt_xdate()
+fig.tight_layout()
+plt.show()
+
+df = load_stringency()
+
+fig, ax = plt.subplots(figsize=(15, 5))
+ax.plot(df.index, df["stringency_index"])
+plt.show()
+
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 Weather data is obtained via the [Meteostat](https://meteostat.net/en/about) project from _Deutscher Wetterdienst_, containing the 8 variables displayed in @fig-weather-time-series.
@@ -325,25 +350,15 @@ I use the OLS implementation of the `statsmodels` package [@perktoldStatsmodelsS
 
 #### Instrumental variables {#sec-instrumental}
 
-The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. Like in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.
+The _instrumental variable_ approach leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. The _exclusion restriction_ (see @sec-app2-iv) assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome. As potential instrumental variables I consider the weather, and pandemic restrictions due to Covid-19. I investigate their impact on protest occurrence, protest size, and protest size changes.
+
+
+While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing. Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data. For each region I determine the 10 cities with the most protests and average their weather data, weighted by the number of protests in each city.
 
 <!--
 - https://bashtage.github.io/linearmodels/iv/index.html
 - https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.two_stage_regression_estimator
 -->
-
-##### Weather as an instrument
-
-While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing.
-
-Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data. For each region I determine the 10 cities with the most protests and average their weather data, weighted by the number of protests in each city.
-
-Two systematic concerns have been raised about using weather as an instrumental variable. I briefly discuss their applicability to my setting:
-
-__Indirect paths:__ @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
-
-__Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables.
-<!-- , and only affect the exogenous climate variables. -->
 
 <!-- ##### Seasonality
 

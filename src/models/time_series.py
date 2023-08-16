@@ -54,6 +54,7 @@ def _apply_method(
     positive_queries: bool = True,
     region_dummies: bool = False,
     add_features: list[str] | None = None,
+    instruments: str | None = None,
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
     **kwargs,
@@ -72,7 +73,6 @@ def _apply_method(
         instrumental_variable_liml=_instrumental_variable_liml,
     )
     method = method_dict[method_name]
-    instr = method_name in ["instrumental_variable", "instrumental_variable_liml"]
     lagged_df = get_lagged_df(
         target=target,
         lags=lags,
@@ -82,7 +82,7 @@ def _apply_method(
         ignore_medium=ignore_medium,
         positive_queries=positive_queries,
         region_dummies=region_dummies,
-        include_instruments=instr,
+        instruments=instruments,
         add_features=add_features,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,

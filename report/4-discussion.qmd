@@ -18,6 +18,14 @@ __Bias from incomplete protest data in synthetic control:__
 - Difficulties with small protest events
 - Difficulties with large protest events
 
+### Instrumental variables
+
+__Weather as an instrument.__ Related work on causal methods for protest impact analysis typically uses precipitation or rainfall, and in some cases additionally temperature and windspeed as instruments. Two systematic concerns have been raised about using such weather variables. I briefly discuss their applicability to my setting:
+
+- __Indirect paths:__ @mellonRainRainGo2023 find 195 variables that have been linked to the weather in previous studies (ironically, many of them instrumental variable studies themselves), and that these undermine the exclusion criterion for instrumental variables, threatening the validity of the variables. The authors have constructed a comprehensive causal graph depicting the known effects of the weather. It shows that _protests_ as well as _violent protests_ are influenced by rainfall and temperature, and that protests have an influence on repression, voting behaviour, policy, and property values. There is no study confirming an influence of the weather on newspaper reporting, but possible indirect paths may include _mood_ and (for climate protests) _pollution_. Other variables such as _migration_ may also have an effect because attention to them might decrease attention to other topics in the news; however most of this kind of variables are only related to the weather in the long term and not in the short term.
+
+- __Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables.
+
 ### Interpretation of the causal impact estimates
 
 ### Usefulness of the data sets

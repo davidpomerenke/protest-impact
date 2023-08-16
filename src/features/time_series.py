@@ -1,6 +1,8 @@
 from typing import Iterable
 
 import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 from src.cache import cache
 from src.features.aggregation import all_regions
@@ -12,7 +14,7 @@ def get_lagged_df(
     lags: Iterable[int],
     step: int = 0,
     cumulative: bool = False,
-    include_instruments: bool = False,
+    instruments: str | None = None,
     include_texts: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
@@ -22,6 +24,7 @@ def get_lagged_df(
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
     add_features: list[str] | None = None,
+    return_loadings: bool = False,
 ):
     """
     Include time-series lags, that is, past values of the various variables.
@@ -40,7 +43,7 @@ def get_lagged_df(
         How many steps ahead should the target variable be predicted? Defaults to 0, that is, the day of the protest.
     cumulative : bool, optional
         When True, use cumulative values including the protest day to the specified step (including both ends). Only applies for the target variable.
-    include_instruments : bool, optional
+    instruments : bool, optional
         Whether to include instrumental variables.
     include_texts : bool, optional
         Whether to include full texts.
@@ -55,7 +58,7 @@ def get_lagged_df(
     """
     lagged_dfs = []
     for name, df in all_regions(
-        include_instruments=include_instruments,
+        instruments=instruments,
         include_texts=include_texts,
         ignore_group=ignore_group,
         positive_queries=positive_queries,
@@ -80,6 +83,11 @@ def get_lagged_df(
                 and not (c.startswith("weekday_") and not c.endswith("_lag0"))
                 # no region lags:
                 and not (c.startswith("region_") and not c.endswith("_lag0"))
+                # no instrument lags:
+                and not (
+                    (c.startswith("weather_") or c.startswith("covid_"))
+                    and not c.endswith("_lag0")
+                )
                 # only lag -1 for moving average:
                 and not ("_ewm" in c and not c.endswith("_lag-1"))
             ]
@@ -98,4 +106,29 @@ def get_lagged_df(
                 .sample(frac=1, replace=True, random_state=random_treatment_global + i)
                 .values
             )
+    if instruments and "pc" in instruments:
+        instruments_ = []
+        if "weather" in instruments:
+            instruments_ += [c for c in lagged_df.columns if c.startswith("weather_")]
+        if "covid" in instruments:
+            instruments_ += [c for c in lagged_df.columns if c.startswith("covid_")]
+        df_instr = StandardScaler().fit_transform(lagged_df[instruments_])
+        pc = PCA()
+        pcr = pc.fit_transform(df_instr)
+        pc_instruments = [f"pca_{i}" for i in range(pcr.shape[1])]
+        loadings = pc.components_
+        loadings_df = pd.DataFrame(
+            loadings,
+            columns=instruments_,
+            index=pc_instruments,
+        )
+        if return_loadings:
+            return loadings_df
+        lagged_df = pd.concat(
+            [
+                lagged_df.drop(columns=instruments_),
+                pd.DataFrame(pcr, columns=pc_instruments),
+            ],
+            axis=1,
+        )
     return lagged_df

@@ -202,11 +202,3 @@ def plot_groups(
             return alt.layer(bars, error_bars, data=results).facet(
                 column=alt.Column("method:N", title="", sort=list(_methods.keys())),
             )
-
-
-plot_trends(
-    cumulative=False,
-    lags=range(-7, 1),
-    steps=range(-15, 15),
-    random_treatment_global=56,
-)

@@ -113,16 +113,16 @@ def synthetic_control_single(
 
 @cache(ignore=["n_jobs"])
 def compute_synthetic_controls(
-    pre_period: int = 3*28,
+    pre_period: int = 3 * 28,
     post_period: int = 28,
     rolling: int = 1,
     scale: str | None = "demean",
     treatment: str = "occ_protest",
     ignore_group: bool = True,
     ignore_medium: bool = False,
-    add_features: list[str]|None = None,
-    random_treatment_regional: int|None = None,
-    random_treatment_global:int|None = None,
+    add_features: list[str] | None = None,
+    random_treatment_regional: int | None = None,
+    random_treatment_global: int | None = None,
     n_jobs: int = 4,
 ):
     dfs = all_regions(
@@ -188,7 +188,7 @@ def synthetic_control(
     cumulative: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
-    add_features: list[str]|None = None,
+    add_features: list[str] | None = None,
     positive_queries: bool = True,
     random_treatment_regional: bool = False,
     random_treatment_global: bool = False,
@@ -244,6 +244,7 @@ def synthetic_control(
                 )
             )
     return pd.DataFrame(rows)
+
 
 def sc_plot(**kwargs):
     y, y_c = compute_synthetic_controls(ignore_medium=True, **kwargs)

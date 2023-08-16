@@ -15,7 +15,7 @@ from tqdm.auto import tqdm
 
 from src.cache import cache
 from src.data.protests import load_official_protests
-from src.data.weather import get_weather_history
+from src.data.weather.weather import get_weather_history
 
 
 @cache

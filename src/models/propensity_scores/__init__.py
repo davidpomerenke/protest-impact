@@ -120,7 +120,7 @@ class CachedLogisticRegression(BaseEstimator, ClassifierMixin):
 
 
 propensity_model = CachedLogisticRegression(
-    solver="liblinear", # alternative: newton-cholesky
+    solver="liblinear",  # alternative: newton-cholesky
     max_iter=1000,
     # class_weight="balanced",
     class_weight=None,
