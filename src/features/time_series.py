@@ -112,23 +112,27 @@ def get_lagged_df(
             instruments_ += [c for c in lagged_df.columns if c.startswith("weather_")]
         if "covid" in instruments:
             instruments_ += [c for c in lagged_df.columns if c.startswith("covid_")]
-        df_instr = StandardScaler().fit_transform(lagged_df[instruments_])
-        pc = PCA()
-        pcr = pc.fit_transform(df_instr)
-        pc_instruments = [f"pca_{i}" for i in range(pcr.shape[1])]
-        loadings = pc.components_
-        loadings_df = pd.DataFrame(
-            loadings,
-            columns=instruments_,
-            index=pc_instruments,
-        )
+        loadings_dfs = []
+        for kind in ["seasonal", "resid"]:
+            instruments__ = [c for c in instruments_ if kind in c]
+            df_instr = StandardScaler().fit_transform(lagged_df[instruments__])
+            pc = PCA()
+            pcr = pc.fit_transform(df_instr)
+            pc_instruments = [f"pca_{kind}_{i}" for i in range(pcr.shape[1])]
+            loadings = pc.components_
+            loadings_df = pd.DataFrame(
+                loadings,
+                columns=instruments__,
+                index=pc_instruments,
+            )
+            loadings_dfs.append(loadings_df)
+            lagged_df = pd.concat(
+                [
+                    lagged_df.drop(columns=instruments__),
+                    pd.DataFrame(pcr, columns=pc_instruments),
+                ],
+                axis=1,
+            )
         if return_loadings:
-            return loadings_df
-        lagged_df = pd.concat(
-            [
-                lagged_df.drop(columns=instruments_),
-                pd.DataFrame(pcr, columns=pc_instruments),
-            ],
-            axis=1,
-        )
+            return loadings_dfs
     return lagged_df

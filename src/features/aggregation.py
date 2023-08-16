@@ -120,7 +120,7 @@ def controls(
 
 
 @cache
-def weather(region: str, seasonal=str | None, source: str = "acled") -> pd.DataFrame:
+def weather(region: str, source: str = "acled") -> pd.DataFrame:
     dfs = []
     weights = []
     for city, weight in location_weights(region, source).items():
@@ -133,15 +133,6 @@ def weather(region: str, seasonal=str | None, source: str = "acled") -> pd.DataF
     if df.isna().any().any():
         df = impute_weather_history(df)
     df = df.add_prefix("weather_")
-    if seasonal is not None:
-        for col in df.columns:
-            sd = seasonal_decompose(
-                df[col],
-                period=365,
-                extrapolate_trend="freq",
-                model="additive",
-            )
-            df[col] = getattr(sd, seasonal)
     return df
 
 
@@ -265,26 +256,21 @@ def one_region(
     df_x = controls(region)
     dfs = [df_y, df_w, df_x]
     if instruments is not None:
-        seasonal = None
-        if "season" in instruments:
-            if "resid" in instruments:
-                seasonal = "resid"
-            elif "trend" in instruments:
-                seasonal = "trend"
-            elif "seasonal" in instruments:
-                seasonal = "seasonal"
         if "weather" in instruments and "covid" in instruments:
             df_z = pd.concat(
-                [
-                    weather(region, source=protest_source, seasonal=seasonal),
-                    load_covid(),
-                ],
-                axis=1,
+                [weather(region, source=protest_source), load_covid()], axis=1
             )
         elif "weather" in instruments:
-            df_z = weather(region, source=protest_source, seasonal=seasonal)
+            df_z = weather(region, source=protest_source)
         elif "covid" in instruments:
             df_z = load_covid()
+        if "season" in instruments:
+            for col in df_z.columns:
+                df_z[f"{col}_seasonal"] = (
+                    df_z[col].rolling(90, center=True, win_type="gaussian").mean(std=30)
+                )
+                df_z[f"{col}_resid"] = df_z[col] - df_z[f"{col}_seasonal"]
+                df_z = df_z.drop(columns=[col])
         dfs.append(df_z)
     if include_texts:
         df_t = fulltexts(region, text_cutoff)

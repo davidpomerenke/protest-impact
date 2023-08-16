@@ -75,6 +75,9 @@ def get_coefficients(instruments_):
         results = sm.OLS(
             df[treatment], sm.add_constant(df[confounders + [instr]])
         ).fit()
+        # results = sm.Logit(
+        #     df[treatment], sm.add_constant(df[confounders + [instr]])
+        # ).fit()
         params.append((results.params[instr]))
         pvals.append((results.pvalues[instr]))
     params_single = pd.DataFrame(dict(coef=params, pval=pvals), index=instruments)
@@ -236,7 +239,8 @@ def _instrumental_variable_liml(
     all_instruments = [
         c
         for c in lagged_df.columns
-        if c.startswith("weather_") or c.startswith("covid_") or c.startswith("pca_")
+        if (c.startswith("weather_") or c.startswith("covid_") or c.startswith("pca_"))
+        and not "season" in c
     ]
     # instruments = [f"{instr}_lag0" for instr in instruments_]
     instruments = instruments_
@@ -244,6 +248,7 @@ def _instrumental_variable_liml(
         [
             c
             for c in lagged_df.columns
+            # if "region" in c
             if not c in [target, treatment_] + all_instruments
         ]
     ]
