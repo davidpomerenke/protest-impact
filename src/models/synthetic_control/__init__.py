@@ -113,10 +113,10 @@ def synthetic_control_single(
 
 @cache(ignore=["n_jobs"])
 def compute_synthetic_controls(
-    pre_period: int = 28,
+    pre_period: int = 3*28,
     post_period: int = 28,
     rolling: int = 1,
-    scale: str | None = None,
+    scale: str | None = "demean",
     treatment: str = "occ_protest",
     ignore_group: bool = True,
     ignore_medium: bool = False,

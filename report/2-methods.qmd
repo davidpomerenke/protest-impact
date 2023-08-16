@@ -313,6 +313,14 @@ Next to the impact for each single day, the cumulative impact is of interest. Po
 
 #### Regression
 
+If all confounders are represented as features and have a linear impact on the treatment and the outcome, then the coefficients of OLS regression can be interpreted as estimates of the ATT (see @sec-app2-reg). Targets are the causal outcome variables, and features are the treatment and the confounders.
+
+I use a 5-fold time-series cross-validation split[^tsplit] to optimize the following hyperparameters: Number of time series lags, inclusion of region dummies, inclusion of exponential moving averages of the treatments and of daily, weekly, and four-weekly time-series differences of the outcomes. To check whether the lack of regularization hinders generalization in OLS, I run the same optimization for a Bayesian Ridge model. As target variable for the optimization process I choose the sum of the overall number of articles mentioning climate change that are published on a given date and the following day; my prior is that this variable is probably most clearly influenced by the occurrence of protests, and that it reflects the impact on both online media and print media (where there is a general one-day delay). I optimize for the root mean squared error (RMSE) and use the R² score as an additional indicator of performance.
+
+[^tsplit]: Here I use simple time-series splits. They create an out-of-distribution situation, but not a very extreme one. Future work may additionally use a geographic split or a time-series split with a large gap to measure the estimator behaviour in more extreme out-of-distribution situations. This could be a good check, because causal models should also work out-of-distribution.
+
+I use the OLS implementation of the `statsmodels` package [@perktoldStatsmodelsStatsmodelsRelease2023] with `HC3` heteroskedacity-robust covariance estimation, and the Bayesian Ridge implementation from `scikit-learn` (@pedregosaScikitlearnMachineLearning2011). `statsmodels` does not support multivariate regression, so I run separate univariate models for each target variable.
+
 #### Instrumental variables {#sec-instrumental}
 
 The idea of the _instrumental variable_ approach is to look for _natural experiments_, where a random variable (or a somewhat random variable) has an effect on the treatment. Like in randomized controlled trials, the randomness removes the problem of hidden confounding. Unlike in randomized trials, the treatment in an instrumental variable setting is only partially randomized. The intuitive approach is to identify this random component and then measure its effect on the outcome. Instrumental variables are also referred to as just _instruments_.

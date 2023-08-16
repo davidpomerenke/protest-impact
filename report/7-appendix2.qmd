@@ -1,4 +1,4 @@
-## Theory {#sec-reg}
+## Appendix 2: Theory {#sec-reg}
 
 I want to determine the _Average Treatment Effect on the Treated (ATT)_ $\tau_T$ for different protest groups[^CATT], and along multiple dimensions of newspaper coverage. I am not interested in the _Average Treatment Effect_ [on the whole population] that is often denoted by $\tau$, so I write $\tau:=\tau_T$.
 
@@ -16,7 +16,7 @@ $$
 \tau_{g,d} = E(Y_d|W_g=1) - E(Y_d(0) | W_g=1)
 $$
 
-### Regression {#sec-reg-math}
+### Regression {#sec-app2-reg}
 
 The following assumptions allow us to use regression to determine the ATT:
 
@@ -77,7 +77,7 @@ E(Y|W,U) &= \beta + \beta_W W + \beta_U U && \text{Structural equation} \label{e
 
 This is very similar to @eq-reg-lin-model, only that now the unmeasured confounders are included rather than the known covariates. (We can leave out the known confounders X from the model without loss of generality, because when we do not include them they will also be unknown confounders, and can thus be treated as pasrt of the unknown confounders U.)
 
-@eq-reg-beta identifies the ATT as $\tau=\beta_W$ and is also applicable here. The assumptions are unconfoundedness and overlap (see @sec-reg-math). In the context of regression, we have dealt with unconfoundedness given the known confounders $W \perp\!\!\!\perp Y(0) | X$ which is implausible due to potential hidden confounders; but the equation here is not about $X$ but about $U$, so the analogous assumption is $W \perp\!\!\!\perp Y(0) | U$, that is, unconfoundedness _given the unknown confounders_, which trivially applies.
+@eq-reg-beta identifies the ATT as $\tau=\beta_W$ and is also applicable here. The assumptions are unconfoundedness and overlap (see @sec-app2-reg). In the context of regression, we have dealt with unconfoundedness given the known confounders $W \perp\!\!\!\perp Y(0) | X$ which is implausible due to potential hidden confounders; but the equation here is not about $X$ but about $U$, so the analogous assumption is $W \perp\!\!\!\perp Y(0) | U$, that is, unconfoundedness _given the unknown confounders_, which trivially applies.
 
 In addition to the structural equation, we can set up two further equations that describe the impact of the instrument Z on both W and Y:
 
@@ -209,7 +209,7 @@ Various methods make use of propensity scores, mainly: _Propensity stratificatio
 
 #### Inverse propensity weighting
 
-Inverse propensity weighting (IPW) gives every sample a weight that is inverse to the propensity score: $\frac{1}{e(X)}$ for treated units and $\frac{1}{1-e(X)}$ for control units. We use the same assumptions as for regression (@sec-reg-math):
+Inverse propensity weighting (IPW) gives every sample a weight that is inverse to the propensity score: $\frac{1}{e(X)}$ for treated units and $\frac{1}{1-e(X)}$ for control units. We use the same assumptions as for regression (@sec-app2-reg):
 
 - __Unconfoundedness__, $W \perp\!\!\!\perp Y(0) | X$: The counterfactual outcome if there was no treatment is independent from the actual treatment. (For @eq-prop we need the same not only for $Y(0)$ but also for $Y(1)$; but the calculation of the _ATT_ does not require this.)
 - __Overlap__, $e(X) < 1$: The treatment assignment is not deterministic.

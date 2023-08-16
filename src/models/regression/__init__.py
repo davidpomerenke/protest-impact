@@ -9,9 +9,8 @@ def _regression(target: str, lagged_df: pd.DataFrame, treatment=None):
     """
     For use with src/models/time_series.py.
     """
-    instruments = [c for c in lagged_df.columns if c.startswith("weather_")]
     y = lagged_df[[target]]
-    X = lagged_df.drop(columns=[target] + instruments)
+    X = lagged_df.drop(columns=[target])
     X = sm.add_constant(X)
     model = sm.OLS(y, X)
     results = model.fit(cov_type="HC3")

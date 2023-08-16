@@ -11,11 +11,23 @@ Analysis of the results with graphics like bargraphs and boxplots has been made.
 
 ### Evaluation of methods
 
-#### Regression
+#### Regression {#sec-res-reg}
 
-regression table
+Hyperparameter optimization shows that the best OLS regression model uses 7 time-series lags of all variables and no additional features. On 5 time-series cross-validation splits, it achieves a predictive performance with a root mean squared error (RMSE) of 36.5±6.2. (The dimension is the sum of the number of climate articles published within a given date and the following day.) This is almost identical to a similarly tuned Bayesian Ridge regression model, which achieves an RMSE of 36.5±6.3. A detailed regression table for the best OLS model can be found in @sec-app1-reg.
 
-MSE generalizability
+```{python}
+# | echo: False
+
+from src.models.regression.hyperopt import best_regression
+
+r = best_regression(ignore_group=True)
+t = "occ_protest_lag0"
+results = r.params[t], tuple(r.conf_int().loc[t]), r.pvalues[t]
+```
+
+The coefficients for the protest variables are equivalent to the ATT (see @sec-app2-reg). Statistically significant at p=0.05 are only protest events by Fridays for Future, Letzte Generation, and groups that are coded as "other" groups. All protest coefficients are positive except for Ende Gelände and Fridays for Future + X, with negative coefficients at p-values of 0.89 and 0.18 respectively. For the aggregated protest occurrence variable (which does not consider the organizing protest group) the estimate is +5.79 additional articles in the first two days, with a confidence interval [+2.67, +8.92] and a p-value of 0.0003. More estimates are displayed in @sec-res-est.
+
+<!-- MSE generalizability -->
 
 #### Instrumental variables
 
@@ -38,14 +50,14 @@ F1
 ```{python}
 # | column: page
 # | echo: false
-import matplotlib.pyplot as plt
-from src.visualization.impacts import plot_trends
+# import matplotlib.pyplot as plt
+# from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False, lags=range(-7,1), steps=range(-28,8))
-fig.suptitle("Placebo test: estimating the causal impact on past outcomes")
-axes[0].set_ylim(-3, 5)
-axes[0].set_xticks(range(-28, 8, 7))
-plt.show()
+# fig, axes = plot_trends(cumulative=False, lags=range(-7, 1), steps=range(-28, 8))
+# fig.suptitle("Placebo test: estimating the causal impact on past outcomes")
+# axes[0].set_ylim(-3, 5)
+# axes[0].set_xticks(range(-28, 8, 7))
+# plt.show()
 ```
 
 #### Placebo treatment
@@ -53,27 +65,37 @@ plt.show()
 ```{python}
 # | column: page
 # | echo: false
-import matplotlib.pyplot as plt
-from src.visualization.impacts import plot_trends
+# import matplotlib.pyplot as plt
+# from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False, lags=range(-7,1), steps=range(-15,15), random_treatment_global=56)
-fig.suptitle("Placebo test: estimating the causal impact of random events")
-# axes[0].set_ylim(-3, 5)
-axes[0].set_xticks(range(-14, 14, 7))
-plt.show()
+# fig, axes = plot_trends(
+#     cumulative=False,
+#     lags=range(-7, 1),
+#     steps=range(-15, 15),
+#     random_treatment_global=56,
+# )
+# fig.suptitle("Placebo test: estimating the causal impact of random events")
+# # axes[0].set_ylim(-3, 5)
+# axes[0].set_xticks(range(-14, 14, 7))
+# plt.show()
 ```
 
 ```{python}
 # | column: page
 # | echo: false
-import matplotlib.pyplot as plt
-from src.visualization.impacts import plot_trends
+# import matplotlib.pyplot as plt
+# from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False, lags=range(-7,1), steps=range(-15,15), random_treatment_regional=25)
-fig.suptitle("Placebo test: estimating the causal impact of random events")
-# axes[0].set_ylim(-3, 5)
-axes[0].set_xticks(range(-14, 14, 7))
-plt.show()
+# fig, axes = plot_trends(
+#     cumulative=False,
+#     lags=range(-7, 1),
+#     steps=range(-15, 15),
+#     random_treatment_regional=25,
+# )
+# fig.suptitle("Placebo test: estimating the causal impact of random events")
+# # axes[0].set_ylim(-3, 5)
+# axes[0].set_xticks(range(-14, 14, 7))
+# plt.show()
 ```
 
 ```{python}
@@ -83,27 +105,27 @@ plt.show()
 
 # Does this even make so much sense, placebo for protest groups? maybe leave out.
 
-import altair as alt
-from src.visualization.impacts import plot_groups
+# import altair as alt
+# from src.visualization.impacts import plot_groups
 
-alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(kind="methods", step=1, random_treatment_global=True)
+# alt.renderers.enable("altair_saver", fmts=["html", "svg"])
+# plot_groups(kind="methods", step=1, random_treatment_global=True)
 ```
 
-### Causal impact estimates
+### Causal impact estimates {#sec-res-est}
 
 #### Time series
 
 ```{python}
 # | column: page
 # | echo: false
-import matplotlib.pyplot as plt
-from src.visualization.impacts import plot_trends
+# import matplotlib.pyplot as plt
+# from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False)
-fig.suptitle("Time series of the causal impact by method and coverage dimension")
-axes[0].set_ylim(-5, 5)
-plt.show()
+# fig, axes = plot_trends(cumulative=False)
+# fig.suptitle("Time series of the causal impact by method and coverage dimension")
+# axes[0].set_ylim(-5, 5)
+# plt.show()
 ```
 
 #### Cumulative impact
@@ -111,10 +133,12 @@ plt.show()
 ```{python}
 # | column: page
 # | echo: false
-fig, axes = plot_trends(cumulative=True)
-fig.suptitle("Cumulative time series of the causal impact by method and coverage dimension")
-axes[0].set_ylim(-10, 50)
-plt.show()
+# fig, axes = plot_trends(cumulative=True)
+# fig.suptitle(
+#     "Cumulative time series of the causal impact by method and coverage dimension"
+# )
+# axes[0].set_ylim(-10, 50)
+# plt.show()
 ```
 
 #### Protest groups
@@ -126,11 +150,11 @@ Causal effects for the individual protest groups differ substantially between re
 # | column: page
 # | echo: false
 
-import altair as alt
-from src.visualization.impacts import plot_groups
+# import altair as alt
+# from src.visualization.impacts import plot_groups
 
-alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(kind="groups", step=1)
+# alt.renderers.enable("altair_saver", fmts=["html", "svg"])
+# plot_groups(kind="groups", step=1)
 ```
 
 ```{python}
@@ -138,11 +162,11 @@ plot_groups(kind="groups", step=1)
 # | column: page
 # | echo: false
 
-import altair as alt
-from src.visualization.impacts import plot_groups
+# import altair as alt
+# from src.visualization.impacts import plot_groups
 
-alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(kind="groups", step=6)
+# alt.renderers.enable("altair_saver", fmts=["html", "svg"])
+# plot_groups(kind="groups", step=6)
 ```
 
 ```{python}
@@ -150,9 +174,9 @@ plot_groups(kind="groups", step=6)
 # | column: page
 # | echo: false
 
-import altair as alt
-from src.visualization.impacts import plot_groups
+# import altair as alt
+# from src.visualization.impacts import plot_groups
 
-alt.renderers.enable('altair_saver', fmts=["html", "svg"])
-plot_groups(kind="methods", step=1)
+# alt.renderers.enable("altair_saver", fmts=["html", "svg"])
+# plot_groups(kind="methods", step=1)
 ```
