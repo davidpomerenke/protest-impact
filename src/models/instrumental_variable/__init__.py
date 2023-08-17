@@ -23,22 +23,23 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 def get_data(instruments_):
     df = get_lagged_df(
-        "media_combined_protest",
+        "media_combined_all",
         instruments=instruments_,
         lags=range(-7, 1),
-        step=1,
+        step=6,
         cumulative=True,
         ignore_group=True,
         ignore_medium=True,
         region_dummies=True,
+        positive_queries=True,
     )
     instruments = [
         c
         for c in df.columns
-        if c.startswith("weather_") or c.startswith("covid_") or c.startswith("pca_")
+        if c.startswith("weather_") or c.startswith("covid_") or c.startswith("pc_")
     ]
     treatment = "occ_protest_lag0"
-    outcome = "media_combined_protest"
+    outcome = "media_combined_all"
     confounders = [c for c in df.columns if c not in [outcome, treatment] + instruments]
     # normalize all instruments
     for instrument in instruments:
@@ -88,14 +89,10 @@ def get_coefficients(instruments_):
         dict(coef=results_combi.params, pval=results_combi.pvalues),
         index=results_combi.params.index,
     )
-    params_combi = params_combi[
-        params_combi.index.str.startswith(
-            "pca_" if "pc_" in instruments_ else instruments_
-        )
-    ]
+    params_combi = params_combi[params_combi.index.isin(instruments)]
     params = pd.concat([params_single, params_combi], axis=1, keys=["single", "combi"])
 
-    params = params.sort_values(by=("single", "pval"))
+    params = params.sort_values(by=("combi", "pval"))
     return params, loadings_df
 
 
@@ -239,7 +236,7 @@ def _instrumental_variable_liml(
     all_instruments = [
         c
         for c in lagged_df.columns
-        if (c.startswith("weather_") or c.startswith("covid_") or c.startswith("pca_"))
+        if (c.startswith("weather_") or c.startswith("covid_") or c.startswith("pc_"))
         and not "season" in c
     ]
     # instruments = [f"{instr}_lag0" for instr in instruments_]
@@ -261,13 +258,32 @@ def _instrumental_variable_liml(
     )
     results = model.fit()
     ci = results.conf_int()
+    first_stage_model = IVLIML(
+        dependent=lagged_df[treatment_],
+        exog=pd.concat([confounders, lagged_df[instruments]], axis=1),
+        endog=None,
+        instruments=None,
+    )
+    first_stage_results = first_stage_model.fit()
+    first_stage_ci = first_stage_results.conf_int()
+    first_stage_solo_results = IVLIML(
+        dependent=lagged_df[treatment_],
+        exog=lagged_df[instruments],
+        endog=None,
+        instruments=None,
+    ).fit()
     coefs = pd.DataFrame(
         dict(
-            coef=[results.params[0]],
             predictor=[treatment],
-            ci_lower=ci["lower"][0],
-            ci_upper=ci["upper"][0],
-            sargan=results.sargan.pval,
+            coef=[results.params[treatment_]],
+            ci_lower=ci["lower"][treatment_],
+            ci_upper=ci["upper"][treatment_],
+            wooldridge=results.wooldridge_overid.pval,
+            anderson_rubin=results.anderson_rubin.pval,
+            first_stage_coef=[first_stage_results.params[instruments[0]]],
+            first_stage_ci_lower=first_stage_ci["lower"][instruments[0]],
+            first_stage_ci_upper=first_stage_ci["upper"][instruments[0]],
+            first_stage_fstat=first_stage_solo_results.f_statistic.stat,
         )
     )
     return coefs

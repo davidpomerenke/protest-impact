@@ -113,12 +113,16 @@ def get_lagged_df(
         if "covid" in instruments:
             instruments_ += [c for c in lagged_df.columns if c.startswith("covid_")]
         loadings_dfs = []
-        for kind in ["seasonal", "resid"]:
+        for kind in ["seasonal_", "resid_", ""]:
             instruments__ = [c for c in instruments_ if kind in c]
+            if len(instruments__) == 0 or not set(instruments__).issubset(
+                lagged_df.columns
+            ):
+                continue
             df_instr = StandardScaler().fit_transform(lagged_df[instruments__])
             pc = PCA()
             pcr = pc.fit_transform(df_instr)
-            pc_instruments = [f"pca_{kind}_{i}" for i in range(pcr.shape[1])]
+            pc_instruments = [f"pc_{kind}{i}" for i in range(pcr.shape[1])]
             loadings = pc.components_
             loadings_df = pd.DataFrame(
                 loadings,
