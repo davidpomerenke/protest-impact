@@ -1,5 +1,6 @@
 /.quarto/
 /_output/
+/_freeze/
 *_files/
 *.tex
 *.pdf

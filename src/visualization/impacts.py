@@ -91,7 +91,11 @@ def plot_trends(
 
 @cache
 def compute_groups(
-    methods, step, random_treatment_regional=None, random_treatment_global=None
+    methods,
+    step,
+    random_treatment_regional=None,
+    random_treatment_global=None,
+    treatments="occ_protest",
 ):
     targets = [
         "media_combined_protest",
@@ -99,15 +103,6 @@ def compute_groups(
         "media_combined_framing",
         "media_combined_goal",
         "media_combined_subsidiary_goal",
-    ]
-    treatments = [
-        # "occ_FFF",
-        # "occ_FFFX",
-        # "occ_ALG",
-        # "occ_XR",
-        # "occ_EG",
-        # "occ_GP",
-        "occ_protest",
     ]
     cumulative = True
     data = []
@@ -157,25 +152,33 @@ def plot_groups(
         step,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
+        treatments=groups,
     )
     results = results[results["treatment"].isin(groups)]
     results["target"] = results["target"].str.replace("media_combined_", "")
+    dimensions = ["protest", "not_protest", "framing", "goal", "subsidiary_goal"]
     x = alt.X(
         "target:N",
         title="",
-        sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"],
+        sort=dimensions,
     )
     yname = "ATT estimate (#articles)"
     bars = (
-        alt.Chart()
+        alt.Chart(results)
         .mark_bar()
         .encode(
             x=x,
-            y=alt.Y("coef:Q", title=yname, scale=alt.Scale(domain=[-10, 10])),
+            y=alt.Y(
+                "coef:Q",
+                title=yname,
+                # scale=alt.Scale(
+                #     domain=[-10, 10],
+                # ),
+            ),
             color=alt.Color(
                 "target:N",
                 title="",
-                sort=["protest", "not_protest", "framing", "goal", "subsidiary_goal"],
+                sort=dimensions,
             ),
         )
         .properties(
@@ -202,3 +205,6 @@ def plot_groups(
             return alt.layer(bars, error_bars, data=results).facet(
                 column=alt.Column("method:N", title="", sort=list(_methods.keys())),
             )
+
+
+# plot_groups(kind="methods", step=1)

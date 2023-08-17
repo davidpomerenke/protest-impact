@@ -482,10 +482,6 @@ e. When performing regression with only the instruments and no control variables
 
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-first-stage-time-series >}}
 
-@fig-first-stage-time-series and @fig-fstat show the results of the two time series of placebo tests.
-
-{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-fstat >}}
-
 It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
 <!--
 
