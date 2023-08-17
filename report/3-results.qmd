@@ -37,7 +37,70 @@ The coefficients for the protest variables are equivalent to the ATT (see @sec-a
 
 #### Instrumental variables
 
-stuff
+Out of the 15 potential instrumental variables, 5 pandemic instruments and 4 weather instruments have a statistically significant impact on protest occurrence (see @fig-iv-basic), but when using them in a combined regression the coefficients are much less significant.
+
+```{python}
+# | echo: false
+# | fig-label: fig-iv-pc
+# | fig-cap: Principal components of the
+from src.models.instrumental_variable import pc_vis
+
+pc_vis("pc_weather_covid", numbers=[0, 7, 11])
+```
+
+<!-- pc_0 at p=0.0005, pc_7 at p=0.007, and pc_11 at p=0.008 -->
+
+Principle component decomposition isolates three very significant components with p<0.01, while the other components have p>0.05.^[This is without adjusting for multiple testing since no hypothesis tests or thresholds are used, but the analysis is rather exploratory.] The three components are displayed in terms of the original variables in @fig-iv-pc.
+
+```{python}
+# | echo: false
+# | fig-label: fig-iv-pc-deseasoned
+# | fig-cap: Principal components of the
+from src.models.instrumental_variable import pc_vis
+
+pc_vis("pc_weather_covid_season", numbers=[9, 8, 11], dfs=slice(1, 2))
+```
+
+Deseasoning the original variables and then performing separate principle component analyses on seasonal and residual parts shows that most of the significant variables are seasonal in nature; but there is also one very significant residual variable pc_resid_9 at p=0.0005 and two somewhat significant residual variables pc_resid_8 at p=0.05 and pc_resid_11 at p=0.07, while all other residual components have p>0.15. The more significant components are broken down in @fig-iv-pc-deseasoned. The first-stage f-statistic for pc_resid_9 is f=33.82; f=2.08 for pc_resid_8; and f=2.02. According to the "rule of thumb" (@InstrumentalVariablesEstimation2023) the threshold for weak instruments is around f=10, so pc_resid_9 would be a strong instrument but the other ones would all be weak. The combined f-statistic of the three mentioned components is f=38.74.
+
+Placebo tests for the first stage (the impact of the instruments on the treatment) are given in @fig-iv-1-placebo.
+
+```{python}
+# | fig-label: fig-iv-1-placebo
+# | fig-cap: First stage placebo tests for using the principal component pc_resid_9 to instrument protest occurrence. Values for the instrument from after the protest date are used. These values cannot have an impact on protest occurrence if the instrument is valid.
+# | echo: false
+from src.models.time_series import instrumental_variable_liml
+import matplotlib.pyplot as plt
+
+results = instrumental_variable_liml(
+    target="media_combined_protest",
+    treatment="occ_protest",
+    instruments="pc_weather_covid_season",
+    iv_instruments=["pc_resid_9"],
+    lags=range(-7, 1),
+    ignore_group=True,
+    ignore_medium=True,
+    cumulative=False,
+    steps=range(-7,29),
+    shift_instruments=True,
+)
+fig, ax = plt.subplots(figsize=(8, 4))
+ax.plot(results.step, results.first_stage_coef, marker=".")
+ax.fill_between(
+    results.step,
+    results.first_stage_ci_lower,
+    results.first_stage_ci_upper,
+    alpha=0.2,
+    color="C0",
+)
+ax.axhline(0, color="k", linewidth=0.5)
+ax.axvline(0, color="k", linestyle="--")
+ax.set_xlabel("Day of instrument (relative to protest)")
+ax.set_ylabel("First stage coefficient")
+ax.set_title("First stage placebo tests with shifted outcome: Impact of pc_resid_9 on protest occurrence")
+plt.tight_layout()
+plt.show()
+```
 
 #### Synthetic control
 

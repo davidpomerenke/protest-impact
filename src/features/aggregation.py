@@ -204,6 +204,7 @@ def one_region(
     protest_source: str = "acled",
     random_treatment: int | None = None,
     add_features: list[str] | None = None,
+    instrument_shift: int = 0,
 ) -> pd.DataFrame | None:
     df_y = outcome(region)
     if df_y is None:
@@ -271,6 +272,7 @@ def one_region(
                 )
                 df_z[f"{col}_resid"] = df_z[col] - df_z[f"{col}_seasonal"]
                 df_z = df_z.drop(columns=[col])
+        df_z = df_z.shift(instrument_shift)
         dfs.append(df_z)
     if include_texts:
         df_t = fulltexts(region, text_cutoff)
@@ -291,6 +293,7 @@ def all_regions(
     protest_source: str = "acled",
     random_treatment_regional: int | None = None,
     add_features: list[str] | None = None,
+    instrument_shift: int = 0,
 ) -> list[pd.DataFrame]:
     dfs = [
         (
@@ -306,6 +309,7 @@ def all_regions(
                 protest_source=protest_source,
                 random_treatment=random_treatment_regional,
                 add_features=add_features,
+                instrument_shift=instrument_shift,
             ),
         )
         for region in tqdm(german_regions)

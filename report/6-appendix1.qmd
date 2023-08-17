@@ -104,3 +104,32 @@ display(
 )
 ```
 \endgroup
+
+#### Instrumental variables {#sec-app1-iv}
+
+
+\begingroup
+\footnotesize\selectfont
+```{python}
+# | fig-label: fig-iv-basic
+# | fig-caption: Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. In the left column each instrument is regressed on its own, in the right column all instruments together; in both cases together with the known confounders. Results are sorted by p-values for the single regressions.
+# | echo: False
+
+from src.models.instrumental_variable import get_coefficients
+
+get_coefficients("weather_covid")[0].sort_values(by=("single", "pval"))
+```
+\endgroup
+
+\begingroup
+\footnotesize\selectfont
+```{python}
+# | fig-label: fig-iv-pc-season
+# | fig-caption: Regression coefficients and p-values for the impact of the principal components of the seasonal and residual (deseasoned) variables on the treatment, controlling for known confounders. In the left column each instrument is regressed on its own, in the right column all instruments together; in both cases together with the known confounders. Results are sorted by p-values for the combined regression.
+# | echo: False
+
+from src.models.instrumental_variable import get_coefficients
+
+get_coefficients("pc_weather_covid_season")[0].sort_values(by=("single", "pval")).head(10)
+```
+\endgroup

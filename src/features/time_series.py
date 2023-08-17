@@ -25,6 +25,7 @@ def get_lagged_df(
     random_treatment_global: int | None = None,
     add_features: list[str] | None = None,
     return_loadings: bool = False,
+    shift_instruments: bool = False,
 ):
     """
     Include time-series lags, that is, past values of the various variables.
@@ -67,6 +68,7 @@ def get_lagged_df(
         region_dummies=region_dummies,
         random_treatment_regional=random_treatment_regional,
         add_features=add_features,
+        instrument_shift=step if shift_instruments else 0,
     ):
         lagged_df = pd.concat(
             [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1
@@ -92,7 +94,7 @@ def get_lagged_df(
                 and not ("_ewm" in c and not c.endswith("_lag-1"))
             ]
         ]
-        y = df[[target]].shift(-step)
+        y = df[[target]].shift(-step if not shift_instruments else 0)
         if cumulative:
             y = y.rolling(step + 1).sum()
         df_combined = pd.concat([y, lagged_df], axis=1).dropna()

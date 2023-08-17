@@ -25,11 +25,15 @@ def plot_impact_ts(
     """
     if ax is None:
         _, ax = plt.subplots(figsize=(8, 4))
-    for target in disambiguate_target(targets):
+    for i, target in enumerate(disambiguate_target(targets)):
         r = results[(results["target"] == target) & (results["predictor"] == predictor)]
-        ax.plot(r["step"], r["coef"], label=target, linewidth=1.5)
+        ax.plot(
+            r["step"], r["coef"], label=target, linewidth=1.5, marker=".", color=f"C{i}"
+        )
         if ci and "ci_lower" in r.columns and "ci_upper" in r.columns:
-            ax.fill_between(r["step"], r["ci_upper"], r["ci_lower"], alpha=0.2)
+            ax.fill_between(
+                r["step"], r["ci_upper"], r["ci_lower"], alpha=0.2, color=f"C{i}"
+            )
     s = results["step"]
     ax.set_xticks(range(s.min(), s.max() + 1, 2))
     ax.set_xlabel("Day of outcome")

@@ -1,14 +1,16 @@
 import json
 import warnings
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import statsmodels.api as sm
 from dowhy import CausalModel
 from dowhy.causal_estimators.instrumental_variable_estimator import (
     InstrumentalVariableEstimator,
 )
-from linearmodels.iv import IVLIML
+from linearmodels.iv import IV2SLS, IVGMM, IVLIML
 from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -21,9 +23,9 @@ from src.paths import models
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
-def get_data(instruments_):
+def get_data(instruments_, loadings=False):
     df = get_lagged_df(
-        "media_combined_all",
+        "media_combined_protest",
         instruments=instruments_,
         lags=range(-7, 1),
         step=6,
@@ -32,14 +34,17 @@ def get_data(instruments_):
         ignore_medium=True,
         region_dummies=True,
         positive_queries=True,
+        return_loadings=loadings,
     )
+    if loadings:
+        return df
     instruments = [
         c
         for c in df.columns
         if c.startswith("weather_") or c.startswith("covid_") or c.startswith("pc_")
     ]
     treatment = "occ_protest_lag0"
-    outcome = "media_combined_all"
+    outcome = "media_combined_protest"
     confounders = [c for c in df.columns if c not in [outcome, treatment] + instruments]
     # normalize all instruments
     for instrument in instruments:
@@ -91,9 +96,24 @@ def get_coefficients(instruments_):
     )
     params_combi = params_combi[params_combi.index.isin(instruments)]
     params = pd.concat([params_single, params_combi], axis=1, keys=["single", "combi"])
-
-    params = params.sort_values(by=("combi", "pval"))
     return params, loadings_df
+
+
+def pc_vis(instruments, numbers, dfs=slice(None)):
+    loadings_dfs = get_data(instruments, loadings=True)
+    for loadings_df in loadings_dfs[dfs]:
+        plt.figure(figsize=(15, 3))
+        loadings = loadings_df.iloc[numbers]
+        loadings.columns = (
+            loadings.columns.str.replace("weather_", "")
+            .str.replace("covid_", "")
+            .str.replace("_lag0", "")
+        )
+        sns.heatmap(loadings.abs(), annot=loadings, cmap="Blues", linewidths=0.5)
+        plt.title("PCA Component Loadings")
+        plt.ylabel("Principal Components")
+        plt.xlabel("Original Features")
+        plt.show()
 
 
 def get_rf_params():
@@ -224,8 +244,8 @@ def _instrumental_variable(
 def _instrumental_variable_liml(
     target: str,
     treatment: str,
-    instruments_: list[str],
     lagged_df: pd.DataFrame,
+    iv_instruments: list[str] = ["pc_resid_9"],
 ):
     """
     WIP.
@@ -239,8 +259,6 @@ def _instrumental_variable_liml(
         if (c.startswith("weather_") or c.startswith("covid_") or c.startswith("pc_"))
         and not "season" in c
     ]
-    # instruments = [f"{instr}_lag0" for instr in instruments_]
-    instruments = instruments_
     confounders = lagged_df[
         [
             c
@@ -254,21 +272,21 @@ def _instrumental_variable_liml(
         dependent=lagged_df[target],
         exog=confounders,
         endog=lagged_df[treatment_],
-        instruments=lagged_df[instruments],
+        instruments=lagged_df[iv_instruments],
     )
     results = model.fit()
     ci = results.conf_int()
-    first_stage_model = IVLIML(
+    first_stage_model = IV2SLS(
         dependent=lagged_df[treatment_],
-        exog=pd.concat([confounders, lagged_df[instruments]], axis=1),
+        exog=pd.concat([confounders, lagged_df[iv_instruments]], axis=1),
         endog=None,
         instruments=None,
     )
     first_stage_results = first_stage_model.fit()
     first_stage_ci = first_stage_results.conf_int()
-    first_stage_solo_results = IVLIML(
+    first_stage_solo_results = IV2SLS(
         dependent=lagged_df[treatment_],
-        exog=lagged_df[instruments],
+        exog=lagged_df[iv_instruments],
         endog=None,
         instruments=None,
     ).fit()
@@ -278,11 +296,11 @@ def _instrumental_variable_liml(
             coef=[results.params[treatment_]],
             ci_lower=ci["lower"][treatment_],
             ci_upper=ci["upper"][treatment_],
-            wooldridge=results.wooldridge_overid.pval,
-            anderson_rubin=results.anderson_rubin.pval,
-            first_stage_coef=[first_stage_results.params[instruments[0]]],
-            first_stage_ci_lower=first_stage_ci["lower"][instruments[0]],
-            first_stage_ci_upper=first_stage_ci["upper"][instruments[0]],
+            # wooldridge=results.wooldridge_overid.pval,
+            # anderson_rubin=results.anderson_rubin.pval,
+            first_stage_coef=[first_stage_results.params[iv_instruments[0]]],
+            first_stage_ci_lower=first_stage_ci["lower"][iv_instruments[0]],
+            first_stage_ci_upper=first_stage_ci["upper"][iv_instruments[0]],
             first_stage_fstat=first_stage_solo_results.f_statistic.stat,
         )
     )
