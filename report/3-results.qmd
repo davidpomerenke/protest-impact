@@ -37,7 +37,9 @@ The coefficients for the protest variables are equivalent to the ATT (see @sec-a
 
 #### Instrumental variables
 
-Out of the 15 potential instrumental variables, 5 pandemic instruments and 4 weather instruments have a statistically significant impact on protest occurrence (see @fig-iv-basic), but when using them in a combined regression the coefficients are much less significant.
+Out of the 15 potential instrumental variables, 5 pandemic instruments and 4 weather instruments have a statistically significant impact on protest occurrence (see @fig-iv-basic), but when using them in a combined regression the coefficients are much less significant. Precipitation is not among the significant variables.
+
+Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the coefficients and siginificances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-weatherlit). I find that such binarization is not systematically better or worse than using the continuous value. (For the single regression, it slightly decreases the coefficient, and for the combined regression with other variables it slightly increases the coefficient.)
 
 ```{python}
 # | echo: false
@@ -50,7 +52,7 @@ pc_vis("pc_weather_covid", numbers=[0, 7, 11])
 
 <!-- pc_0 at p=0.0005, pc_7 at p=0.007, and pc_11 at p=0.008 -->
 
-Principle component decomposition isolates three very significant components with p<0.01, while the other components have p>0.05.^[This is without adjusting for multiple testing since no hypothesis tests or thresholds are used, but the analysis is rather exploratory.] The three components are displayed in terms of the original variables in @fig-iv-pc.
+Principal component decomposition isolates three very significant components with p<0.01, while the other components have p>0.05.^[This is without adjusting for multiple testing since no hypothesis tests or thresholds are used, but the analysis is rather exploratory.] The three components are displayed in terms of the original variables in @fig-iv-pc.
 
 ```{python}
 # | echo: false
@@ -61,9 +63,9 @@ from src.models.instrumental_variable import pc_vis
 pc_vis("pc_weather_covid_season", numbers=[9, 8, 11], dfs=slice(1, 2))
 ```
 
-Deseasoning the original variables and then performing separate principle component analyses on seasonal and residual parts shows that most of the significant variables are seasonal in nature; but there is also one very significant residual variable pc_resid_9 at p=0.0005 and two somewhat significant residual variables pc_resid_8 at p=0.05 and pc_resid_11 at p=0.07, while all other residual components have p>0.15. The more significant components are broken down in @fig-iv-pc-deseasoned. The first-stage f-statistic for pc_resid_9 is f=33.82; f=2.08 for pc_resid_8; and f=2.02. According to the "rule of thumb" (@InstrumentalVariablesEstimation2023) the threshold for weak instruments is around f=10, so pc_resid_9 would be a strong instrument but the other ones would all be weak. The combined f-statistic of the three mentioned components is f=38.74.
+Deseasoning the original variables and then performing separate principle component analyses on seasonal and residual parts shows that most of the significant variables are seasonal in nature; but there is also one very significant residual variable pc_resid_9 at p=0.0005 and two somewhat significant residual variables pc_resid_8 at p=0.05 and pc_resid_11 at p=0.07, while all other residual components have p>0.15 (without adjusting for multiple testing). The more significant components are broken down in @fig-iv-pc-deseasoned. The first-stage f-statistic for pc_resid_9 is f=33.82; f=2.08 for pc_resid_8; and f=2.02. According to the "rule of thumb" (@InstrumentalVariablesEstimation2023) the threshold for weak instruments is around f=10, so pc_resid_9 would be a strong instrument but the other ones would all be weak. The combined f-statistic of the three mentioned components is f=38.74.
 
-Placebo tests for the first stage (the impact of the instruments on the treatment) are given in @fig-iv-1-placebo.
+Placebo tests for the first stage (the impact of the instrument on the treatment) are given in @fig-iv-1-placebo. From day 3 after the protest date there is no longer a significant impact of the instrument on the treatment
 
 ```{python}
 # | fig-label: fig-iv-1-placebo
@@ -81,7 +83,7 @@ results = instrumental_variable_liml(
     ignore_group=True,
     ignore_medium=True,
     cumulative=False,
-    steps=range(-7,29),
+    steps=range(-7, 29),
     shift_instruments=True,
 )
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -97,7 +99,9 @@ ax.axhline(0, color="k", linewidth=0.5)
 ax.axvline(0, color="k", linestyle="--")
 ax.set_xlabel("Day of instrument (relative to protest)")
 ax.set_ylabel("First stage coefficient")
-ax.set_title("First stage placebo tests with shifted outcome: Impact of pc_resid_9 on protest occurrence")
+ax.set_title(
+    "First stage placebo tests with shifted outcome: Impact of pc_resid_9 on protest occurrence"
+)
 plt.tight_layout()
 plt.show()
 ```
@@ -124,7 +128,7 @@ from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(cumulative=False, lags=range(-7, 1), steps=range(-28, 8))
 fig.suptitle("Placebo test: estimating the causal impact on past outcomes")
-axes[0].set_ylim(-3, 5)
+# axes[0].set_ylim(-3, 5)
 axes[0].set_xticks(range(-28, 8, 7))
 plt.show()
 ```
@@ -145,7 +149,7 @@ fig, axes = plot_trends(
 )
 fig.suptitle("Placebo test: estimating the causal impact of random events")
 # axes[0].set_ylim(-3, 5)
-axes[0].set_xticks(range(-14, 14, 7))
+axes[0].set_xticks(range(-14, 15, 7))
 plt.show()
 ```
 
@@ -193,7 +197,7 @@ from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(cumulative=False)
 fig.suptitle("Time series of the causal impact by method and coverage dimension")
-axes[0].set_ylim(-5, 5)
+# axes[0].set_ylim(-5, 5)
 plt.show()
 ```
 

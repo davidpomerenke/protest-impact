@@ -26,6 +26,39 @@ __Weather as an instrument.__ Related work on causal methods for protest impact 
 
 - __Spatial interdependence__: @coopermanRandomizationInferenceRainfall2017 raise concern about spatial interdependence of rainfall across regions. This applies particularly when the effect of rainfall across regions _on a single date_ is investigated, for example in the context of an election. In my setting I investigate the individual effects of protest events that are spread across multiple years. The amount of protests that take place on the same date is therefore very small, and spatial interdependence of the _weather_ among temporally separated events is very low. Spatial interdependence of the _climate_ (thus also influencing the weather) is still a problem. When removing the climate influence from the weather and only using the (climate-independent) weather as instrumental variables, the spatial interdependence should be mostly removed from the intrumental variables.
 
+##### Pandemic restrictions as an instrument
+
+The timespan covered by my dataset (mostly 2020-2022) coincides with the COVID-19 pandemic, which has had very drastic impacts in 2020 and 2021, and still some in 2022. This may open up the possibility for exploiting a new kind of instrumental variable, because the pandemic comes with both legal restrictions and psychological aversion against large gatherings, including demonstrations.
+
+I see 3 reasons why pandemic restrictions may not be a valid instrument:
+
+1. Just like the weather, the spread of the coronavirus is to some extent a natural event. It is, however, to some extent controlled by the behaviour of humans, and especially the restrictions due to COVID-19 have a large political component. I worry especially about geographical confounding: Restrictions in Germany have in large part been up to the regional legislators and governments, and perhaps those governing parties whose climate policy causes outrage tend to impose especially strict (or loose) COVID-19 restrictions for one reason or another.
+2. Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally or systematically correlated with political processes and with media attention cycles.
+3. There is a potential direct impact of COVID-19 on media coverage: Stricter restrictions may correlate with a more intense media focus on the pandemic, decreasing attention on any other topic. This could be measured and corrected for. Without such correction, we may overestimate the effect of protests, because the non-occurrence of protests may be correlated with decreased coverage of any non-covid topic, and the occurrence of protests may be correlated with the usual amount of coverage for non-covid topics.
+
+
+<!--
+ Placebo tests for instrumental variables
+
+To further strengthen the evidence that the _precipitation_ variable has a significant impact on protest occurrence and size, I perform placebo tests where I try to predict protest occurrence and size not from the weather of the respective day, but from other days before and after the protest. I expect:
+
+a. The weather after the protest should not have any effect on the treatment. For very few days after the protest there might still be a correlation because the weather on one day is correlated with the weather on the next day. This correlation should rapidly decline over the course of a few days and permanently go down to $0$.
+b. For days before the protest, I expect a similar amount of correlation. In addition, I expect some small causal effects, because organizers and attendees may decide a few days before the protest whether it should take place or whether they want to attend, and might be influenced in their decision by the current weather, and not only the weather forecast; and even the weather forecast depends not only on the actual weather on the day, but substantially on the weather a few days earlier. In addition, the previous weather may have an impact on previous protests, which may in turn have an impact on the protest on the current date. Therefore I expect coefficients and significances before the protest date to also shrink to 0 in the long term, but on a much slower timescale, say, multiple days or weeks.
+c. I expect these declines both before and after the protest dates to be smooth.
+d. In similar manner to the coefficients of the relevant variables, I expect the overall predictive power of the regression (adjusted $Rˆ2$ / f-statistic) to continuously decline before and after the protest date, and much faster after the protest.
+e. When performing regression with only the instruments and no control variables, I expect the predictive power to decline to 0 in both directions.
+
+{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-first-stage-time-series >}}
+
+It seems that the obtained coefficients are almost completely random, and that knowledge about the weather on the protest date does not improve predictive power in comparison to using the weather on any other day. -->
+<!--
+
+Evaluation
+
+- Placebo
+- first stage Placebo
+- statistical tests -->
+
 ### Interpretation of the causal impact estimates
 
 ### Usefulness of the data sets

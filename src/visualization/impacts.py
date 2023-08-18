@@ -1,3 +1,5 @@
+from functools import partial
+
 import altair as alt
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -7,6 +9,7 @@ from src.models.synthetic_control import synthetic_control
 from src.models.time_series import (
     disambiguate_target,
     doubly_robust,
+    instrumental_variable_liml,
     propensity_weighting,
     regression,
 )
@@ -46,9 +49,16 @@ def plot_impact_ts(
     return ax
 
 
+ivliml = partial(
+    instrumental_variable_liml,
+    instruments="pc_weather_covid_season",
+    iv_instruments=["pc_resid_9"],
+)
+
 _methods = dict(
     regression=regression,
     synthetic_control=synthetic_control,
+    instrumental_variable_liml=ivliml,
     # propensity_weighting=propensity_weighting,
     # doubly_robust=doubly_robust,
 )
@@ -62,7 +72,7 @@ def plot_trends(
     random_treatment_global=None,
     n_jobs=4,
 ):
-    fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=True, sharex=True)
+    fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=False, sharex=True)
     treatment = "occ_protest"
     targets = ["media_combined_protest", "media_combined_not_protest"]
     params = dict(

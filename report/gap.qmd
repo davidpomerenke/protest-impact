@@ -1,0 +1,49 @@
+##### Leveraging the gap between pre-registered and observed protest size
+
+For Berlin the police not only collects the protest registrations with their participant estimates, but also monitors the actual numbers of participants and adds them to the same database (see @fig-iv-gap). To see whether this can generally be exploited for instrumental variables, in a first step I use the data for all protests, not just for climate protests. I only use protests where both the registered and actual participant numbers are available, and remove outliers for which the absolute change is beyond the 4th standard deviation. As weather data I use the precipitation average in the week before the protest, versus the precipitation data on the protest data. I operationalize changes in protest size and in precipitation as the inverse hyperbolic sine (arcsinh) of the absolute difference between the values from before and during the protest date. (The inverse hyperbolic sine behaves similarly to the logarithm but also works for zero and negative values.) These are somewhat arbitrary choices and it must be noted that the results depend heavily on the choice of these scaling decisions.
+
+ @fig-iv-gap
+
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#fig-iv-gap >}}
+
+Predicting the change for all Berlin data:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-all >}}
+\endgroup
+
+Placebo:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#fig-change-regression-placebo >}}
+\endgroup
+
+First stage for the climate protests, reasonable:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-reasonable >}}
+\endgroup
+
+and more suitable for 2-stage:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful >}}
+\endgroup
+
+and aggregated:
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-regression-climate-useful-aggregated >}}
+\endgroup
+
+And results for the 2nd stage (the actually interesting thing):
+
+\begingroup
+\scriptsize\selectfont
+{{< embed ../src/models/instrumental_variable/gap/gap.ipynb#tbl-change-liml-climate >}}
+\endgroup
