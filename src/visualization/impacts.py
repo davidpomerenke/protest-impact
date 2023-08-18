@@ -49,16 +49,21 @@ def plot_impact_ts(
     return ax
 
 
-ivliml = partial(
+_regression = partial(regression, lags=range(-7, 1))
+
+_synthetic_control = partial(synthetic_control, lags=range(-23, 1))
+
+_instrumental_variable_liml = partial(
     instrumental_variable_liml,
     instruments="pc_weather_covid_season",
     iv_instruments=["pc_resid_9"],
+    lags=range(-7, 1),
 )
 
 _methods = dict(
-    regression=regression,
-    synthetic_control=synthetic_control,
-    instrumental_variable_liml=ivliml,
+    regression=_regression,
+    synthetic_control=_synthetic_control,
+    instrumental_variable_liml=_instrumental_variable_liml,
     # propensity_weighting=propensity_weighting,
     # doubly_robust=doubly_robust,
 )
@@ -66,19 +71,17 @@ _methods = dict(
 
 def plot_trends(
     cumulative: bool = False,
-    lags=range(-1, 1),
     steps=range(0, 15),
     random_treatment_regional=None,
     random_treatment_global=None,
     n_jobs=4,
 ):
-    fig, axes = plt.subplots(1, 4, figsize=(15, 5), sharey=False, sharex=True)
+    fig, axes = plt.subplots(1, 5, figsize=(15, 5), sharey=False, sharex=True)
     treatment = "occ_protest"
     targets = ["media_combined_protest", "media_combined_not_protest"]
     params = dict(
         target=targets,
         treatment=treatment,
-        lags=lags,
         steps=steps,
         cumulative=cumulative,
         ignore_group=True,

@@ -112,7 +112,7 @@ def synthetic_control_single(
 
 
 @cache(ignore=["n_jobs"])
-def compute_synthetic_controls(
+def synthetic_control_multiple(
     pre_period: int = 3 * 28,
     post_period: int = 28,
     rolling: int = 1,
@@ -190,15 +190,18 @@ def synthetic_control(
     ignore_medium: bool = False,
     add_features: list[str] | None = None,
     positive_queries: bool = True,
-    random_treatment_regional: bool = False,
-    random_treatment_global: bool = False,
+    random_treatment_regional: bool = None,
+    random_treatment_global: bool = None,
     n_jobs: int = 4,
 ) -> pd.DataFrame:
     """
     Compute the synthetic control for a given target and treatment.
-    For use with `src.models.time_series.apply_method`.
+    The other models use `src.models.time_series.apply_method` as a wrapper but here we integrate them.
+    (Due to caching that could actually be changed in the future.)
     """
-    ys, y_cs = compute_synthetic_controls(
+    ys, y_cs = synthetic_control_multiple(
+        pre_period=abs(min(lags)),
+        post_period=max(steps) + 1,
         treatment=treatment,
         ignore_group=ignore_group,
         ignore_medium=ignore_medium,
@@ -241,13 +244,15 @@ def synthetic_control(
                     coef=df.mean(),
                     ci_lower=ci_low,
                     ci_upper=ci_high,
+                    rmse=np.sqrt(np.mean(df**2)),
+                    mae=np.mean(np.abs(df)),
                 )
             )
     return pd.DataFrame(rows)
 
 
 def sc_plot(**kwargs):
-    y, y_c = compute_synthetic_controls(ignore_medium=True, **kwargs)
+    y, y_c = synthetic_control_multiple(ignore_medium=True, **kwargs)
     ys, y_cs = dict(), dict()
     for outcome in y[0].columns:
         ys[outcome] = pd.concat([df[outcome] for df in y], axis=1)
