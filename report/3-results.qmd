@@ -110,7 +110,20 @@ plt.show()
 
 RMSE: 55.7±1.2, bias -2.64±2.78
 
-Pre-fit MSE, plots
+```{python}
+# | echo: false
+from src.models.synthetic_control import sc_plot
+
+sc_plot(scale="demean", pre_period=22, post_period=22)
+```
+
+```{python}
+# | echo: false
+# | fig-cap: with 7-day rolling average
+from src.models.synthetic_control import sc_plot
+
+sc_plot(scale="demean", rolling=7, pre_period=12 * 28, post_period=3 * 28)
+```
 
 Difficulties with large protest events: plot size vs #regions
 
