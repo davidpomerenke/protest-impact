@@ -177,24 +177,7 @@ Causality[^invented by Spohn xxxx]
 
 Here I give an overview of the causal model that I generally assume. Then I give an overview of the different causal methods used in this project, how they exploit the causal model, and what additional assumptions they make. Since _time series methods_ may be used in various contexts, I also briefly introduce their structure and show how they can be applied to various machine learning problems that arise as part of the causal methods.
 
-We can group the variables from the dataset described in @sec-data into 4 causal categories, and add another category for variables that we do not know but that might be relevant. The _treatment units_ are _days_, and data is available for multiple regions. For each day in a given region, we have data in the following categories:
 
-- Treatment __W__:
-  - For each protest group, a dummy variable whether it organizes at least one protest event in the given region (_binary treatment_)^[Alternatively, I could use for each protest group the number of protesters in the given region as a _continuous treatment_; but this requires (a) slightly more complicated methods to deal with continuous treatments, and (b) difficult assumptions about scaling -- is the effect linear, logistic, or more complicated?]
-- Outcome __Y__:
-  - Number of newspaper articles published that mention the climate crisis, across 5 dimensions (see @sec-data-discourse): overall mentions; mentioning protest activity; mentioning long-term goals; mentioning specific short-term goals; using a drastic or catastrophic framing.
-- Instruments __Z__:
-  - Weather: min/max/avg temperature, air pressure, precipitation, snowfall, wind speed, and peak gust
-  - Covid restrictions: stringency index of the restrictions, and movement variables for 6 location types
-- Known confounders __X__:
-  - Day of the week, as dummy variables
-  - Holiday occurrence in the given region
-  - Region:
-    - represented as dummy variables
-    - alternatively, represented using 29 sociodemographic indicators: voting behavior, average female income, ...
-  - Time-series lags (that is, values from previous days) of some or all variables -- see @sec-time-series
-- Unknown confounders __U__:
-  - __?__
 
 @fig-causal-graph-simple shows the causal relations between the 5 categories graphically.
 

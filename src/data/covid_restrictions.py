@@ -1,8 +1,10 @@
 import pandas as pd
 
+from src.cache import cache
 from src.paths import external_data
 
 
+@cache
 def load_mobility():
     df = pd.read_csv(
         external_data / "our-world-in-data/mobility-trends/changes-visitors-covid.csv",
@@ -25,6 +27,7 @@ def load_mobility():
     return df
 
 
+@cache
 def load_stringency():
     df = pd.read_csv(
         external_data / "our-world-in-data/stringency-index/owid-covid-data.csv",
