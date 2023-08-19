@@ -1,6 +1,6 @@
 /.quarto/
 /_output/
-/_freeze/
+# /_freeze/
 *_files/
 
 ## Core latex/pdflatex auxiliary files:
