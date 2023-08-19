@@ -9,6 +9,14 @@ Excellent and critical discussion and or reflection on all findings vis-a-vis ex
 
 ## Discussion
 
+### Regression
+
+### Instrumental variables
+
+### Synthetic control
+
+### Propensity scores
+
 ### Validity of the methods
 
 __Anticipation effects.__ [@abadieSyntheticControlMethods2010]

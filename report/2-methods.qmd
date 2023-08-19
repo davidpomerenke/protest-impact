@@ -188,11 +188,7 @@ In a first labeling phase, I annotate 650 random articles for training and 500 r
 \color{Red}TODO: Extraction of dates, locations, protest groups.
 \endgroup
 
-#### Newspaper coverage
-
-Public discourse {#sec-data-discourse}
-
-__Online newspapers.__ {#sec-mediacloud}
+#### Newspaper coverage {#sec-data-discourse}
 
 ```{python}
 # | label: fig-mediacloud-history
@@ -215,12 +211,10 @@ ax.set_title("Article counts for online newspapers in Bayern")
 plt.show()
 ```
 
-[Media Cloud](https://www.mediacloud.org/) is an open data platform that continuously crawls newspaper websites around the world and stores article metadata and word counts in a database. Full texts are in principle available by following the links and scraping the websites oneself, but this is very slow and often hampered by anti-scraping measures of the websites. I use the [`api/v2/stories_public/count`](https://github.com/mediacloud/backend/blob/master/doc/api_2_0_spec/api_2_0_spec.md#apiv2stories_publiccount) endpoint of their API. I query for tags from the [regional and national collections about Germany](https://search.mediacloud.org/collections/news/geographic). Baden-Württemberg and Mecklenburg-Vorpommern are missing from the collection. There has been a (partial) outage in January 2022 resulting in (near-)zero counts for that timespan. I do not exclude this timespan because it would be complicated and error-prone with respect to time-series analysis. This may lead to an under-estimation of eventual causal effect sizes of up to $\frac{1}{36}\approx 0.028$, but I do not expect it to influence my results in any other systematic way.
-
-__Print newspapers__ {#sec-dereko}
+__Online newspapers.__ [Media Cloud](https://www.mediacloud.org/) is an open data platform that continuously crawls newspaper websites around the world and stores article metadata and word counts in a database. Full texts are in principle available by following the links and scraping the websites oneself, but this is very slow and often hampered by anti-scraping measures of the websites. I use the [`api/v2/stories_public/count`](https://github.com/mediacloud/backend/blob/master/doc/api_2_0_spec/api_2_0_spec.md#apiv2stories_publiccount) endpoint of their API. I query for tags from the [regional and national collections about Germany](https://search.mediacloud.org/collections/news/geographic). Baden-Württemberg and Mecklenburg-Vorpommern are missing from the collection. There has been a (partial) outage in January 2022 resulting in (near-)zero counts for that timespan. I do not exclude this timespan because it would be complicated and error-prone with respect to time-series analysis. This may lead to an under-estimation of eventual causal effect sizes of up to $\frac{1}{36}\approx 0.028$, but I do not expect it to influence my results in any other systematic way. {#sec-mediacloud}
 
 ```{python}
-# | label: fig-derekp-history
+# | label: fig-dereko-history
 # | fig-cap: Number of daily print newspaper articles published in the region of Bavaria falling under 5 different queries relating to climate change. A rolling mean with a 7-day window has been applied for smoother display.
 # | column: page
 # | echo: false
@@ -313,7 +307,7 @@ __Pandemic restrictions.__ The timespan covered by my dataset coincides with the
 1. _Temporal correlation._ Unlike the weather, COVID-19 restrictions are temporally correlated over longer timespans, that is, they change more slowly. This introduces some chance that they may be accidentally or systematically correlated with political processes and with media attention cycles.
 2. _Direct media impact._ There is a potential direct impact of COVID-19 on media coverage: Stricter restrictions may correlate with a more intense media focus on the pandemic, decreasing attention on any other topic. Controlling for coverage levels before the protests can decrease this problem.
 
-### Data aggregation
+### Data aggregation {#sec-agg}
 
 The data is aggregated by region and date. For every day and region there is a row that contains information about all causal variables. In causal terms, days are the _treatment units_, and the treatment is whether or not a protest (by a certain group) takes place on a given day in a given region. Summarizing and categorizing the variables that are described in detail in the above sections, we have:
 
@@ -346,17 +340,21 @@ __Outcome time series.__ Protests may have an impact on newspaper converage not 
 
 ### Causal impact estimation
 
+For the selection of suitable models, I specify the treatment as the occurrence of a protest event by any protest group, and the outcome as the one-week amount of total newspaper coverage mentioning the climate crisis. I then use these models to also estimate more specific impacts for events from specific groups; and for the coverage during single days, in order to build impact estimate time series.
+
 #### Regression
 
-If all confounders are represented as features and have a linear impact on the treatment and the outcome, then the coefficients of OLS regression can be interpreted as estimates of the ATT (see @sec-app2-reg). Targets are the causal outcome variables, and features are the treatment and the confounders.
+I estimate an OLS regression model, in order to interpret the coefficients for the treatments causally. This assumes the complete and correct specification of all confounding variables, and a linear model; see @sec-app2-reg for formal details.
 
-I use a 5-fold time-series cross-validation split[^tsplit] to optimize the following hyperparameters: Number of time series lags, inclusion of region dummies, inclusion of exponential moving averages of the treatments and of daily, weekly, and four-weekly time-series differences of the outcomes. To check whether the lack of regularization hinders generalization in OLS, I run the same optimization for a Bayesian Ridge model. I optimize for the root mean squared error (RMSE) and use the R² score as an additional indicator of performance.
+I perform hyperparameter optimization by 5-fold time-series cross-validation. Hyperparameters are: number of time series lags, inclusion of region dummies, inclusion of moving average features, and inclusion of time-series difference features (see @sec-agg).
 
-[^tsplit]: Here I use simple time-series splits. They create an out-of-distribution situation, but not a very extreme one. Future work may additionally use a geographic split or a time-series split with a large gap to measure the estimator behaviour in more extreme out-of-distribution situations. This would be a good check, because causal models should also work out-of-distribution.
+An interesting question is what metric to optimize for. In predictive contexts this would typically be the (root) mean squared error ((R)MSE) or the mean average error (MAE); they minimize variance in the first place. For causal impact estimation, we want the estimates to be _unbiased_ much more than we want them to have a low variance. Therefore I minimize the bias, defined as the absolute value of the mean error (ME). Unlike the MAE, this takes the direction of the errors into account.
 
-As target variable for the optimization process I choose the sum of the overall number of articles mentioning climate change that are published on a given date and the following day. -- My prior is that this variable is probably most clearly influenced by the occurrence of protests, because it captures the effect directly after the protest event, where it will be least diluted, because and captures the effect on both online media and print media (which has a one-day delay). Therefore I focus on this variable for model selection. The best model is then also used for the estimation of the causal effect on specific coverage dimensions and over time, by swapping out the target variables.
+OLS is unbiased for in-distribution data anyway. I want a model that also generalizes to out-of-distribution data -- this is what we generally want from causal models -- and OLS is not automatically unbiased for this. By using time-series cross-validation splits, I create a situation that is slightly out-of-distribution. Future work could also create situations that are more extremely out-of-distribution, for example by using large gaps for the time-series splits, or by using geographic splits.
 
-I use the OLS implementation of the `statsmodels` package [@perktoldStatsmodelsStatsmodelsRelease2023] with `HC3` heteroskedacity-robust covariance estimation, and the Bayesian Ridge implementation from `scikit-learn` (@pedregosaScikitlearnMachineLearning2011). `statsmodels` does not support multivariate regression, so I run separate univariate models for each target variable.
+To set the generalization capabilities of the OLS model into perspective, I also estimate similarly optimized Ridge and Lasso regression models. But I cannot use them for causal impact estimation because the coefficients are regularized and thus biased.
+
+I use the `OLS` implementation from the `statsmodels` package [@perktoldStatsmodelsStatsmodelsRelease2023] with `HC3` heteroskedacity-robust covariance estimation, and the `BayesianRidge` and `LassoLarsIC` implementations from `scikit-learn` (@pedregosaScikitlearnMachineLearning2011). `statsmodels` does not support multivariate regression, so I run separate univariate models for each target variable.
 
 #### Instrumental variables {#sec-instrumental}
 
