@@ -1,3 +1,8 @@
+---
+execute:
+  freeze: true
+---
+
 ## Appendix 1: Supplementary tables and figures
 
 ### Data
