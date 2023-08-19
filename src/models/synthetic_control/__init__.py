@@ -123,6 +123,7 @@ def synthetic_control_multiple(
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
     n_jobs: int = 4,
+    show_progress: bool = True,
 ):
     dfs = all_regions(
         ignore_group=ignore_group,
@@ -167,7 +168,7 @@ def synthetic_control_multiple(
             post_period=post_period,
             dfs=dfs,
         )
-        for name, date_ in tqdm(protest_dates)
+        for name, date_ in tqdm(protest_dates, disable=not show_progress)
     )
     ys, y_cs = [], []
     for (name, date_), result in zip(protest_dates, results):
@@ -197,6 +198,7 @@ def synthetic_control(
     random_treatment_regional: bool = None,
     random_treatment_global: bool = None,
     n_jobs: int = 4,
+    show_progress: bool = True,
 ) -> pd.DataFrame:
     """
     Compute the synthetic control for a given target and treatment.
@@ -213,6 +215,7 @@ def synthetic_control(
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
         n_jobs=n_jobs,
+        show_progress=show_progress,
     )
     col_dfs = dict()
     for col in ys[0].columns:

@@ -10,7 +10,7 @@ import pandas as pd
 from dateutil import parser
 from dateutil.relativedelta import relativedelta
 from dotenv import load_dotenv
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from src import fulltext_path, project_root, website_name
 from src.data.news.mediacloud.mediacloud import search as mediacloud_search

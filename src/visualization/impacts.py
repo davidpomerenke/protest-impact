@@ -93,6 +93,7 @@ def plot_trends(
     random_treatment_regional=None,
     random_treatment_global=None,
     n_jobs=4,
+    show_progress=True,
 ):
     fig, axes = plt.subplots(1, 5, figsize=(15, 5), sharey=False, sharex=True)
     treatment = "occ_protest"
@@ -109,6 +110,7 @@ def plot_trends(
         random_treatment_global=random_treatment_global,
         add_features=["size", "ewm"],
         n_jobs=n_jobs,
+        show_progress=show_progress,
     )
     fig_params = dict(predictor=treatment, targets=targets)
     for i, (mname, m) in enumerate(_methods.items()):

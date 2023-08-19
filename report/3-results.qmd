@@ -3,7 +3,6 @@ execute:
   freeze: true
 ---
 
-
 <!--
 
 Analysis of the results with graphics like bargraphs and boxplots has been made. Statistical methods have been employed to compare different results. AUCs have been obtained. Minimal verification.
@@ -95,6 +94,7 @@ results = instrumental_variable_liml(
     cumulative=False,
     steps=range(-7, 29),
     shift_instruments=True,
+    show_progress=False,
 )
 fig, ax = plt.subplots(figsize=(6, 3))
 ax.plot(results.step, results.first_stage_coef, marker=".")
@@ -124,10 +124,12 @@ bias
 -0.330+-1.13
 
 ```{python}
+# | echo: false
+
 import matplotlib.pyplot as plt
 from src.models.synthetic_control.hyperopt import hyperopt
 
-results, _ = hyperopt()
+results, _ = hyperopt(show_progress=False)
 fig, ax = plt.subplots(figsize=(5, 2))
 ax.plot([abs(r["lags"][0]) for r in results], [r["bias"] for r in results], marker=".")
 plt.fill_between(
@@ -165,7 +167,9 @@ for t, n in titlenames:
 # | fig-cap: with 7-day rolling average
 
 for t, n in titlenames:
-    fig, ax = sc_plot(t, n, scale="demean", rolling=7, pre_period=3, post_period=3 * 28)
+    fig, ax = sc_plot(
+        t, n, scale="demean", rolling=7, pre_period=365, post_period=3 * 28
+    )
     plt.show()
 ```
 
@@ -192,7 +196,7 @@ balanced: 0.213+-0.017
 import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False, steps=range(-28, 8))
+fig, axes = plot_trends(cumulative=False, steps=range(-28, 8), show_progress=False)
 fig.suptitle("Placebo test: estimating the causal impact on outcomes before the event")
 axes[0].set_xticks(range(-28, 8, 7))
 axes[0].set_ylim(-30, 30)
@@ -216,6 +220,7 @@ fig, axes = plot_trends(
     cumulative=False,
     steps=range(-15, 15),
     random_treatment_global=56,
+    show_progress=False,
 )
 fig.suptitle("Placebo test: estimating the causal impact of random events")
 # axes[0].set_ylim(-3, 5)
@@ -239,6 +244,7 @@ fig, axes = plot_trends(
     cumulative=False,
     steps=range(-15, 15),
     random_treatment_regional=25,
+    show_progress=False,
 )
 fig.suptitle("Placebo test: estimating the causal impact of random events")
 # axes[0].set_ylim(-3, 5)
@@ -282,7 +288,7 @@ plt.show()
 import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False)
+fig, axes = plot_trends(cumulative=False, show_progress=False)
 fig.suptitle("Time series of the causal impact by method and coverage dimension")
 axes[0].set_ylim(-30, 30)
 axes[1].set_ylim(-30, 30)
@@ -302,7 +308,7 @@ plt.show()
 import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=True)
+fig, axes = plot_trends(cumulative=True, show_progress=False)
 fig.suptitle(
     "Cumulative time series of the causal impact by method and coverage dimension"
 )

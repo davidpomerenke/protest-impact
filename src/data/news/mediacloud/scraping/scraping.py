@@ -5,7 +5,7 @@ from time import sleep
 from urllib.parse import quote
 
 import requests
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from src import fulltext_path, html2text
 from src.types import NewsItem

@@ -2,10 +2,6 @@
 /_output/
 /_freeze/
 *_files/
-*.tex
-*.pdf
-*.html
-report.md
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

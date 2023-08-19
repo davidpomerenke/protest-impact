@@ -42,7 +42,7 @@ def objective(params):
     return params
 
 
-def hyperopt(n_jobs=4):
+def hyperopt(n_jobs=4, show_progress=True):
     lags = [1, 7, 30, 90, 180, 270, 360]
     # lags = range(84, 169, 28)
     # lags = range(112, 133, 7)
@@ -58,7 +58,7 @@ def hyperopt(n_jobs=4):
     combinations = list(product(*params.values()))
     results = Parallel(n_jobs=n_jobs)(
         delayed(objective)(dict(zip(params.keys(), combination)))
-        for combination in tqdm(combinations)
+        for combination in tqdm(combinations, disable=not show_progress)
     )
     with open(models / "synthetic_control" / "params.json", "w") as f:
         json.dump(results, f, indent=2)
