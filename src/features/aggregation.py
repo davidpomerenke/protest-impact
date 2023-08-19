@@ -2,7 +2,6 @@ from itertools import chain
 
 import numpy as np
 import pandas as pd
-from statsmodels.tsa.seasonal import seasonal_decompose
 from tqdm.auto import tqdm
 
 from src import end, start
@@ -28,7 +27,7 @@ def outcome(
     aspects = dict()
     for source_name, source in [("online", "mediacloud"), ("print", "dereko")]:
         for qname, query in climate_queries(short=True).items():
-            df = counts_for_region(qname, region, source)
+            df = counts_for_region(qname, region, source, start=start, end=end)
             if df is None:
                 return None
             aspects[f"media_{source_name}_{qname}"] = df["count"]
@@ -205,8 +204,14 @@ def one_region(
     random_treatment: int | None = None,
     add_features: list[str] | None = None,
     instrument_shift: int = 0,
+    earlier_media: bool = False,
 ) -> pd.DataFrame | None:
-    df_y = outcome(region)
+    if earlier_media:
+        start = pd.Timestamp("2018-01-01")
+        end = pd.Timestamp("2022-12-31")
+        df_y = outcome(region, start=start, end=end)
+    else:
+        df_y = outcome(region)
     if df_y is None:
         return None
     if positive_queries:
@@ -251,6 +256,9 @@ def one_region(
                     df_y.diff(1).add_suffix("_diff1"),
                     df_y.diff(7).add_suffix("_diff7"),
                     df_y.diff(28).add_suffix("_diff28"),
+                    df_y.diff(91).add_suffix("_diff112"),
+                    df_y.diff(182).add_suffix("_diff224"),
+                    df_y.diff(364).add_suffix("_diff448"),
                 ],
                 axis=1,
             )
@@ -294,6 +302,7 @@ def all_regions(
     random_treatment_regional: int | None = None,
     add_features: list[str] | None = None,
     instrument_shift: int = 0,
+    earlier_media: bool = False,
 ) -> list[pd.DataFrame]:
     dfs = [
         (
@@ -310,6 +319,7 @@ def all_regions(
                 random_treatment=random_treatment_regional,
                 add_features=add_features,
                 instrument_shift=instrument_shift,
+                earlier_media=earlier_media,
             ),
         )
         for region in tqdm(german_regions)

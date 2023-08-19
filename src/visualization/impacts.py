@@ -49,9 +49,11 @@ def plot_impact_ts(
     return ax
 
 
+_correlation = partial(regression, lags=[0], no_controls=True)
+
 _regression = partial(regression, lags=range(-7, 1))
 
-_synthetic_control = partial(synthetic_control, lags=range(-23, 1))
+_synthetic_control = partial(synthetic_control, lags=range(-125, 1))
 
 _instrumental_variable_liml = partial(
     instrumental_variable_liml,
@@ -60,12 +62,27 @@ _instrumental_variable_liml = partial(
     lags=range(-7, 1),
 )
 
+_propensity_weighting = partial(
+    propensity_weighting,
+    lags=range(-4, 1),
+    add_features=["diff", "size", "ewm"],
+    standardize=True,
+)
+
+_doubly_robust = partial(
+    doubly_robust,
+    lags=range(-1, 1),
+    # add_features=["diff", "size", "ewm"],
+    # standardize=True,
+)
+
 _methods = dict(
+    correlation=_correlation,
+    # propensity_weighting=_propensity_weighting,
     regression=_regression,
     synthetic_control=_synthetic_control,
     instrumental_variable_liml=_instrumental_variable_liml,
-    # propensity_weighting=propensity_weighting,
-    # doubly_robust=doubly_robust,
+    # doubly_robust=_doubly_robust,
 )
 
 
@@ -219,8 +236,12 @@ def plot_groups(
                 column=alt.Column("treatment:N", title="", sort=groups),
             )
         case "methods":
-            return alt.layer(bars, error_bars, data=results).facet(
-                column=alt.Column("method:N", title="", sort=list(_methods.keys())),
+            return (
+                alt.layer(bars, error_bars, data=results)
+                .facet(
+                    column=alt.Column("method:N", title="", sort=list(_methods.keys())),
+                )
+                .resolve_scale(y="independent")
             )
 
 

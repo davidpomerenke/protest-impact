@@ -15,7 +15,7 @@ def objective(params):
     rmses = []
     maes = []
     coefs = []
-    for i in range(5):
+    for i in range(4):
         result = synthetic_control(
             target="media_combined_all",
             treatment="occ_protest",
@@ -43,10 +43,14 @@ def objective(params):
 
 def hyperopt(n_jobs=4):
     # lags = [7, 28, 3 * 28, 6 * 28, 365]
-    # lags = [7, 14, 21, 28, 2 * 28, 3 * 28]
-    # lags = [21, 24, 28, 35, 42, 49]
-    # lags = range(20, 41)
-    lags = range(20, 25)
+    # lags = range(84, 169, 28)
+    # lags = range(112, 133, 7)
+    # lags = range(126, 142, 3)
+    # lags = [136, 137]
+    # lags = [138]
+    # lags = [136, 137, 138, 139]
+    # lags = [138, 140, 144]
+    lags = [125, 130, 138]
     params = dict(
         lags=[[-i] for i in lags],
     )
@@ -57,5 +61,5 @@ def hyperopt(n_jobs=4):
     )
     with open(models / "synthetic_control" / "params.json", "w") as f:
         json.dump(results, f, indent=2)
-    best_result = min(results, key=lambda r: r["rmse"])
+    best_result = min(results, key=lambda r: np.abs(r["bias"]))
     return best_result

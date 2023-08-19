@@ -14,7 +14,6 @@ from tqdm.auto import tqdm
 from src.cache import cache
 from src.features.aggregation import all_regions
 from src.features.time_series import get_lagged_df
-from src.paths import processed_data
 
 
 def loss_w(W, X, y) -> float:
@@ -61,7 +60,7 @@ def get_features(df: pd.DataFrame, scale, rolling, idx_pre, date_) -> pd.DataFra
     return df
 
 
-@cache
+# @cache
 def synthetic_control_single(
     region: str,
     date_: pd.Timestamp,
@@ -132,6 +131,7 @@ def synthetic_control_multiple(
         ignore_medium=ignore_medium,
         add_features=add_features,
         random_treatment_regional=random_treatment_regional,
+        earlier_media=True,
     )
     if random_treatment_global is not None:
         lagged_df = get_lagged_df(
@@ -151,7 +151,6 @@ def synthetic_control_multiple(
         for date_ in dates:
             if date_ - pd.Timedelta(days=pre_period) in df.index:
                 protest_dates.append((name, date_))
-    # maybe actually use lags and steps as pre_period and post_period?
     results = Parallel(n_jobs=n_jobs)(
         delayed(synthetic_control_single)(
             name,
@@ -200,7 +199,7 @@ def synthetic_control(
     (Due to caching that could actually be changed in the future.)
     """
     ys, y_cs = synthetic_control_multiple(
-        pre_period=abs(min(lags)),
+        pre_period=abs(min(list(lags) + list(steps))),
         post_period=max(steps) + 1,
         treatment=treatment,
         ignore_group=ignore_group,
