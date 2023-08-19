@@ -7,7 +7,7 @@ from joblib import Parallel, delayed
 from munch import Munch
 from sklearn.linear_model import BayesianRidge, LassoLarsIC
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import TimeSeriesSplit
+from sklearn.model_selection import KFold, TimeSeriesSplit
 from tqdm.auto import tqdm
 
 from src.cache import cache
@@ -22,16 +22,19 @@ def objective(params):
     lagged_df = get_lagged_df(
         target=target,
         lags=p.lags,
-        step=1,
+        step=6,
         cumulative=True,
         ignore_group=False,
         ignore_medium=True,
         region_dummies=p.region_dummies,
         add_features=p.add_features,
     )
-    cv = TimeSeriesSplit(n_splits=5)
+    # cv = TimeSeriesSplit(n_splits=5)
+    cv = KFold(n_splits=5, shuffle=True)
     rmses = []
     r2s = []
+    maes = []
+    biases = []
     for train_index, test_index in cv.split(lagged_df):
         train = lagged_df.iloc[train_index]
         test = lagged_df.iloc[test_index]
@@ -53,18 +56,24 @@ def objective(params):
         r2 = r2_score(test[target], y_pred)
         rmses.append(rmse)
         r2s.append(r2)
+        maes.append(np.mean(np.abs(y_pred - test[target])))
+        biases.append(np.mean(y_pred - test[target]))
     params["rmse"] = np.mean(rmses)
     params["rmse_std"] = np.std(rmses)
     params["r2"] = np.mean(r2s)
     params["r2_std"] = np.std(r2s)
+    params["mae"] = np.mean(maes)
+    params["mae_std"] = np.std(maes)
+    params["bias"] = np.mean(biases)
+    params["bias_std"] = np.std(biases)
     return params
 
 
 def hyperopt(model, n_jobs=4):
     params = dict(
-        lags=[list(range(-i, 1)) for i in range(1, 15)],
-        region_dummies=[True, False],
-        add_features=[[], ["ewm"], ["size"], ["diff"], ["ewm", "size", "diff"]],
+        lags=[list(range(-i, 1)) for i in range(1, 15, 2)],
+        region_dummies=[False],  # True
+        add_features=[[], ["diff"], ["diff", "ewm"]],
         model=[model],
     )
     combinations = list(product(*params.values()))
@@ -74,7 +83,7 @@ def hyperopt(model, n_jobs=4):
     )
     with open(models / "regression" / f"{model}_params.json", "w") as f:
         json.dump(results, f, indent=2)
-    best_result = min(results, key=lambda r: r["rmse"])
+    best_result = min(results, key=lambda r: np.abs(r["bias"]))
     return best_result
 
 

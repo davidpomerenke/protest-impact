@@ -1,6 +1,6 @@
 ---
 execute:
-  freeze: auto
+  freeze: true
 ---
 
 
@@ -19,6 +19,15 @@ Analysis of the results with graphics like bargraphs and boxplots has been made.
 
 #### Regression {#sec-res-reg}
 
+| Model          | Hyp. opt. obj. | RMSE          | Bias         |
+| -------------- | -------------- | ------------- | ------------ |
+| OLS            | min RMSE       | 110.6 ± 24.2  | -18.8 ± 10.4 |
+| OLS            | min bias       | 130.9 ± 21.5  | -14.3 ± 10.1 |
+| BayesianRidge  | min bias       | 119.7 ± 23.4  | -3.85 ± 15.2 |
+| LassoLarsIC    | min bias       | 118.9 ± 24.5  | -2.89 ± 15.7 |
+
+: Using 5-fold time-series split. (Results for using conventional cross-validation split are approximately unbiased (bias < 0.02).) {#tbl-reg-hypopt}
+
 Hyperparameter optimization shows that the best OLS regression model uses 7 time-series lags of all variables and no additional features. On 5 time-series cross-validation splits, it achieves a predictive performance with a root mean squared error (RMSE) of 36.5±6.2 and a (cross-validated) R² of 0.88±0.02. (The dimension is the sum of the number of climate articles published within a given date and the following day.) This is almost identical to a similarly tuned Bayesian Ridge regression model, which achieves an RMSE of 36.5±6.3 and the same R² value. A detailed regression table for the best OLS model can be found in @sec-app1-reg.
 
 ```{python}
@@ -29,6 +38,7 @@ from src.models.regression.hyperopt import best_regression
 r = best_regression(ignore_group=True)
 t = "occ_protest_lag0"
 results = r.params[t], tuple(r.conf_int().loc[t]), r.pvalues[t]
+results
 ```
 
 The coefficients for the protest variables are equivalent to the ATT (see @sec-app2-reg). Statistically significant at p=0.05 are only protest events by Fridays for Future, Letzte Generation, and groups that are coded as "other" groups. All protest coefficients are positive except for Ende Gelände and Fridays for Future + X, with negative coefficients at p-values of 0.89 and 0.18 respectively. For the aggregated protest occurrence variable (which does not consider the organizing protest group) the estimate is +5.79 additional articles in the first two days, with a confidence interval [+2.67, +8.92] and a p-value of 0.0003. More estimates are displayed in @sec-res-est.
@@ -86,7 +96,7 @@ results = instrumental_variable_liml(
     steps=range(-7, 29),
     shift_instruments=True,
 )
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plt.subplots(figsize=(6, 3))
 ax.plot(results.step, results.first_stage_coef, marker=".")
 ax.fill_between(
     results.step,
@@ -129,7 +139,9 @@ Difficulties with large protest events: plot size vs #regions
 
 #### Propensity scores
 
-F1
+logistic regression unbalanced with diffs, ewms, sizes
+
+F1: 0.233±0.044
 
 ### Placebo tests
 
@@ -141,10 +153,15 @@ F1
 import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
-fig, axes = plot_trends(cumulative=False, lags=range(-7, 1), steps=range(-28, 8))
-fig.suptitle("Placebo test: estimating the causal impact on past outcomes")
-# axes[0].set_ylim(-3, 5)
+fig, axes = plot_trends(cumulative=False, steps=range(-28, 8))
+fig.suptitle("Placebo test: estimating the causal impact on outcomes before the event")
 axes[0].set_xticks(range(-28, 8, 7))
+axes[0].set_ylim(-30, 30)
+axes[1].set_ylim(-30, 30)
+axes[2].set_ylim(-5, 5)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-300, 300)
+plt.tight_layout()
 plt.show()
 ```
 
@@ -158,13 +175,18 @@ from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(
     cumulative=False,
-    lags=range(-7, 1),
     steps=range(-15, 15),
     random_treatment_global=56,
 )
 fig.suptitle("Placebo test: estimating the causal impact of random events")
 # axes[0].set_ylim(-3, 5)
 axes[0].set_xticks(range(-14, 15, 7))
+axes[0].set_ylim(-5, 5)
+axes[1].set_ylim(-5, 5)
+axes[2].set_ylim(-5, 5)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-100000, 100000)
+plt.tight_layout()
 plt.show()
 ```
 
@@ -176,13 +198,18 @@ from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(
     cumulative=False,
-    lags=range(-7, 1),
     steps=range(-15, 15),
     random_treatment_regional=25,
 )
 fig.suptitle("Placebo test: estimating the causal impact of random events")
 # axes[0].set_ylim(-3, 5)
 axes[0].set_xticks(range(-14, 14, 7))
+axes[0].set_ylim(-30, 30)
+axes[1].set_ylim(-30, 30)
+axes[2].set_ylim(-5, 5)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-3000, 3000)
+plt.tight_layout()
 plt.show()
 ```
 
@@ -193,11 +220,16 @@ plt.show()
 
 # Does this even make so much sense, placebo for protest groups? maybe leave out.
 
-import altair as alt
-from src.visualization.impacts import plot_groups
+# import altair as alt
+# from src.visualization.impacts import plot_groups
 
-alt.renderers.enable("altair_saver", fmts=["html", "svg"])
-plot_groups(kind="methods", step=1, random_treatment_global=True)
+# alt.renderers.enable("altair_saver", fmts=["html", "svg"])
+# plot_groups(kind="methods", step=1, random_treatment_global=True)
+# axes[0].set_ylim(-5, 5)
+# axes[1].set_ylim(-5, 5)
+# axes[2].set_ylim(-5, 5)
+# axes[3].set_ylim(-5, 5)
+# axes[4].set_ylim(-5, 5)
 ```
 
 ### Causal impact estimates {#sec-res-est}
@@ -213,9 +245,12 @@ from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(cumulative=False)
 fig.suptitle("Time series of the causal impact by method and coverage dimension")
-axes[0].set_ylim(-5, 5)
+axes[0].set_ylim(-30, 30)
+axes[1].set_ylim(-30, 30)
 axes[1].set_ylim(-5, 5)
-axes[2].set_ylim(-250, 250)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-300, 300)
+plt.tight_layout()
 plt.show()
 ```
 
@@ -225,13 +260,19 @@ plt.show()
 # | fig-cap: Note that the y-axes are shared between some of the plots, but the instrumental variable plot has a much larger y-axis.
 # | column: page
 # | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
 fig, axes = plot_trends(cumulative=True)
 fig.suptitle(
     "Cumulative time series of the causal impact by method and coverage dimension"
 )
-axes[0].set_ylim(-10, 30)
-axes[1].set_ylim(-10, 30)
-axes[2].set_ylim(-500, 1500)
+axes[0].set_ylim(-100, 300)
+axes[1].set_ylim(-100, 300)
+axes[2].set_ylim(-10, 30)
+axes[3].set_ylim(-10, 30)
+axes[4].set_ylim(-500, 1500)
+plt.tight_layout()
 plt.show()
 ```
 
@@ -268,6 +309,7 @@ plot_groups(kind="groups", step=6)
 # | column: page
 # | echo: false
 
+# problem: y axis visualization; maybe switch to matplotlib
 import altair as alt
 from src.visualization.impacts import plot_groups
 

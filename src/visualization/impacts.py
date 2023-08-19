@@ -51,7 +51,7 @@ def plot_impact_ts(
 
 _correlation = partial(regression, lags=[0], no_controls=True)
 
-_regression = partial(regression, lags=range(-7, 1))
+_regression = partial(regression, lags=[-1, 0], add_features=["diff"])
 
 _synthetic_control = partial(synthetic_control, lags=range(-125, 1))
 

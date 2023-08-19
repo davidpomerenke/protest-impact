@@ -5,12 +5,16 @@ from src.cache import cache
 
 
 @cache
-def _regression(target: str, lagged_df: pd.DataFrame, treatment=None):
+def _regression(
+    target: str, lagged_df: pd.DataFrame, treatment=None, no_controls: bool = False
+):
     """
     For use with src/models/time_series.py.
     """
     y = lagged_df[[target]]
     X = lagged_df.drop(columns=[target])
+    if no_controls:
+        X = X[[c for c in X.columns if c.startswith("occ_")]]
     X = sm.add_constant(X)
     model = sm.OLS(y, X)
     results = model.fit(cov_type="HC3")
