@@ -147,17 +147,26 @@ plt.show()
 
 ```{python}
 # | echo: false
+import matplotlib.pyplot as plt
 from src.models.synthetic_control import sc_plot
 
-sc_plot(scale="demean", pre_period=22, post_period=22)
+titlenames = [
+    ("articles mentioning protest", "media_combined_protest"),
+    ("articles NOT mentioning protest", "media_combined_not_protest"),
+]
+for t, n in titlenames:
+    fig, ax = sc_plot(t, n, scale="demean", pre_period=22, post_period=22)
+    ax.set_xlim(-25, 25)
+    plt.show()
 ```
 
 ```{python}
 # | echo: false
 # | fig-cap: with 7-day rolling average
-from src.models.synthetic_control import sc_plot
 
-sc_plot(scale="demean", rolling=7, pre_period=12 * 28, post_period=3 * 28)
+for t, n in titlenames:
+    fig, ax = sc_plot(t, n, scale="demean", rolling=7, pre_period=3, post_period=3 * 28)
+    plt.show()
 ```
 
 Difficulties with large protest events: plot size vs #regions
@@ -215,7 +224,7 @@ axes[0].set_ylim(-5, 5)
 axes[1].set_ylim(-5, 5)
 axes[2].set_ylim(-5, 5)
 axes[3].set_ylim(-5, 5)
-axes[4].set_ylim(-100000, 100000)
+axes[4].set_ylim(-1000, 1000)
 plt.tight_layout()
 plt.show()
 ```
@@ -277,7 +286,7 @@ fig, axes = plot_trends(cumulative=False)
 fig.suptitle("Time series of the causal impact by method and coverage dimension")
 axes[0].set_ylim(-30, 30)
 axes[1].set_ylim(-30, 30)
-axes[1].set_ylim(-5, 5)
+axes[2].set_ylim(-5, 5)
 axes[3].set_ylim(-5, 5)
 axes[4].set_ylim(-300, 300)
 plt.tight_layout()
@@ -346,3 +355,7 @@ from src.visualization.impacts import plot_groups
 alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="methods", step=6)
 ```
+
+#### Datasets
+
+TODO

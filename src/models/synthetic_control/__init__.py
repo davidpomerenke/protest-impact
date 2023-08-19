@@ -255,7 +255,7 @@ def synthetic_control(
     return pd.DataFrame(rows)
 
 
-def sc_plot(**kwargs):
+def sc_plot(title, name_, **kwargs):
     y, y_c = synthetic_control_multiple(ignore_medium=True, **kwargs)
     ys, y_cs = dict(), dict()
     for outcome in y[0].columns:
@@ -272,12 +272,7 @@ def sc_plot(**kwargs):
         index=y_cs["media_combined_all"].index,
     )
     for (name, y), (name_c, y_c) in zip(ys.items(), y_cs.items()):
-        for title, _name in [
-            ("articles mentioning protest", "media_combined_protest"),
-            ("articles NOT mentioning protest", "media_combined_not_protest"),
-        ]:
-            if name != _name:
-                continue
+        if name == name_:
             fig, ax = plt.subplots(figsize=(6, 2))
             ax.plot(y.index, y.mean(axis=1), label="Actual")
             ax.plot(y_c.index, y_c.mean(axis=1), label="Synthetic")
@@ -288,4 +283,4 @@ def sc_plot(**kwargs):
             ax.set_xlabel("Days since protest")
             ax.axvline(0, color="black", linestyle="--")
             plt.tight_layout()
-            plt.show()
+            return fig, ax

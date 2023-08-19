@@ -59,7 +59,8 @@ _instrumental_variable_liml = partial(
     instrumental_variable_liml,
     instruments="pc_weather_covid_season",
     iv_instruments=["pc_resid_9"],
-    lags=range(-7, 1),
+    lags=range(-1, 1),
+    add_features=["diff"],
 )
 
 _propensity_weighting = partial(
@@ -71,14 +72,14 @@ _propensity_weighting = partial(
 
 _doubly_robust = partial(
     doubly_robust,
-    lags=range(-1, 1),
-    # add_features=["diff", "size", "ewm"],
-    # standardize=True,
+    lags=range(-4, 1),
+    add_features=["diff", "size", "ewm"],
+    standardize=True,
 )
 
 _methods = dict(
     correlation=_correlation,
-    # propensity_weighting=_propensity_weighting,
+    propensity_weighting=_propensity_weighting,
     regression=_regression,
     synthetic_control=_synthetic_control,
     instrumental_variable_liml=_instrumental_variable_liml,
@@ -144,7 +145,6 @@ def compute_groups(
         params = dict(
             target=targets,
             treatment=treatment,
-            lags=range(-14, 1),
             steps=[step],
             cumulative=cumulative,
             ignore_group=treatment == "occ_protest",
@@ -205,9 +205,9 @@ def plot_groups(
             y=alt.Y(
                 "coef:Q",
                 title=yname,
-                # scale=alt.Scale(
-                #     domain=[-10, 10],
-                # ),
+                scale=alt.Scale(
+                    zero=True,  # does not seem to work
+                ),
             ),
             color=alt.Color(
                 "target:N",
