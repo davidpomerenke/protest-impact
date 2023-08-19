@@ -53,7 +53,7 @@ _correlation = partial(regression, lags=[0], no_controls=True)
 
 _regression = partial(regression, lags=[-1, 0], add_features=["diff"])
 
-_synthetic_control = partial(synthetic_control, lags=range(-125, 1))
+_synthetic_control = partial(synthetic_control, lags=range(-180, 1))
 
 _instrumental_variable_liml = partial(
     instrumental_variable_liml,

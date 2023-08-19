@@ -138,10 +138,15 @@ def synthetic_control_multiple(
             target=treatment, lags=[-1], ignore_group=ignore_group
         )
         for i, (name, df) in enumerate(dfs):
-            df[treatment] = (
+            start = pd.Timestamp("2020-01-01")
+            end = pd.Timestamp("2022-12-31")
+            n_days = (end - start).days
+            df[treatment] = (np.zeros(len(df) - n_days)).tolist() + list(
                 lagged_df[treatment]
                 .sample(
-                    n=len(df), replace=True, random_state=random_treatment_global + i
+                    n=n_days,
+                    replace=False,
+                    random_state=random_treatment_global + i,
                 )
                 .values
             )

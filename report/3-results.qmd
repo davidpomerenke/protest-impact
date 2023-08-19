@@ -118,7 +118,32 @@ plt.show()
 
 #### Synthetic control
 
-RMSE: 55.7±1.2, bias -2.64±2.78
+180 lags
+rmse 65.8+-2.40
+bias
+-0.330+-1.13
+
+```{python}
+import matplotlib.pyplot as plt
+from src.models.synthetic_control.hyperopt import hyperopt
+
+results, _ = hyperopt()
+fig, ax = plt.subplots(figsize=(5, 2))
+ax.plot([abs(r["lags"][0]) for r in results], [r["bias"] for r in results], marker=".")
+plt.fill_between(
+    [abs(r["lags"][0]) for r in results],
+    [r["bias"] - r["bias_std"] for r in results],
+    [r["bias"] + r["bias_std"] for r in results],
+    alpha=0.2,
+)
+ax.axhline(0, color="black", linewidth=0.5)
+ax.set_xlabel("Pre-period length")
+ax.set_ylabel("Bias")
+ax.set_title("Bias vs. pre-period length")
+ax.set_xticks([abs(r["lags"][0]) for r in results])
+plt.tight_layout()
+plt.show()
+```
 
 ```{python}
 # | echo: false
@@ -139,9 +164,14 @@ Difficulties with large protest events: plot size vs #regions
 
 #### Propensity scores
 
-logistic regression unbalanced with diffs, ewms, sizes
+hypopt n lags, ewm, diffs, log sizes
+
+predicting all positive: 0.118
+
+logistic regression unbalanced with diffs, ewms, sizes, 4 lags
 
 F1: 0.233±0.044
+balanced: 0.213+-0.017
 
 ### Placebo tests
 

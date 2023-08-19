@@ -1,6 +1,7 @@
 import json
 from itertools import product
 
+import matplotlib.pyplot as plt
 import numpy as np
 from joblib import Parallel, delayed
 from tqdm.auto import tqdm
@@ -42,7 +43,7 @@ def objective(params):
 
 
 def hyperopt(n_jobs=4):
-    # lags = [7, 28, 3 * 28, 6 * 28, 365]
+    lags = [1, 7, 30, 90, 180, 270, 360]
     # lags = range(84, 169, 28)
     # lags = range(112, 133, 7)
     # lags = range(126, 142, 3)
@@ -50,7 +51,7 @@ def hyperopt(n_jobs=4):
     # lags = [138]
     # lags = [136, 137, 138, 139]
     # lags = [138, 140, 144]
-    lags = [125, 130, 138]
+    # lags = [120, 130, 140, 150, 160]
     params = dict(
         lags=[[-i] for i in lags],
     )
@@ -62,4 +63,4 @@ def hyperopt(n_jobs=4):
     with open(models / "synthetic_control" / "params.json", "w") as f:
         json.dump(results, f, indent=2)
     best_result = min(results, key=lambda r: np.abs(r["bias"]))
-    return best_result
+    return results, best_result
