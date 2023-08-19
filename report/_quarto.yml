@@ -6,6 +6,8 @@ bibliography: [references.bib]
 csl: chicago-author-date.csl
 reference-location: margin
 citation-location: document
+execute:
+  freeze: true
 format:
   pdf:
     number-sections: true
