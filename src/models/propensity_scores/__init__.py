@@ -33,6 +33,7 @@ def _dowhy_model_estimation(
     target: str,
     treatment: str,
     lagged_df: pd.DataFrame,
+    standardize: bool = False,
 ) -> pd.DataFrame:
     """
     Wraps propensity score dowhy estimators, see below.
@@ -49,6 +50,9 @@ def _dowhy_model_estimation(
         for c in lagged_df.columns
         if c not in ([target, treatment_] + effect_modifiers + instruments)
     ]
+    if standardize:
+        for c in common_causes:
+            lagged_df[c] = (lagged_df[c] - lagged_df[c].mean()) / lagged_df[c].std()
     model = CausalModel(
         data=lagged_df,
         treatment=treatment_,
@@ -99,7 +103,7 @@ def get_propensity_scores(
 
 
 class CachedLogisticRegression(BaseEstimator, ClassifierMixin):
-    def __init__(self, solver, max_iter, class_weight):
+    def __init__(self, solver, max_iter=None, class_weight=None):
         self.solver = solver
         self.max_iter = max_iter
         self.class_weight = class_weight
@@ -119,16 +123,18 @@ class CachedLogisticRegression(BaseEstimator, ClassifierMixin):
         return (probas > 0.5).astype(int)
 
 
-propensity_model = CachedLogisticRegression(
+propensity_model = LogisticRegression(
     solver="liblinear",  # alternative: newton-cholesky
-    max_iter=1000,
+    max_iter=100,
     # class_weight="balanced",
-    class_weight=None,
+    # class_weight=None,
 )
 
 
 @cache
-def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
+def _propensity_weighting(
+    target: str, treatment: str, lagged_df: pd.DataFrame, **kwargs
+):
     """
     For use with models.time_series.apply_method.
     """
@@ -137,11 +143,11 @@ def _propensity_weighting(target: str, treatment: str, lagged_df: pd.DataFrame):
         confidence_intervals=True,
         propensity_score_model=propensity_model,
     )
-    return _dowhy_model_estimation(estimator, target, treatment, lagged_df)
+    return _dowhy_model_estimation(estimator, target, treatment, lagged_df, **kwargs)
 
 
 @cache
-def _doubly_robust(target: str, treatment: str, lagged_df: pd.DataFrame):
+def _doubly_robust(target: str, treatment: str, lagged_df: pd.DataFrame, **kwargs):
     """
     For use with models.time_series.apply_method.
     """
@@ -149,8 +155,9 @@ def _doubly_robust(target: str, treatment: str, lagged_df: pd.DataFrame):
         Econml,
         econml_estimator=LinearDRLearner(
             model_propensity=propensity_model,
-            model_regression=StatsModelsLinearRegression(),
+            # model_regression=StatsModelsLinearRegression(),
+            model_regression=WeightedLassoCV(),
         ),
         confidence_intervals=True,
     )
-    return _dowhy_model_estimation(estimator, target, treatment, lagged_df)
+    return _dowhy_model_estimation(estimator, target, treatment, lagged_df, **kwargs)

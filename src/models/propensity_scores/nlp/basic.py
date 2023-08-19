@@ -3,7 +3,7 @@ from munch import Munch
 from nltk.corpus import stopwords
 from scipy.sparse import csr_matrix, hstack
 from sklearn.ensemble import RandomForestClassifier, StackingClassifier
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.metrics import f1_score
 from sklearn.model_selection import (
@@ -27,7 +27,7 @@ def get_data(
 ) -> Munch:
     df = get_lagged_df(
         target=treatment,
-        lags=[-1, 0],
+        lags=range(-4, 1),
         ignore_group=treatment == "occ_protest",
         text_cutoff=cutoff,
         region_dummies=False,
@@ -52,23 +52,23 @@ def get_data(
     ]
 
     X_ts = df.drop(columns=[treatment, f"{treatment}_lag0", f"{treatment}_lag-1"])
-    X_ts = X_ts[
-        [
-            c
-            for c in X_ts.columns
-            if not c.startswith("text_") and not c.startswith("media_")
-        ]
-    ]
+    X_ts = X_ts[[c for c in X_ts.columns if not c.startswith("text_")]]
+    # standardize X_ts
+    X_ts = (X_ts - X_ts.mean()) / X_ts.std()
     text_cols = [c for c in df.columns if c.startswith("text_")]
     X_text = df[text_cols]
     tscv = TimeSeriesSplit(n_splits=5)
-    clf = ComplementNB()
+    clf = LogisticRegression(
+        max_iter=10,
+        class_weight=None,
+        solver="liblinear",
+        # solver="newton-cholesky",
+    )
     return Munch(
         X_ts=X_ts, _X_text=X_text, y=y, tscv=tscv, clf=clf, text_cols=text_cols
     )
 
 
-@cache
 def f1_random(treatment):
     # calculate expected f1 score for random guessing
     y = get_data(treatment=treatment).y
@@ -104,7 +104,7 @@ def f1_lr(
 def get_text_vector(cutoff: int | None = None):
     d = get_data(cutoff=cutoff)
     lags = [int(c.split("_lag")[1]) for c in d.text_cols]
-    vec = CountVectorizer(
+    vec = TfidfVectorizer(
         stop_words=stopwords.words("german"),
         ngram_range=(1, 2),
         max_features=1000,
@@ -113,17 +113,17 @@ def get_text_vector(cutoff: int | None = None):
     )
     # caution: this performs preprocessing across cv splits, not suitable for evaluation
     same_day = d._X_text["text_lag0"]  # source is print newspapers, so no leaking here
-    week_before = (
-        d._X_text["text_lag-7"]
-        + d._X_text["text_lag-6"]
-        + d._X_text["text_lag-5"]
-        + d._X_text["text_lag-4"]
-        + d._X_text["text_lag-3"]
+    prev_day = d._X_text["text_lag-1"]
+    prev_days = (
+        d._X_text["text_lag-1"]
         + d._X_text["text_lag-2"]
-        + d._X_text["text_lag-1"]
+        + d._X_text["text_lag-3"]
+        + d._X_text["text_lag-4"]
     )
     vec = vec.fit(same_day)
-    # X_text = hstack([vec.transform(same_day), vec.transform(week_before)])
+    # X_text = hstack(
+    #     [vec.transform(same_day), vec.transform(prev_day), vec.transform(prev_days)]
+    # )
     X_text = vec.transform(same_day)
     return X_text, vec
 
@@ -135,8 +135,8 @@ def f1_text(cutoff: int | None = None):
     print(f"Cross-validated F1 score: {cvs.mean():.3f} +/- {cvs.std():.3f}")
 
 
-def f1_combi(cutoff: int | None = None):
-    d = get_data(cutoff=cutoff)
+def f1_combi(cutoff: int | None = None, add_features: list[str] | None = None):
+    d = get_data(cutoff=cutoff, add_features=add_features)
     X_text, vec = get_text_vector(cutoff=cutoff)
     X_ts_sparse = csr_matrix(d.X_ts.values)
     X_combi = hstack([X_ts_sparse, X_text])
@@ -154,8 +154,8 @@ def get_text_probas(cutoff: int | None = None):
     return X_text_proba
 
 
-def f1_augmented(cutoff: int | None = None):
-    d = get_data(cutoff=cutoff)
+def f1_augmented(cutoff: int | None = None, add_features: list[str] | None = None):
+    d = get_data(cutoff=cutoff, add_features=add_features)
     X_text_proba = get_text_probas(cutoff=cutoff)
     X_text_proba = pd.Series(X_text_proba[:, 1], name="text_proba")
     X_augmented = pd.concat([d.X_ts, X_text_proba], axis=1)

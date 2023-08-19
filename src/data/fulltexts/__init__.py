@@ -42,7 +42,8 @@ def press_releases(cutoff: int = 500) -> pd.Series:
 
 
 @cache
-def _read_fulltexts(cutoff: int | None = None):
+def _read_fulltexts(cutoff: int | str | None = None):
+    title_only = isinstance(cutoff, str) and cutoff == "title"
     articles = []
     article = None
     title = None
@@ -54,16 +55,21 @@ def _read_fulltexts(cutoff: int | None = None):
                 # every article is split into multiple lines
                 item = json.loads(line)
                 if item["title"] == title:
-                    # append to ongoing article
-                    article["text"] += "\n...\n" + item["text"]
+                    if not title_only:
+                        # append to ongoing article
+                        article["text"] += "\n...\n" + item["text"]
                 else:
                     # start new article
                     if article:
-                        article["text"] = article["text"][:cutoff]
+                        article["text"] = article["text"][
+                            : cutoff if isinstance(cutoff, int) else None
+                        ]
                         articles.append(article)
                     article = item
                     if item["title"] is not None:
-                        article["text"] = item["title"] + "\n\n" + item["text"]
+                        article["text"] = item["title"]
+                        if not title_only:
+                            article["text"] += "\n\n" + item["text"]
                     title = item["title"]
     corpora = pd.read_csv(external_data / "ids-dereko/corpora/corpora.csv", sep=";")
     regions = {
