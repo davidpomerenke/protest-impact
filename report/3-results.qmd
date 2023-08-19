@@ -124,7 +124,8 @@ plt.show()
 @fig-synth-hyperopt shows how the length of the pre-treatment period influences the bias of the causal estimate. Bias is most reduced at n=180, with a bias (mean error) of -0.330±1.13, and an RMSE of 65.8±2.40.
 
 ```{python}
-# | fig-cap: fig-synth-hyperopt
+# | fig-label: fig-synth-hyperopt
+# | fig-cap: Hyperparameter optimization: Influence of the pre-period length on bias (mean error).
 # | echo: false
 
 import matplotlib.pyplot as plt
@@ -140,15 +141,19 @@ plt.fill_between(
     alpha=0.2,
 )
 ax.axhline(0, color="black", linewidth=0.5)
-ax.set_xlabel("Pre-period length")
-ax.set_ylabel("Bias")
+ax.set_xlabel("Pre-period length (days)")
+ax.set_ylabel("Bias (#articles)")
 ax.set_title("Bias vs. pre-period length")
 ax.set_xticks([abs(r["lags"][0]) for r in results])
 plt.tight_layout()
 plt.show()
 ```
 
+@fig-sc-180 shows the fit for the optimized unbiased model (specifically: unbiased for estimating the -day cumulative coverage). @fig-sc-22 shows the fit for a shorter pre-treatment period and with better pre-treatment fit.
+
 ```{python}
+# | fig-label: fig-sc-180
+# | fig-cap: Synthetic control fit around the treatment for a pre-treatment period of n=180. Values are aggregates from synthetic controls for all protest events. Weekly patterns are due to regularities in protest event timing (Fridays for Future) and weekly cycles in general newspaper coverage.
 # | echo: false
 import matplotlib.pyplot as plt
 from src.models.synthetic_control import sc_plot
@@ -158,18 +163,38 @@ titlenames = [
     ("articles NOT mentioning protest", "media_combined_not_protest"),
 ]
 for t, n in titlenames:
-    fig, ax = sc_plot(t, n, scale="demean", pre_period=22, post_period=22)
-    ax.set_xlim(-25, 25)
+    fig, ax = sc_plot(t, n, scale="demean", pre_period=180, post_period=20)
+    ax.set_xlim(-20, 7)
     plt.show()
 ```
 
 ```{python}
+# | fig-label: fig-sc-22
+# | fig-cap: Synthetic control fit around the treatment for a pre-treatment period of n=22. Values are aggregates from synthetic controls for all protest events. Weekly patterns are due to regularities in protest event timing (Fridays for Future) and weekly cycles in general newspaper coverage.
 # | echo: false
-# | fig-cap: with 7-day rolling average
+import matplotlib.pyplot as plt
+from src.models.synthetic_control import sc_plot
+
+titlenames = [
+    ("articles mentioning protest", "media_combined_protest"),
+    ("articles NOT mentioning protest", "media_combined_not_protest"),
+]
+for t, n in titlenames:
+    fig, ax = sc_plot(t, n, scale="demean", pre_period=22, post_period=20)
+    ax.set_xlim(-20, 7)
+    plt.show()
+```
+
+@fig-sc-longterm gives an impression of the long-term impact. Rolling averages are used for preprocessing, so the absolute impacts cannot directly be retrieved.
+
+```{python}
+# | figl-label: fig-sc-longterm
+# | fig-cap: Synthetic control with pre-treatment period of two years and longterm effects for half a year. Outcomes have been preprocessed with weekly rolling averages. No bias checks have been made for this model.
+# | echo: false
 
 for t, n in titlenames:
     fig, ax = sc_plot(
-        t, n, scale="demean", rolling=7, pre_period=365, post_period=3 * 28
+        t, n, scale="demean", rolling=7, pre_period=2 * 360, post_period=0.5 * 360
     )
     plt.show()
 ```

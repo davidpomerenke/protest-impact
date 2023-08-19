@@ -258,6 +258,7 @@ def synthetic_control(
     return pd.DataFrame(rows)
 
 
+@cache
 def sc_plot(title, name_, **kwargs):
     y, y_c = synthetic_control_multiple(ignore_medium=True, **kwargs)
     ys, y_cs = dict(), dict()
