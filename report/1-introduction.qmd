@@ -263,6 +263,8 @@ digraph D {
 }
 ```
 
+<!-- The _instrumental variable_ approach leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. The _exclusion restriction_ (see @sec-app2-iv) assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome. -->
+
 This method utilizes one or more instrumental variables. Valid isntruments affect the treatment but do not directly affect the outcome -- not via other paths and not even via confounding. This is especially true for approximately random variables, such as the weather. (The weather is not purely random but also contains regional and seasonal components; but we can try to isolate them or work around the problem.)
 
 In the simplest case, we can compare the effect of __Z__ on __W__ with the effect of __Z__ on __Y__ to obtain the desired estimate for the effect of __W__ on __Y__. We can also apply _two-stage_ approaches to first isolate the part of __W__ that is caused by __Z__, and then estimate its impact on __Y__.
@@ -284,6 +286,8 @@ digraph D {
   {date} -> {U} [style=dotted, color=blue]
 }
 ```
+
+<!-- The synthetic control method [@abadieSyntheticControlMethods2010; @cunninghamCausalInferenceMixtape2021, ch. 10] leverages the idea of comparing a region where a protest happens with other regions where no protest happens on the same day. However it goes beyond a simple comparison. Instead it constructs a _synthetic region_ from all the control regions that is as close as possible to the treatment region. The synthetic region can then be used to model the counterfactual of no protest for the treatment region. -->
 
 The underlying assumption for the synthetic control method is that the unknown confounders affect the different regions uniformly: On any given day, the impact of the confounders is the same for all regions. This assumption is plausible especially for confounders coming from global and national politics and events; it is violated by regional confounders, but maybe they are not so important and we can live with it.
 

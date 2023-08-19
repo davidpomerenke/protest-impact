@@ -52,10 +52,8 @@ def get_data(instruments_, loadings=False):
     return df, instruments, treatment, outcome, confounders
 
 
-def get_covariances(instruments="weather_"):
+def get_covariances(instruments):
     df, instruments, treatment, outcome, _ = get_data(instruments)
-
-    # 1. with continuous instruments
 
     # get covariances between instruments and treatment
     covs = df[instruments + [treatment]].cov()
@@ -67,6 +65,10 @@ def get_covariances(instruments="weather_"):
 
     covs = pd.concat([covs_w, covs_y], axis=1, keys=["cov_w", "cov_y"])
     covs["wald"] = covs["cov_y"] / covs["cov_w"]
+
+    # get correlation between instruments and outcome
+
+    covs["corr_y"] = df[instruments + [outcome]].corr().loc[instruments, outcome]
 
     covs = covs.sort_values(ascending=False, key=abs, by="cov_w")
     return covs

@@ -358,7 +358,10 @@ I use the `OLS` implementation from the `statsmodels` package [@perktoldStatsmod
 
 #### Instrumental variables {#sec-instrumental}
 
-The _instrumental variable_ approach leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. The _exclusion restriction_ (see @sec-app2-iv) assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome. As potential instrumental variables I consider the weather, and pandemic restrictions due to Covid-19. I investigate their impact on protest occurrence, protest size, and protest size changes.
+I consider
+
+In order
+I estimate a _limited information maximum likelihood_
 
 
 While the previous literature has mostly focused on rainfall, I consider all weather variables to be potentially useful and analyze all of them for suitability, addressing the concern of multiple testing. Since the protest events in the main data set are aggregated daily on a regional level, I use regional weather data. For each region I determine the 10 cities with the most protests and average their weather data, weighted by the number of protests in each city.
@@ -370,63 +373,27 @@ I follow @negroWhichSideAre2019 in using 10-year averages for each day of the ye
 - https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.two_stage_regression_estimator
 -->
 
-For evaluating the validity of an instrument, an important step is to consider the impact of the instrument __Z__ on the treatment __W__, which is relevant for condition (2.) on valid instruments from above. The _first stage_, that is, regressing __W__ on __Z__, can provide relevant information.
-
 ##### Precipitation
 
 I make two separate regressions, one with protest occurrence, and one with protest size as dependent variables. All potential instrumental variables are used as independent variables, and the long-term weather components are used as control variables. Both regressions use linear regression (and _not_ logistic regression, even though the target is binary) due to consistency with the second stage. For the protest size variable, only days with protest occurrence are included in the data. To adjust for multiple testing, I use the Benjamini-Yekutieli procedure. It has less power than the Benjamini-Hochberg procedure, but accounts for potential correlations among the independent variables, which seem very likely here. I include regional dummies as control variables but do not include them in the adjustment procedure because I am not interested in their significance.
 
-\begingroup
-\scriptsize\selectfont
-{{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#tbl-first-stage-with-control >}}
-\endgroup
-
-Results for the significant regression coefficients are shown in @tbl-first-stage-with-control and suggest that there is only one potential instrument with a somewhat statistically significant p-value of $0.03$ for protest occurrence and $0.10$ for protest size. This is consistent with the fact that the previous literature almost exclusively relies on this variable, and provides support for this practice. The finding that some of the long-term variables also have a somewhat statistically significant effect shows that it does indeed matter to separate them.
-
-
-##### Separating short-term and long-term weather components
-
-An additional concern that has been identified and adjusted for by some previous studies (see @sec-weatherlit) is that weather contains a non-random component that is correlated both temporally with annual seasonality (which may be linked, for example, to media attention cycles, and many other variables), and geographically with places with generally nice or bad weather (which may be linked, for example, to economic indicators, or also to previous protest activity). This is in violation of condition (1.) on valid instruments from above. Therefore I try to split each weather variable into a long-term non-random variable and a short-term almost-random variable.
-
+First-stage placebo.
 
 #### Synthetic control {#sec-synth}
 
-The synthetic control method [@abadieSyntheticControlMethods2010; @cunninghamCausalInferenceMixtape2021, ch. 10] leverages the idea of comparing a region where a protest happens with other regions where no protest happens on the same day. However it goes beyond a simple comparison. Instead it constructs a _synthetic region_ from all the control regions that is as close as possible to the treatment region. The synthetic region can then be used to model the counterfactual of no protest for the treatment region.
+I fit a synthetic control for each protest event.[^global] Control regions are all regions that do not have a protest event on the given date. For all regions, outcome variables[^global] of all coverage dimensions are considered during a specified pre-treatment period. Values of the different dimensions are stacked, resulting in one column per region. The columns for the control regions are scaled, where the scaling options are: demeaning (subtraction of the mean), as suggested by @fermanSyntheticControlsImperfect2021; subtraction of the values from the last date within the pre-treatment period; z-score standardization; mean normalization (division by the mean); and logarithmic scaling. Nonnegative least squares (NNLS) regression is performed to predict the treatment region values from the control region values; alternatively, interpolation is performed, which is similar to NNLS but demands that the coefficients for the regions um up to 1. The obtained weights are then used to predict the counterfactual for the post-treatment period from the control regions, and the difference is the causal impact.
 
+[^global]: Estimating region weights globally rather than for every single protest event is unfortunately not possible because the available control regions varies between events.
 
-<!--
+[^sociodemographic]: Alternatively to regressing on pre-treatment outcomes, weights can also be obtained by fitting on fundamental characteristics of the regions (such as sociodemographic or economic statistics) that are considered predictive of the outcome [@abadieSyntheticControlMethods2010]. I discard such an approach because the choice of variables biases the causal impact estimate, and I find it hard to justify any specific variables that would be predictive of climate change newspaper coverage.
 
-Selecting control regions based on the distance
+For the synthetic control method, significance is typically evaluated by using permutation tests. In my setting I do not only have a single estimate, but rather a large number of estimates from fitting many synthetic controls, so I can compute confidence intervals based on the population variance of the estimates.
 
-- reverse and effect
+I manually evaluate the suitability of the scaling and fitting methods by plotting the pre-treatment fit. The length of the pre-treatment period is chosen by hyperparameter optimization. The objective is an unbiased estimation of the counterfactual in the post-treatment period. Since the counterfactual is unknown, a workaround is to minimize the post-treatment bias in the general case. If the weights generally represent the "true" relationship between the regions, then they will also do so for the counterfactual, subject to the model assumptions from @sec-app2-synth. Therefore I perform hyperparameter optimization for minimizing the post-treatment bias in synthetic control settings for randomly selected dates (rather than actual protest dates).[^pretreat] This is similar to having a large number of train-test splits, to which the synthetic control method is applied, and additional cross-validation is not necessary.
 
-Selecting control regions based on sociodemographics
+[^pretreat]: An alternative is to focus on the pre-treatment fit. Theoretically both approaches are similarly justified. By referring to propensities, anticipation effects, or missing data, one may practically argue in favour of one approach or the other; see discussion for related thoughts.
 
-Variables
-
-Methods:
-- correlation
-- linear regression
-- PC regression
-- PLS regression
-- NMF regression
-
-visualize "maps of Germany" based on first 2 components
-
-select n_components based on cross-validation
-
-Selecting control regions based on high predictive quality
-
-manually
-
-using tf-causalimpact
-
-Evaluation
-
-- Placebo
-- balance of the covariates (=how good are the synthetic units in fundamental terms?)
-- pre-treatment fit?
-- (p-values) -->
+I use a custom implementation that builds on @facurealvesCausalInferenceBrave2022 [ch. 15]. Future work may also use a _Bayesian structural time series_ model [@brodersenInferringCausalImpact2015a], which makes similar assumptions and is practically more flexible.
 
 #### Propensity scores
 

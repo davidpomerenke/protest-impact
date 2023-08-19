@@ -42,6 +42,13 @@ results
 
 #### Instrumental variables
 
+```{python}
+# | echo: false
+from src.models.instrumental_variable import get_covariances
+
+get_covariances("weather_covid")
+```
+
 Out of the 15 potential instrumental variables, 5 pandemic instruments and 4 weather instruments have a statistically significant impact on protest occurrence (see @fig-iv-basic), but when using them in a combined regression the coefficients are much less significant. Precipitation is not among the significant variables.
 
 Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the coefficients and siginificances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-weatherlit). I find that such binarization is not systematically better or worse than using the continuous value. (For the single regression, it slightly decreases the coefficient, and for the combined regression with other variables it slightly increases the coefficient.)
@@ -114,12 +121,10 @@ plt.show()
 
 #### Synthetic control
 
-180 lags
-rmse 65.8+-2.40
-bias
--0.330+-1.13
+@fig-synth-hyperopt shows how the length of the pre-treatment period influences the bias of the causal estimate. Bias is most reduced at n=180, with a bias (mean error) of -0.330±1.13, and an RMSE of 65.8±2.40.
 
 ```{python}
+# | fig-cap: fig-synth-hyperopt
 # | echo: false
 
 import matplotlib.pyplot as plt
@@ -168,8 +173,6 @@ for t, n in titlenames:
     )
     plt.show()
 ```
-
-Difficulties with large protest events: plot size vs #regions
 
 #### Propensity scores
 
