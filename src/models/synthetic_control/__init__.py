@@ -286,5 +286,4 @@ def sc_plot(title, name_, **kwargs):
             ax.set_ylabel("#articles")
             ax.set_xlabel("Days since protest")
             ax.axvline(0, color="black", linestyle="--")
-            plt.tight_layout()
             return fig, ax

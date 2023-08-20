@@ -95,7 +95,7 @@ def plot_trends(
     n_jobs=4,
     show_progress=True,
 ):
-    fig, axes = plt.subplots(1, 5, figsize=(15, 5), sharey=False, sharex=True)
+    fig, axes = plt.subplots(1, 5, figsize=(15, 4), sharey=False, sharex=True)
     treatment = "occ_protest"
     targets = ["media_combined_protest", "media_combined_not_protest"]
     params = dict(

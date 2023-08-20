@@ -3,6 +3,11 @@ execute:
   freeze: true
 ---
 
+```{python}
+from matplotlib_inline.backend_inline import set_matplotlib_formats
+
+set_matplotlib_formats("svg")
+```
 <!--
 
 Analysis of the results with graphics like bargraphs and boxplots has been made. Statistical methods have been employed to compare different results. AUCs have been obtained. Minimal verification.
@@ -37,26 +42,30 @@ from src.models.regression.hyperopt import best_regression
 r = best_regression(ignore_group=True)
 t = "occ_protest_lag0"
 results = r.params[t], tuple(r.conf_int().loc[t]), r.pvalues[t]
-results
 ```
 
 #### Instrumental variables
 
+\begingroup
+\footnotesize\selectfont
 ```{python}
 # | echo: false
 from src.models.instrumental_variable import get_covariances
 
 get_covariances("weather_covid")
 ```
+\endgroup
 
 Out of the 15 potential instrumental variables, 5 pandemic instruments and 4 weather instruments have a statistically significant impact on protest occurrence (see @fig-iv-basic), but when using them in a combined regression the coefficients are much less significant. Precipitation is not among the significant variables.
 
 Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the coefficients and siginificances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-weatherlit). I find that such binarization is not systematically better or worse than using the continuous value. (For the single regression, it slightly decreases the coefficient, and for the combined regression with other variables it slightly increases the coefficient.)
 
 ```{python}
-# | echo: false
-# | fig-label: fig-iv-pc
+# | label: fig-iv-pc
 # | fig-cap: Principal components of the
+# | column: page
+# | echo: false
+
 from src.models.instrumental_variable import pc_vis
 
 pc_vis("pc_weather_covid", numbers=[0, 7, 11])
@@ -67,9 +76,11 @@ pc_vis("pc_weather_covid", numbers=[0, 7, 11])
 Principal component decomposition isolates three very significant components with p<0.01, while the other components have p>0.05.^[This is without adjusting for multiple testing since no hypothesis tests or thresholds are used, but the analysis is rather exploratory.] The three components are displayed in terms of the original variables in @fig-iv-pc.
 
 ```{python}
-# | echo: false
-# | fig-label: fig-iv-pc-deseasoned
+# | label: fig-iv-pc-deseasoned
 # | fig-cap: Principal components of the
+# | column: page
+# | echo: false
+
 from src.models.instrumental_variable import pc_vis
 
 pc_vis("pc_weather_covid_season", numbers=[9, 8, 11], dfs=slice(1, 2))
@@ -80,7 +91,7 @@ Deseasoning the original variables and then performing separate principle compon
 Placebo tests for the first stage (the impact of the instrument on the treatment) are given in @fig-iv-1-placebo. From day 3 after the protest date there is no longer a significant impact of the instrument on the treatment
 
 ```{python}
-# | fig-label: fig-iv-1-placebo
+# | label: fig-iv-1-placebo
 # | fig-cap: First stage placebo tests for using the principal component pc_resid_9 to instrument protest occurrence. Values for the instrument from after the protest date are used. These values cannot have an impact on protest occurrence if the instrument is valid.
 # | echo: false
 from src.models.time_series import instrumental_variable_liml
@@ -99,7 +110,7 @@ results = instrumental_variable_liml(
     shift_instruments=True,
     show_progress=False,
 )
-fig, ax = plt.subplots(figsize=(6, 3))
+fig, ax = plt.subplots(figsize=(8, 3))
 ax.plot(results.step, results.first_stage_coef, marker=".")
 ax.fill_between(
     results.step,
@@ -124,8 +135,8 @@ plt.show()
 @fig-synth-hyperopt shows how the length of the pre-treatment period influences the bias of the causal estimate. Bias is most reduced at n=180, with a bias (mean error) of -0.330±1.13, and an RMSE of 65.8±2.40.
 
 ```{python}
-# | fig-label: fig-synth-hyperopt
-# | fig-cap: Hyperparameter optimization: Influence of the pre-period length on bias (mean error).
+# | label: fig-synth-hyperopt
+# | fig-cap: "Hyperparameter optimization: Influence of the pre-period length on bias (mean error)."
 # | echo: false
 
 import matplotlib.pyplot as plt
@@ -149,54 +160,62 @@ plt.tight_layout()
 plt.show()
 ```
 
-@fig-sc-180 shows the fit for the optimized unbiased model (specifically: unbiased for estimating the -day cumulative coverage). @fig-sc-22 shows the fit for a shorter pre-treatment period and with better pre-treatment fit.
+@fig-sc-long shows the fit for the optimized unbiased model (specifically: unbiased for estimating the -day cumulative coverage).
 
 ```{python}
-# | fig-label: fig-sc-180
+# | label: fig-sc-long
 # | fig-cap: Synthetic control fit around the treatment for a pre-treatment period of n=180. Values are aggregates from synthetic controls for all protest events. Weekly patterns are due to regularities in protest event timing (Fridays for Future) and weekly cycles in general newspaper coverage.
 # | echo: false
-import matplotlib.pyplot as plt
-from src.models.synthetic_control import sc_plot
 
-titlenames = [
-    ("articles mentioning protest", "media_combined_protest"),
-    ("articles NOT mentioning protest", "media_combined_not_protest"),
-]
-for t, n in titlenames:
-    fig, ax = sc_plot(t, n, scale="demean", pre_period=180, post_period=20)
-    ax.set_xlim(-20, 7)
-    plt.show()
+# import matplotlib.pyplot as plt
+# from src.models.synthetic_control import sc_plot
+
+# titlenames = [
+#     ("articles mentioning protest", "media_combined_protest"),
+#     ("articles NOT mentioning protest", "media_combined_not_protest"),
+# ]
+# for t, n in titlenames:
+#     fig, ax = sc_plot(t, n, scale="demean", pre_period=180, post_period=20)
+#     ax.set_xlim(-20, 7)
+#     fig.tight_layout()
+# plt.show()
 ```
 
+@fig-sc-short shows the fit for a shorter pre-treatment period and with better pre-treatment fit.
+
 ```{python}
-# | fig-label: fig-sc-22
+# | label: fig-sc-short
 # | fig-cap: Synthetic control fit around the treatment for a pre-treatment period of n=22. Values are aggregates from synthetic controls for all protest events. Weekly patterns are due to regularities in protest event timing (Fridays for Future) and weekly cycles in general newspaper coverage.
 # | echo: false
-import matplotlib.pyplot as plt
-from src.models.synthetic_control import sc_plot
+# | layout-nrow: 2
 
-titlenames = [
-    ("articles mentioning protest", "media_combined_protest"),
-    ("articles NOT mentioning protest", "media_combined_not_protest"),
-]
-for t, n in titlenames:
-    fig, ax = sc_plot(t, n, scale="demean", pre_period=22, post_period=20)
-    ax.set_xlim(-20, 7)
-    plt.show()
+# import matplotlib.pyplot as plt
+# from src.models.synthetic_control import sc_plot
+
+# titlenames = [
+#     ("articles mentioning protest", "media_combined_protest"),
+#     ("articles NOT mentioning protest", "media_combined_not_protest"),
+# ]
+# for t, n in titlenames:
+#     fig, ax = sc_plot(t, n, scale="demean", pre_period=22, post_period=20)
+#     ax.set_xlim(-20, 7)
+#     fig.tight_layout()
+#     plt.show()
 ```
 
 @fig-sc-longterm gives an impression of the long-term impact. Rolling averages are used for preprocessing, so the absolute impacts cannot directly be retrieved.
 
 ```{python}
-# | figl-label: fig-sc-longterm
+# | label: fig-sc-longterm
 # | fig-cap: Synthetic control with pre-treatment period of two years and longterm effects for half a year. Outcomes have been preprocessed with weekly rolling averages. No bias checks have been made for this model.
 # | echo: false
 
-for t, n in titlenames:
-    fig, ax = sc_plot(
-        t, n, scale="demean", rolling=7, pre_period=2 * 360, post_period=0.5 * 360
-    )
-    plt.show()
+print("test")
+# for t, n in titlenames:
+#     fig, ax = sc_plot(
+#         t, n, scale="demean", rolling=7, pre_period=2 * 360, post_period=0.5 * 360
+#     )
+#     plt.show()
 ```
 
 #### Propensity scores
@@ -212,7 +231,7 @@ The best logistic regression model achieves a 5-fold time-series cross-validated
 @fig-placebo-outcome shows placebo tests for the outcome for all models. Further placebo tests concern the treatments: For @fig-placebo-treatment-regional, the treatments are randomized within each region, while for @fig-placebo-treatment-global they are randomized across region (see @sec-meth-placebo).
 
 ```{python}
-# | fig-label: fig-placebo-outcome
+# | label: fig-placebo-outcome
 # | fig-cap: Placebo tests for the outcome. The protests event date is at x=0. To the right of it are impact estimates for subsequent days, where it is possible that there actually is a causal impact. To the left of it are the days prior to the event data, where a causal impact is not possible. Pay attention to the differences in the y-axis scale.
 # | column: page
 # | echo: false
@@ -234,7 +253,7 @@ plt.show()
 
 
 ```{python}
-# | fig-label: fig-placebo-treatment-regional
+# | label: fig-placebo-treatment-regional
 # | fig-cap: Placebo tests for the treatment, where treatments are randomized but the protest day proportions among regions are not, potentially causing some bias. Pay attention to the differences in the y-axis scale.
 # | column: page
 # | echo: false
@@ -248,7 +267,6 @@ fig, axes = plot_trends(
     show_progress=False,
 )
 fig.suptitle("Placebo test: estimating the causal impact of random events")
-# axes[0].set_ylim(-3, 5)
 axes[0].set_xticks(range(-14, 14, 7))
 axes[0].set_ylim(-30, 30)
 axes[1].set_ylim(-30, 30)
@@ -261,7 +279,7 @@ plt.show()
 
 
 ```{python}
-# | fig-label: fig-placebo-treatment-global
+# | label: fig-placebo-treatment-global
 # | fig-cap: Placebo tests for the treatment, with completely randomized treatments across regions. Pay attention to the differences in the y-axis scale.
 # | column: page
 # | echo: false
@@ -291,7 +309,7 @@ plt.show()
 @fig-impact-ts and @fig-impact-ts-cum show time series of the absolute and cumulative causal impact estimates, for protest-related and non-protest-related media coverage and for all causal methods. The order of magnitude of the causal effects differs substantially between some of the methods.
 
 ```{python}
-# | fig-label: fig-impact-ts
+# | label: fig-impact-ts
 # | fig-cap: Causal impact estimates by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
 # | column: page
 # | echo: false
@@ -310,7 +328,7 @@ plt.show()
 ```
 
 ```{python}
-# | fig-label: fig-impact-ts-cum
+# | label: fig-impact-ts-cum
 # | fig-cap: Pay attention to the differences in the y-axis scale.
 # | column: page
 # | echo: false
@@ -333,7 +351,7 @@ plt.show()
 @fig-impact-dims summarizes the 7-day cumulative impacts by coverage dimension and includes the impact for three specific sub-topics (see @sec-data-discourse).
 
 ```{python}
-# | fig-label: fig-impact-dims
+# | label: fig-impact-dims
 # | fig-caption: 7-day cumulative causal impact estimates by method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false
@@ -349,7 +367,7 @@ plot_groups(kind="methods", step=6)
 @fig-impact-groups-2 and @fig-impact-groups-7 break down the 2-day and 7-day cumulative impacts for the different protest groups, as estimated by the synthetic control method.
 
 ```{python}
-# | fig-label: fig-impact-groups-2
+# | label: fig-impact-groups-2
 # | fig-caption: 2-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false
@@ -362,7 +380,7 @@ plot_groups(kind="groups", step=1)
 ```
 
 ```{python}
-# | fig-label: fig-impact-groups-7
+# | label: fig-impact-groups-7
 # | fig-caption: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false

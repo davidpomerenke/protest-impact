@@ -15,28 +15,18 @@ Excellent and critical discussion and or reflection on all findings vis-a-vis ex
 
 ### Synthetic control
 
-### Propensity scores
-
-### Validity of the methods
-
 __Bias from incomplete protest data in synthetic control:__
 
 - Difficulties with small protest events
 - Difficulties with large protest events
 
-#### Anticipation effects {#sec-anticip}
+### Propensity scores
 
-[@abadieSyntheticControlMethods2010]
+- not good enough, biased towards correlation
 
+### General issues
 
-
-### Instrumental variables
-
-
-
-
-
+- Anticipation effects {#sec-anticip} [@abadieSyntheticControlMethods2010]
+- problem of not enough interaction terms / heterogeneity -> use CRFs, DML
 
 ### Interpretation of the causal impact estimates
-
-### Usefulness of the data sets
