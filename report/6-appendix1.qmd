@@ -78,30 +78,30 @@ Table: Queries for retrieving article counts from online and print newspapers. T
 # | fig-cap: "Detailed results for the best regression model from @sec-res-reg. Dependent variable is the absolute number of articles mentioning climate change from the treatment date and the following day. Due to including time series lags there are overall 140 parameters plus a constant term, so only the 20 parameters with lowest p-values are displayed. Note that for the weekday dummies the first value (Friday) is dropped and the other dummies are to be interpreted in relation to it."
 # | echo: False
 
-import pandas as pd
-from IPython.display import display
-import warnings
-from src.models.regression.hyperopt import best_regression
+# import pandas as pd
+# from IPython.display import display
+# import warnings
+# from src.models.regression.hyperopt import best_regression
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
+# warnings.simplefilter(action='ignore', category=FutureWarning)
 
-tables = best_regression().summary().tables
-display(tables[0])
-results_as_html = tables[1].as_html()
-df = pd.read_html(results_as_html, header=0, index_col=0)[0]
-display(df.sort_values("P>|z|").head(20).sort_index())
+# tables = best_regression().summary().tables
+# display(tables[0])
+# results_as_html = tables[1].as_html()
+# df = pd.read_html(results_as_html, header=0, index_col=0)[0]
+# display(df.sort_values("P>|z|").head(20).sort_index())
 ```
 \endgroup
 
 \begingroup
 \footnotesize\selectfont
 ```{python}
-# | label: fig-reg-details
+# | label: fig-reg-details-occ
 # | fig-cap: "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
 # | echo: False
-display(
-    df[(df.index.str.startswith("occ") & df.index.str.endswith("lag0"))].sort_index()
-)
+# display(
+#     df[(df.index.str.startswith("occ") & df.index.str.endswith("lag0"))].sort_index()
+# )
 ```
 \endgroup
 
@@ -125,7 +125,7 @@ get_coefficients("weather_covid")[0].sort_values(by=("combi", "pval"))
 \footnotesize\selectfont
 ```{python}
 # | label: fig-xxx
-# | fig-cap:
+# | fig-cap: "hum"
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients
@@ -137,8 +137,8 @@ get_coefficients("weather_covid_season")[0].sort_values(by=("combi", "pval"))
 \begingroup
 \footnotesize\selectfont
 ```{python}
-# | label:
-# | fig-cap:
+# | label: fig-zyz
+# | fig-cap: hom
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients

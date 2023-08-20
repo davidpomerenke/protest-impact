@@ -368,20 +368,7 @@ alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="methods", step=6)
 ```
 
-@fig-impact-groups-2 and @fig-impact-groups-7 break down the 2-day and 7-day cumulative impacts for the different protest groups, as estimated by the synthetic control method.
-
-```{python}
-# | label: fig-impact-groups-2
-# | fig-cap: 2-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
-# | column: page
-# | echo: false
-
-import altair as alt
-from src.visualization.impacts import plot_groups
-
-alt.renderers.enable("altair_saver", fmts=["html", "svg"])
-plot_groups(kind="groups", step=1)
-```
+@fig-impact-groups-2 break down the 7-day cumulative impact for the different protest groups, as estimated by the synthetic control method.
 
 ```{python}
 # | label: fig-impact-groups-7
