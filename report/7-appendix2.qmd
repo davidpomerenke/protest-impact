@@ -201,13 +201,13 @@ Since the available control regions vary from day to day, many regressions have 
 
 @fermanSyntheticControlsImperfect2021 suggest that demeaning the data based on the pre-treatment period makes the synthetic control method more robust.
 
-### Propensity scores
+### Propensity scores{#sec-app2-ps}
 
 The propensity score $e(X) = P(W=1|X)$ is the probability of the treatment given the confounding variables. It is often computed using logistic regression, but any machine learning model that produces reasonable probability estimates can be used; this makes it more flexible than linear models.
 
 Various methods make use of propensity scores, mainly: _Propensity stratification, inverse propensity weighting, and propensity matching_. Propensity stratification requires the specification of a hyperparameter $k$ for the number of strata, with no reliable methods available for making a suitable choice [@dingFirstCourseCausal2023, ch. 11]. Propensity matching is very intuitive but also very problematic because it is usually not possible to establish a perfect matching between treated and control units, and any matching method introduces imbalance, so that the imbalance may even be increased rather than reduced [@kingWhyPropensityScores2019]. Therefore I focus on inverse propensity weighting.
 
-#### Inverse propensity weighting
+#### Inverse propensity weighting {#sec-app2-ipw}
 
 Inverse propensity weighting (IPW) gives every sample a weight that is inverse to the propensity score: $\frac{1}{e(X)}$ for treated units and $\frac{1}{1-e(X)}$ for control units. We use the same assumptions as for regression (@sec-app2-reg):
 
@@ -244,10 +244,8 @@ $$
 \tau^{\text{Hájek}} = \hat{\bar{Y}}(1) - \frac{1}{n} \frac{\sum_{i=1}^{n}\frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)Y_i}{1-e(X_i)}}{\sum_{i=1}^{n}\frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)}{1-e(X_i)}}
 $$
 
-I use the implementation from the [DoWhy](https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.propensity_score_weighting_estimator) Python package, with a normalized weighting scheme (that is, the Hájek estimator) for ATT estimation.
-
-#### Doubly robust estimation
+#### Doubly robust estimation {#sec-app2-dre}
 
 Both regression (@sec-reg) and IPW rely on the same assumptions of overlap and conditional unconfoundedness. They can be combined into a single estimator known as _augmented inverse propensity weighting_ or as the _doubly robust estimator_. It is consistent if at least one of the models is correctly specified -- that is, if either the treatment or the outcome is consistently estimated. If both models are correct, then it helps reducing the bias of the regression estimator, and reducing the variance of the propensity score estimator.
 
-Doubly robust estimation is defined, motivated, and proven in @dingFirstCourseCausal2023 [ch. 12, ch. 13.2]. As an implementation I use the `LinearDRLearner` from the [EconML](https://econml.azurewebsites.net/_autosummary/econml.dr.LinearDRLearner.html) Python package.
+Doubly robust estimation is defined, motivated, and proven in @dingFirstCourseCausal2023 [ch. 12, ch. 13.2].

@@ -19,12 +19,16 @@ Excellent and critical discussion and or reflection on all findings vis-a-vis ex
 
 ### Validity of the methods
 
-__Anticipation effects.__ [@abadieSyntheticControlMethods2010]
-
 __Bias from incomplete protest data in synthetic control:__
 
 - Difficulties with small protest events
 - Difficulties with large protest events
+
+#### Anticipation effects {#sec-anticip}
+
+[@abadieSyntheticControlMethods2010]
+
+
 
 ### Instrumental variables
 

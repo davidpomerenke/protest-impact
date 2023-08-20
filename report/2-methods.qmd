@@ -342,6 +342,8 @@ __Outcome time series.__ Protests may have an impact on newspaper converage not 
 
 For the selection of suitable models, I specify the treatment as the occurrence of a protest event by any protest group, and the outcome as the one-week amount of total newspaper coverage mentioning the climate crisis. I then use these models to also estimate more specific impacts for events from specific groups; and for the coverage during single days, in order to build impact estimate time series.
 
+For the main experiments I use the ACLED dataset as source for protest events; and as source for media coverage I use the sum of both online and print newspaper articles.
+
 #### Regression
 
 I estimate an OLS regression model, in order to interpret the coefficients for the treatments causally. This assumes the complete and correct specification of all confounding variables, and a linear model; see @sec-app2-reg for formal details.
@@ -354,7 +356,7 @@ OLS is unbiased for in-distribution data anyway. I want a model that also genera
 
 To set the generalization capabilities of the OLS model into perspective, I also estimate similarly optimized Ridge and Lasso regression models. But I cannot use them for causal impact estimation because the coefficients are regularized and thus biased.
 
-I use the `OLS` implementation from the `statsmodels` package [@perktoldStatsmodelsStatsmodelsRelease2023] with `HC3` heteroskedacity-robust covariance estimation, and the `BayesianRidge` and `LassoLarsIC` implementations from `scikit-learn` (@pedregosaScikitlearnMachineLearning2011). `statsmodels` does not support multivariate regression, so I run separate univariate models for each target variable.
+I use the `OLS` implementation from the `statsmodels` package [@perktoldStatsmodelsStatsmodelsRelease2023] with `HC3` heteroskedacity-robust covariance estimation, and the `BayesianRidge` and `LassoLarsIC` implementations from `scikit-learn` [@pedregosaScikitlearnMachineLearning2011]. `statsmodels` does not support multivariate regression, so I run separate univariate models for each target variable.
 
 #### Instrumental variables {#sec-instrumental}
 
@@ -397,15 +399,21 @@ I use a custom implementation that builds on @facurealvesCausalInferenceBrave202
 
 #### Propensity scores
 
-Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events.
+_Propensity scores_ quantify the probability of the treatment, that is: how likely is it on a given day in a given region that a protest takes place? (See @sec-app2-ps for details.)
 
+I obtain propensity scores by training probabilistic classifier models to predict the treatment (the occurrence of protests) from the known confounders (primarily past time-series values and features, see @sec-agg). I consider Naive Bayes and logistic regression models because they both produce well-calibrated probabilities. I optimize the following hyperparameters on a 5-fold time-series split: number of time series lags, inclusion of region dummies, inclusion of moving average features, inclusion of time-series difference features, and inclusion of log-scaled participant numbers (and corresponding moving averages) in the past time series (in addition to the binary protest occurrence variables). For logistic regression I also consider whether balanced class weights are used. Optimization objective is the F1 score.
 
+As final propensity scores I use cross-predicted probabilities from a conventional 5-fold cross-validation split, because time-series splits would not yield predictions for the start of the time series.
+
+I use _inverse propensity weighting_ (IPW) as a pure propensity score model. IPW essentially calculates a weighted mean, where more weight is given to protest days with a low probability for a protest, and to non-protest days with a high probability for a protest (see @sec-app2-ipw for details). IPW can be combined with regression, which is called _doubly robust estimation_ (DRE) and is theoretically valid if the assumptions of at least one of its parts hold (see @sec-app2-dre).
+
+I use the IPW implementation from the `DoWhy` Python package [@sharmaDoWhyEndtoEndLibrary2020], with a normalized weighting scheme (that is, the Hájek estimator) for ATT estimation. As an implementation for DRE I use the `LinearDRLearner` from the `EconML` Python package (@econml) with their `StatsModelsLinearRegression` model as regression model. For the computation of propensity scores I use `LogisticRegressionCV` from `scikit-learn` (@pedregosaScikitlearnMachineLearning2011) with the `liblinear` solver.
+
+<!--
 
 ##### Propensity scores from full texts
 
-TODO
-
-<!-- cite Wager, and causal NLP overview
+cite Wager, and causal NLP overview
 
 Predicting propensity scores from text: cite causalNLP overviews
 For example, @bundeskriminalamtbkaLagebildLetzteGeneration2023 hypothesize that "Die Fallzahlen unterliegen einem „wellenartigen“ Verlauf, welcher sich vornehmlich durch (das Ausbleiben von) Großveranstaltungen im gleichen Kontext erklären lässt."
@@ -418,15 +426,19 @@ possible models:
 
 faster finetuning: https://github.com/huggingface/peft -->
 
-<!-- ### Evaluation
+#### Evaluation {#sec-meth-placebo}
 
-- bootstrapping for comparable standard errors
-- placebo tests
-  - negative outcome, esp. lagged outcome: Ding ch. 16.2.1
-  - negative exposure: Ding ch. 16.2.2
-- cross-validation (ood with one year gap) of
-  - regression -> prediction mse
-  - iv -> f1 for predicting protests (first stage) (and mse for predicting coverage (second stage)) -- or just directly the outcome?
-  - synth -> predictive quality within different pre-fit areas
-  - prop scores -> prop score f1 -- and the outcome? (esp for doubly robust)
-- (E-values): how large would hidden confounding need to be? Ding ch. 17 -->
+There is no straightforward way to evaluate causal models, since the true causal impacts are unknown.
+
+__Subsidiary metrics.__ The sections above describe the optimization and evaluation of subsidiary metrics for the individual methods:
+
+- For the regression method I evaluate the predictive quality on time-series splits in terms of bias. The best model is also used for the parts of the other methods that use regression (the individual stages of the 2SLS instrumental variables estimator, and the second stage of the doubly robust estimaor).
+- Similarly for the synthetic control I evaluate bias on time-series splits, just that the underlying regression works differently.
+- For the propensity score methods I evaluate the classification quality in terms of the F1 score in time-series splits. (But conventional splits are used for prediction.)
+
+__Placebo tests.__ An evaluation method that is specifically suited to causal models is given by placebo tests. They cannot show that a model is correct, but they can make it much more plausible [@dingFirstCourseCausal2023, ch. 16]. I use two types of placebo tests:
+
+- _Negative outcome_ [see @dingFirstCourseCausal2023, ch. 16.2.1]. Here I compute the causal impacts of protest events on newspaper coverage before the occurrence of the events. These outcomes are very similar to the outcomes that I actually want to estimate, but we know that there is no causal impact, due to the order in time. (See @sec-anticip for discussion of anticipation effects.)
+- _Negative exposure_ [see @dingFirstCourseCausal2023, ch. 16.2.2]. Here I compute the impact of random days rather than days with protest events. I assign the random treatments by sampling without replacement from the actual treatments; so the distribution of protest and non-protest days remains the same. I perform two sampling procedures: (a) sampling within each region, so that the protest-day proportions among the regions remain intact and some bias is retained; and (b) sampling across regions, so that treatments are completely random.
+
+The expectation for the placebo tests is that the models should estimate zero causal impacts for them. If they estimate clear non-zero impacts, then the models are shown to be incorrect.

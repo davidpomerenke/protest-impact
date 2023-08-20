@@ -310,6 +310,8 @@ digraph D {
 }
 ```
 
+<!-- Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events. -->
+
 Propensity score methods estimate the probability (propensity) of receiving the treatment. There are various strategies for eliminating selection bias with the use of propensity scores: notably propensity score matching, propensity score stratification, inverse propensity weighting. Double machine learning estimators such as causal forests help with estimating heterogenous treatment effects.
 
 Propensity score methods still suffer from _omitted variable bias_ if there are unknown confounders. This can be mitigated by learning propensity scores from less structured big data such as texts, using classification models from natural language processing. The advantage of doing so is that the unknown confounders need not be pre-specified. The assumption is that the texts need to contain all of the unknown confounders, and in some detectable form. While this will never completely be the case (and cannot be verified anyway), I can hope that it at least substantially reduces the bias.
