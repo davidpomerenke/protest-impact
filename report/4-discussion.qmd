@@ -11,15 +11,16 @@ Excellent and critical discussion and or reflection on all findings vis-a-vis ex
 
 ### Regression
 
-- bias in time-series: probably not too much of a problem
-- placebo outcome: not good, omitted variable bias or nonlinear relations
-- placebo treatment: relatively reasonable
-- impact: clearly converges, very plausible
+__Bias.__ The results affirm that OLS is unbiased for in-distribution data, but they show that it is here substantially biased across time-series splits, where it underestimates the media coverage amount one week from a given date by 14 articles. This is likely due to a generally increasing trend in media coverage in my dataset. By minimizing for bias, I have already slightly decreased the bias from 18 to 14. Regularized models generalize much better and drive down the bias to 3 or 4 articles, so it would be desirable to use them; but their coefficients are biased, and the coefficient for the treatment is the estimator for the causal impact. Future work might explore (a) using regularized models that exclude the treatment coefficient from regularization or (b) debiased regularized models such as debiased Lasso [@vandegeerAsymptoticallyOptimalConfidence2014], which is also implemented in `EconML`. Still, it is plausible that the bias is caused by the trend throughout the time-series splits, and does thus not necessarily threaten the validity of the model.
+
+__Placebo behaviour.__ The estimated effects for the pre-treatment clearly differ from zero, and indicate bias. Bias may come from omitted variables, or from a misspecified model. The estimates exhibit weekly patterns during the placebo timespan. Weekdays are already controlled for, so this suggests a lack of interaction variables involving weekdays, or very nonlinear implications of weekdays. This could be cosmetically fixed by adding interaction terms for weekdays; but there may as well be other interactions that are not visible in the time series and also require modelling. Causal random forests [@wagerEstimationInferenceHeterogeneous2017] may provide a more systematic solution. The estimates for placebo treatments do not raise concerns.
 
 ### Instrumental variables
 
-- weird finding that the weather is not relevant, compare with literature
-- wald estimates: not reliable; we can take correlation as a lower limit
+__Correlation and Wald estimate.__ The correlation between the instruments and the treatment is generally very low. Wald estimates are scaled inversely by this first-stage correlations, and measurement errors make them unreliable when they are close to zero. We can assume with certainty that the first-stage correlations are smaller than 1, so the correlation between the instruments and the outcome can be taken as a lower bound for the causal impact of the protests, but they are low and we have no confidence intervals. We could compute confidence intervals for them, but they are implausibly low anyway.
+
+<!-- __Principal component analysis.__ P-values for multiple regression with all instruments are generally low, and PCA successfully helps to recover  -->
+
 - interpret principal components: weather, especially seasonal one; unclear, movement?
 - interpret deseasoned principal components: movement?; weather and stringency -> going outside?; weather
 - problem: how to argue for not really interpretable components?
@@ -29,34 +30,41 @@ Excellent and critical discussion and or reflection on all findings vis-a-vis ex
 - future work: use other weak variable methods such as Ding, that are only implemented in r
 - related work probably relies on seasonal effect, which may be legitimate with controlling, whcih they do! alternative in the absence of clear instruments might also be double machine learning
 
-### Synthetic control
+__Significance of precipitation.__- weird finding that the weather is not relevant, compare with literature
 
-- good that we can optimiza unbiased
-- tradeoff bias v direct pre-treatment fit, see discussion of anticipation
-- placebo outcome: anticipation effects, weekly patterns
-  - alternative: rolling averages, difficult to retrieve absolute effects; or weekly aggregates
-- placebo treatment: very reasonable
-- impact: converges somewhat, somewhat reasonable
 
-__Bias from incomplete protest data in synthetic control:__
+### Synthetic control {#sec-disc-synth}
 
-- Difficulties with small protest events
-- Difficulties with large protest events
+__Bias.__ The general prediction bias of the synthetic control method can be successfully reduced by hyperparameter optimization. The optimized hyperparameters are presumably only useful for this specific dataset. However a generally small bias does not necessarily mean a small bias for post-treatment counterfactuals, which is impossible to evaluate.
 
-### Propensity scores
+An alternative to my approach would be to minimize the bias in the pre-treatment period. Placebo tests indicate that the synthetic control method performs generally reasonably, except for the end of the pre-treatment period -- this favours the alternative approach. Minimizing bias in the pre-treatment period presumably leads to smaller fitting intervals and higher variance; this should be checked empirically in future work. The strength of the synthetic control method is to reduce bias by fitting control regions over long timespans, and this advantage would get lost by deliberately choosing shorter fitting intervals. This argument, if empirically underfed, would support my present approach.
 
-- not good enough, biased towards correlation
-- placebo tests (both): uniform bias; if this was zero, it would be very plausible
-- doubly robust is weird; rather use double ml?
-- disappointing that F1 is so low -- use text
-  - experiments indicate
+__Anticipation effects.__ @abadieSyntheticControlMethods2010 briefly discuss the presence of _anticipation effects_, and suggest to adjust the pre/post-treatment split such that the anticipation effects also lie in the post-treatment interval. This is reasonable -- but how do we know whether we actually observe anticipation effects, or rather confounders? If the increase in coverage before the protest occurrence really is a confounder, then the principle behind inverse propensity weighting (see @sec-app2-ipw) suggests that we should assign a smaller weight to the impacts of this protest, rather than adding additional anticipation effects.
 
-### General issues
+- An argument in favour of viewing the increased coverage as anticipation effects is that it mostly restricted to coverage that mentions protests. This suggests that the coverage may indeed be in anticipation of the protest, rather than that the protest is a reaction to the increase in coverage. Yet this cannot be said so clearly: For example, if a large protests receives a lot of previous coverage, it might attract even more participants.
 
-- Anticipation effects {#sec-anticip} [@abadieSyntheticControlMethods2010]: weekly patters in regression
-- problem of not enough interaction terms / heterogeneity -> use CRForests, DML
+- I take the view that talk of "anticipation effects" is noncausal, since there is no physical pathway against the arrow of time. In more strictly causal terms, an increase in coverage, even if it is completely devoted to an anticipated protest, is due to factors that temporally precede the protest: The campaigning work and press relations of protest groups may play a role; journalists may deem a future large protest as more plausible when previous protests have already occurred, or when the protest organizers have a high reputation. Many of these factors may be influenced by the occurrence of previous protests, which attract more campaigners, create network effects, or bring the issue to attention in the first place. A causal analysis should then attribute the anticipation effects to the previous protests rather than the anticipcated one.
+
+- Theoretically problematic is that, of course, ultimately all protest activity is causally determined by some events that lead to the occurrence of the protest (neglecting quantum effects). Controlling for all these would yield a zero causal effect. The question is then which prior events should be included in the definition of a protest. The clear part of the answer is that the decisions of the participants to attend the protest should probably be seen as part of the protest, whereas clearly external factors such as the weather should probably not. Whether previous campaigning work and the credibility that the event is going to happen should be counted as part of the protest is, in my view, an open definitory question. If one answers it positively, then one could follow the anticipation effect theory, but only after verifying from the full texts that the increased coverage really only concerns the anticipated protest. If one answers it negatively, then one could experiment with decreasing the fitting interval until anticipation effects are removed (but this is problematic due to the incomplete data problem described below), or resort to propensity score methods.
+
+__Incomplete data.__ The synthetic control method suffers from missing data in two opposite ways:
+
+- _Large events_ may not have enough control regions to suitably model the treatment region. I have not set a threshold for the minimum number of control regions. One large event (21.03.2021) has happened in all regions, so that it had to be excluded from the analysis, leading to a slight underestimation of the average impact. It is also possible that synthetic controls based on very few control regions suffer from systematic bias.
+
+- _Small events_ may not always be present in the dataset. An unsystematic internet search for some protest dates with a predicted negative impact shows that some of them use control regions where actually some protest events took place and were just not in the dataset. Optimizing the fit in the anticipation effect timespan would weigh these "false negative" regions even higher, exacerbating the bias.
+
+__Weekly patterns.__ @fig-sc-long shows that the model has difficulty with modeling the weekly decrease of newspaper coverage on Sundays. Better fit can be achieved by using weekly moving averages (as done in @fig-sc-longterm). The fitted weights could be used for obtaining daily impact estimates. Future work could check whether such preprocessing actually makes a difference, and whether it is theoretically desirable.
+
+__Spillover effects.__ The synthetic control method assumes that there are no spillover effects. Their existence leads to an under-estimation of the causal effects. In principle one could also try to model these effects, but that would complicate the model a lot.
+
+### Propensity scores {#sec-disc-ps}
+
+__Bias.__ The placebo tests show that IPW consistently reduces the bias that pure correlation has, but not until zero. This is likely due to the rather low F1-score for the propensity scores. Future work may use dedicated time series forecasting or classification methods to improve performance; or may leverage text classification of prior discourse or of press releases about related events.
+
+__Extensions.__ IPW does not consider the effect of the confounders on the treatment. This is theoretically justified if the propensity scores are reliable (see @sec-app2-ipw). In the absence of good propensity scores, the model may benefit from combination with a model for the outcome. The _doubly robust estimator_ should be re-evaluated, and occcurring problems should be investigated in more depth. A nonparametric alternative would be _double machine learning_ [@chernozhukovDoubleDebiasedMachine2017]; it fits a regression model on the residuals of nonparametric propensity score and outcome models.
 
 ### Impact estimates
 
-- convergence to about 7 protest articles after a week -- long-term convergence unclear
-- no method suggests that no-protest goes down in the long term
+__Convergence.__ A plausible property of the causal impact is that the absolute impact converges to zero over time, and the cumulative impact thus converges to some total number of additional newspaper articles. This behaviour can be clearly seen for the protest-mentioning articles with regression, synthetic control, and to some extent with instrumental variables.
+
+__Comparisons between protest groups.__ The results are not very significant. FFF, ALG, and XR cause a statistically significant (at p<0.05) increase in protest-mentioning articles over the course of a week. The increase in other climate change articles is only significant for XR, making a backfiring effect for them very unlikely. A significant increase in more dramatic framing is seen for Fridays for Future. These are all without adjusting for multiple testing.

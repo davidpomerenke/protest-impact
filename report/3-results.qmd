@@ -4,6 +4,8 @@ execute:
 ---
 
 ```{python}
+# | echo: false
+
 from matplotlib_inline.backend_inline import set_matplotlib_formats
 
 set_matplotlib_formats("svg")
@@ -225,6 +227,8 @@ Hyperparameter optimization shows that the best model is a logistic regression m
 The baseline value for the F1 score can be calculated by setting all predictions positive. This results in F1=0.118 for my dataset.
 
 The best logistic regression model achieves a 5-fold time-series cross-validated score of F1=0.233±0.044, while a similar model with balanced class weights achieves F1=0.213±0.017.
+
+Brief experiments with doubly robust estimation show that other than expected it gives estimates that are multiple orders of magnitudes higher than those of regression or inverse propensity weighting; it estimates chaotic time series; and it is overly sensitive to the hyperparameters that create the time series features (number of lags, inclusion of moving averages, etc.), much more than regression or IPW. I do not further investigate the problem and exclude the method from the analysis.
 
 ### Placebo tests
 

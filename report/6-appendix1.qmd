@@ -117,7 +117,33 @@ display(
 
 from src.models.instrumental_variable import get_coefficients
 
-get_coefficients("weather_covid")[0].sort_values(by=("single", "pval"))
+get_coefficients("weather_covid")[0].sort_values(by=("combi", "pval"))
+```
+\endgroup
+
+\begingroup
+\footnotesize\selectfont
+```{python}
+# | label: fig-xxx
+# | fig-cap:
+# | echo: False
+
+from src.models.instrumental_variable import get_coefficients
+
+get_coefficients("weather_covid_season")[0].sort_values(by=("combi", "pval"))
+```
+\endgroup
+
+\begingroup
+\footnotesize\selectfont
+```{python}
+# | label:
+# | fig-cap:
+# | echo: False
+
+from src.models.instrumental_variable import get_coefficients
+
+get_coefficients("pc_weather_covid")[0].sort_values(by=("combi", "pval")).head(10)
 ```
 \endgroup
 
@@ -130,6 +156,6 @@ get_coefficients("weather_covid")[0].sort_values(by=("single", "pval"))
 
 from src.models.instrumental_variable import get_coefficients
 
-get_coefficients("pc_weather_covid_season")[0].sort_values(by=("single", "pval")).head(10)
+get_coefficients("pc_weather_covid_season")[0].sort_values(by=("combi", "pval")).head(10)
 ```
 \endgroup
