@@ -75,7 +75,7 @@ Table: Queries for retrieving article counts from online and print newspapers. T
 \footnotesize\selectfont
 ```{python}
 # | label: fig-reg-details
-# | fig-caption: "Detailed results for the best regression model from @sec-res-reg. Dependent variable is the absolute number of articles mentioning climate change from the treatment date and the following day. Due to including time series lags there are overall 140 parameters plus a constant term, so only the 20 parameters with lowest p-values are displayed. Note that for the weekday dummies the first value (Friday) is dropped and the other dummies are to be interpreted in relation to it."
+# | fig-cap: "Detailed results for the best regression model from @sec-res-reg. Dependent variable is the absolute number of articles mentioning climate change from the treatment date and the following day. Due to including time series lags there are overall 140 parameters plus a constant term, so only the 20 parameters with lowest p-values are displayed. Note that for the weekday dummies the first value (Friday) is dropped and the other dummies are to be interpreted in relation to it."
 # | echo: False
 
 import pandas as pd
@@ -97,7 +97,7 @@ display(df.sort_values("P>|z|").head(20).sort_index())
 \footnotesize\selectfont
 ```{python}
 # | label: fig-reg-details
-# | fig-caption: "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
+# | fig-cap: "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
 # | echo: False
 display(
     df[(df.index.str.startswith("occ") & df.index.str.endswith("lag0"))].sort_index()
@@ -112,7 +112,7 @@ display(
 \footnotesize\selectfont
 ```{python}
 # | label: fig-iv-basic
-# | fig-caption: Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. In the left column each instrument is regressed on its own, in the right column all instruments together; in both cases together with the known confounders. Results are sorted by p-values for the single regressions.
+# | fig-cap: Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. In the left column each instrument is regressed on its own, in the right column all instruments together; in both cases together with the known confounders. Results are sorted by p-values for the single regressions.
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients
@@ -125,7 +125,7 @@ get_coefficients("weather_covid")[0].sort_values(by=("single", "pval"))
 \footnotesize\selectfont
 ```{python}
 # | label: fig-iv-pc-season
-# | fig-caption: Regression coefficients and p-values for the impact of the principal components of the seasonal and residual (deseasoned) variables on the treatment, controlling for known confounders. In the left column each instrument is regressed on its own, in the right column all instruments together; in both cases together with the known confounders. Results are sorted by p-values for the combined regression.
+# | fig-cap: Regression coefficients and p-values for the impact of the principal components of the seasonal and residual (deseasoned) variables on the treatment, controlling for known confounders. In the left column each instrument is regressed on its own, in the right column all instruments together; in both cases together with the known confounders. Results are sorted by p-values for the combined regression.
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients

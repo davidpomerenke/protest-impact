@@ -352,7 +352,7 @@ plt.show()
 
 ```{python}
 # | label: fig-impact-dims
-# | fig-caption: 7-day cumulative causal impact estimates by method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
+# | fig-cap: 7-day cumulative causal impact estimates by method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false
 
@@ -368,7 +368,7 @@ plot_groups(kind="methods", step=6)
 
 ```{python}
 # | label: fig-impact-groups-2
-# | fig-caption: 2-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
+# | fig-cap: 2-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false
 
@@ -381,7 +381,7 @@ plot_groups(kind="groups", step=1)
 
 ```{python}
 # | label: fig-impact-groups-7
-# | fig-caption: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
+# | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false
 

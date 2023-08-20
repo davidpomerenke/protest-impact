@@ -137,6 +137,8 @@ cite Teune, Wasow, maybe Repke
 @barrieDoesProtestInfluence: time series effects on tweets by uk mps, recent and very nice (not strictly causal, but really plausible; or could perhaps consider it a discontinuity design)
 
 @chenHowClimateMovement2023a analyze the coverage of the climate movement on Twitter as well as in online newspapers. They use topic modelling to find major themes in discourse, and plot the quantitative evolution of these themes over time from 2018 to 2021, overlaying it with information about the occurrence of the semi-annual global climate strikes.
+
+@AttentionClimateChange2023 find that the Covid-19 pandemic has led to a fewer discussion of climate protests on Twitter, albeit not to fewer discussion of the climate crisis itself.
 -->
 
 #### Causal approaches to protest event analysis {#sec-weatherlit}

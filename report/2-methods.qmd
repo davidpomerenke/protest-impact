@@ -266,7 +266,7 @@ __Alternative soruces of public discourse.__ Future work could also explore Twit
 {{< embed ../src/models/instrumental_variable/notebooks/05-31-instrumental-again.ipynb#fig-weather-time-series >}}
 
 ```{python}
-# | fig-caption: Pandemic restriction variables. The top figure displays 6 different variables that show how often various place categories are visited. The bottom figure gives the stringency index, an aggregated measure of expert estimates of the severity of restrictions along multiple dimensions.
+# | fig-cap: Pandemic restriction variables. The top figure displays 6 different variables that show how often various place categories are visited. The bottom figure gives the stringency index, an aggregated measure of expert estimates of the severity of restrictions along multiple dimensions.
 # | echo: false
 import matplotlib.pyplot as plt
 from src.data.covid_restrictions import load_mobility, load_stringency

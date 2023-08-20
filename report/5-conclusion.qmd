@@ -20,4 +20,12 @@ __Answer to Q3.__
 
 ### Limitations and future work
 
-- incorporate the topic models from @chenHowClimateMovement2023a
+- contentwise:
+  - incorporate the topic models from @chenHowClimateMovement2023a
+- methodwise
+  - sc
+    - extend synthetic control to deal better with nonlinear patterns - eg by rolling average with back-calculation
+    - match with tfidf for topic differences
+  - improve F1 score computation from texts with llms
+    - combine this with time series methods
+  - investigate why doubly robust is so bad; experiment with double ml

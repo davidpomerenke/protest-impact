@@ -11,9 +11,32 @@ Excellent and critical discussion and or reflection on all findings vis-a-vis ex
 
 ### Regression
 
+- bias in time-series: probably not too much of a problem
+- placebo outcome: not good, omitted variable bias or nonlinear relations
+- placebo treatment: relatively reasonable
+- impact: clearly converges, very plausible
+
 ### Instrumental variables
 
+- weird finding that the weather is not relevant, compare with literature
+- wald estimates: not reliable; we can take correlation as a lower limit
+- interpret principal components: weather, especially seasonal one; unclear, movement?
+- interpret deseasoned principal components: movement?; weather and stringency -> going outside?; weather
+- problem: how to argue for not really interpretable components?
+- first stage: plausible
+- order of magnitude completely unreasonable
+- placebo tests seem roughly reasonable for the protest articles but not others -- this might be a weak instrument issue
+- future work: use other weak variable methods such as Ding, that are only implemented in r
+- related work probably relies on seasonal effect, which may be legitimate with controlling, whcih they do! alternative in the absence of clear instruments might also be double machine learning
+
 ### Synthetic control
+
+- good that we can optimiza unbiased
+- tradeoff bias v direct pre-treatment fit, see discussion of anticipation
+- placebo outcome: anticipation effects, weekly patterns
+  - alternative: rolling averages, difficult to retrieve absolute effects; or weekly aggregates
+- placebo treatment: very reasonable
+- impact: converges somewhat, somewhat reasonable
 
 __Bias from incomplete protest data in synthetic control:__
 
@@ -23,10 +46,17 @@ __Bias from incomplete protest data in synthetic control:__
 ### Propensity scores
 
 - not good enough, biased towards correlation
+- placebo tests (both): uniform bias; if this was zero, it would be very plausible
+- doubly robust is weird; rather use double ml?
+- disappointing that F1 is so low -- use text
+  - experiments indicate
 
 ### General issues
 
-- Anticipation effects {#sec-anticip} [@abadieSyntheticControlMethods2010]
-- problem of not enough interaction terms / heterogeneity -> use CRFs, DML
+- Anticipation effects {#sec-anticip} [@abadieSyntheticControlMethods2010]: weekly patters in regression
+- problem of not enough interaction terms / heterogeneity -> use CRForests, DML
 
-### Interpretation of the causal impact estimates
+### Impact estimates
+
+- convergence to about 7 protest articles after a week -- long-term convergence unclear
+- no method suggests that no-protest goes down in the long term
