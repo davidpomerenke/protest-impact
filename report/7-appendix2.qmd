@@ -65,7 +65,7 @@ There are three conditions that make a variable $Z$ a valid instrument [@dingFir
 2. $Z$ changes the distribution of the treatment $W$.
 3. $Z$ does not directly influence $Y$, but only indirectly via $W$ (_exclusion restriction_).
 
-#### Indirect least squares
+#### Indirect least squares {#sec-app2-iv-ils}
 
 In the case of a single instrument and a single treatment, we can use indirect least squares [@dingFirstCourseCausal2023, ch. 23.6.2; @pischkeLabourEconomicsPhD2019, slides on instrumental variables; @facurealvesCausalInferenceBrave2022, ch. 8]. It is also known simply as _instrumental variable_ method, and -- modified for the special case of a binary instrument -- as _Wald estimator_ [@dingFirstCourseCausal2023, ch. 21].
 
@@ -114,7 +114,7 @@ A corresponding estimator is given using the sample covariances. Estimators for 
 
 Impressively, the instrument allows us to control for confounders without needing to specify them -- if the strong assumptions of randomization and exclusion actually hold.
 
-#### Two-stage least squares
+#### Two-stage least squares {#sec-app2-2sls}
 
 An alternative to indirect least squares that extends to multiple instruments and treatments is the _two-stage least squares_ (TSLS) estimator. It involves two OLS regression steps:
 

@@ -15,6 +15,7 @@ from scipy import stats
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit, cross_val_score
+from statsmodels import stats
 
 from src.cache import cache
 from src.features.time_series import get_lagged_df
@@ -55,49 +56,69 @@ def get_data(instruments_, loadings=False):
 def get_covariances(instruments):
     df, instruments, treatment, outcome, _ = get_data(instruments)
 
+    covs = pd.DataFrame()
+
     # get covariances between instruments and treatment
-    covs = df[instruments + [treatment]].cov()
-    covs_w = covs.loc[instruments, treatment]
+    covs_w = df[instruments + [treatment]].cov().loc[instruments, treatment]
 
     # get covariances between instruments and outcome
-    covs = df[instruments + [outcome]].cov()
-    covs_y = covs.loc[instruments, outcome]
+    covs_y = df[instruments + [outcome]].cov().loc[instruments, outcome]
 
-    covs = pd.concat([covs_w, covs_y], axis=1, keys=["cov_w", "cov_y"])
-    covs["wald"] = covs["cov_y"] / covs["cov_w"]
+    covs["wald"] = (covs_y / covs_w).apply(lambda x: round(x, 2))
+
+    # get correlation between instruments and treatment
+
+    covs["corr_w"] = (
+        df[instruments + [treatment]]
+        .corr()
+        .loc[instruments, treatment]
+        .apply(lambda x: round(x, 4))
+    )
 
     # get correlation between instruments and outcome
 
-    covs["corr_y"] = df[instruments + [outcome]].corr().loc[instruments, outcome]
+    covs["corr_y"] = (
+        df[instruments + [outcome]]
+        .corr()
+        .loc[instruments, outcome]
+        .apply(lambda x: round(x, 4))
+    )
 
-    covs = covs.sort_values(ascending=False, key=abs, by="cov_w")
+    covs = covs[["corr_w", "corr_y", "wald"]]
+    covs.index = covs.index.str.replace("_lag0", "")
     return covs
 
 
 def get_coefficients(instruments_):
     df, instruments, treatment, outcome, confounders = get_data(instruments_)
     loadings_df = None
-    params = []
-    pvals = []
-    for instr in instruments:
-        results = sm.OLS(
-            df[treatment], sm.add_constant(df[confounders + [instr]])
-        ).fit()
-        # results = sm.Logit(
-        #     df[treatment], sm.add_constant(df[confounders + [instr]])
-        # ).fit()
-        params.append((results.params[instr]))
-        pvals.append((results.pvalues[instr]))
-    params_single = pd.DataFrame(dict(coef=params, pval=pvals), index=instruments)
     results_combi = sm.OLS(
         df[treatment], sm.add_constant(df[confounders + instruments])
     ).fit()
-    params_combi = pd.DataFrame(
+    params = pd.DataFrame(
         dict(coef=results_combi.params, pval=results_combi.pvalues),
         index=results_combi.params.index,
     )
-    params_combi = params_combi[params_combi.index.isin(instruments)]
-    params = pd.concat([params_single, params_combi], axis=1, keys=["single", "combi"])
+    params.columns = params.columns.str.replace("coef", "coef_w").str.replace(
+        "pval", "p"
+    )
+    # correct for multiple testing with benjamini hochberg
+    params["p_bh"] = stats.multitest.multipletests(
+        params["p"], alpha=0.05, method="fdr_bh"
+    )[1]
+    params["p_by"] = stats.multitest.multipletests(
+        params["p"], alpha=0.05, method="fdr_by"
+    )[1]
+    params["p"] = params["p"].apply(lambda x: round(x, 4))
+    params["p_by"] = params["p_by"].apply(lambda x: round(x, 4))
+    params["p_bh"] = params["p_bh"].apply(lambda x: round(x, 4))
+    params["coef_w"] = params["coef_w"].apply(lambda x: round(x, 5))
+    for instr in instruments:
+        results = sm.OLS(df[treatment], sm.add_constant(df[[instr]])).fit()
+        params.loc[instr, "fstat"] = results.fvalue.round(2)
+    params = params[params.index.isin(instruments)]
+    params.index = params.index.str.replace("_lag0", "")
+    # params = params[["coef_w", "p", "p_bh", "p_by", "fstat"]]
     return params, loadings_df
 
 
