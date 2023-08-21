@@ -48,6 +48,8 @@ results = r.params[t], tuple(r.conf_int().loc[t]), r.pvalues[t]
 
 #### Instrumental variables
 
+\begingroup
+\scriptsize\selectfont
 ```{python}
 # | label: fig-iv-wald
 # | fig-cap: Correlations between the instruments and the treatment (corr_w) and between the instruments and the outcome (corr_y), and Wald estimator results.
@@ -60,10 +62,10 @@ get_covariances("weather_covid")
 
 Correlations and Wald estimator results of the original variable are shown in @fig-iv-wald. Note that the Wald estimator is not valid for weak instruments.
 
-Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the covariances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-weatherlit), but the binarization does not change the covariance much. (TODO: give number.)
+Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the covariances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-lit-causal), but the binarization does not change the covariance much. (TODO: give number.)
 
 \begingroup
-\footnotesize\selectfont
+\scriptsize\selectfont
 ```{python}
 # | label: fig-iv-basic
 # | fig-cap: First-stage impact of the original instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed.
@@ -76,7 +78,7 @@ get_coefficients("weather_covid")[0].sort_values(by="p")
 \endgroup
 
 \begingroup
-\footnotesize\selectfont
+\scriptsize\selectfont
 ```{python}
 # | label: fig-iv-deseason
 # | fig-cap: First-stage impact of the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
@@ -197,18 +199,19 @@ plt.show()
 # | fig-cap: Synthetic control fit around the treatment for a pre-treatment period of n=180. Values are aggregates from synthetic controls for all protest events. Weekly patterns are due to regularities in protest event timing (Fridays for Future) and weekly cycles in general newspaper coverage.
 # | echo: false
 
-# import matplotlib.pyplot as plt
-# from src.models.synthetic_control import sc_plot
+import matplotlib.pyplot as plt
+from src.models.synthetic_control import sc_plot
 
-# titlenames = [
-#     ("articles mentioning protest", "media_combined_protest"),
-#     ("articles NOT mentioning protest", "media_combined_not_protest"),
-# ]
-# for t, n in titlenames:
-#     fig, ax = sc_plot(t, n, scale="demean", pre_period=180, post_period=20)
-#     ax.set_xlim(-20, 7)
-#     fig.tight_layout()
-# plt.show()
+titlenames = [
+    ("articles mentioning protest", "media_combined_protest"),
+    ("articles NOT mentioning protest", "media_combined_not_protest"),
+]
+fig, axes = plt.subplots(2, 1, figsize=(6, 4))
+for i, (t, n) in enumerate(titlenames):
+    sc_plot(t, n, scale="demean", pre_period=180, post_period=20, ax=axes[i])
+    axes[i].set_xlim(-20, 7)
+fig.tight_layout()
+plt.show()
 ```
 
 @fig-sc-short shows the fit for a shorter pre-treatment period and with better pre-treatment fit.
@@ -219,33 +222,41 @@ plt.show()
 # | echo: false
 # | layout-nrow: 2
 
-# import matplotlib.pyplot as plt
-# from src.models.synthetic_control import sc_plot
+import matplotlib.pyplot as plt
+from src.models.synthetic_control import sc_plot
 
-# titlenames = [
-#     ("articles mentioning protest", "media_combined_protest"),
-#     ("articles NOT mentioning protest", "media_combined_not_protest"),
-# ]
-# for t, n in titlenames:
-#     fig, ax = sc_plot(t, n, scale="demean", pre_period=22, post_period=20)
-#     ax.set_xlim(-20, 7)
-#     fig.tight_layout()
-#     plt.show()
+titlenames = [
+    ("articles mentioning protest", "media_combined_protest"),
+    ("articles NOT mentioning protest", "media_combined_not_protest"),
+]
+fig, axes = plt.subplots(2, 1, figsize=(6, 4))
+for i, (t, n) in enumerate(titlenames):
+    sc_plot(t, n, scale="demean", pre_period=22, post_period=20, ax=axes[i])
+    axes[i].set_xlim(-20, 7)
+fig.tight_layout()
+plt.show()
 ```
 
-@fig-sc-longterm gives an impression of the long-term impact. Rolling averages are used for preprocessing, so the absolute impacts cannot directly be retrieved.
+@fig-sc-longterm gives an impression of the long-term impact estimate. Rolling averages are used for preprocessing, so the absolute impacts cannot directly be retrieved.
 
 ```{python}
 # | label: fig-sc-longterm
 # | fig-cap: Synthetic control with pre-treatment period of two years and longterm effects for half a year. Outcomes have been preprocessed with weekly rolling averages. No bias checks have been made for this model.
 # | echo: false
 
-print("test")
-# for t, n in titlenames:
-#     fig, ax = sc_plot(
-#         t, n, scale="demean", rolling=7, pre_period=2 * 360, post_period=0.5 * 360
-#     )
-#     plt.show()
+import matplotlib.pyplot as plt
+from src.models.synthetic_control import sc_plot
+
+titlenames = [
+    ("articles mentioning protest", "media_combined_protest"),
+    ("articles NOT mentioning protest", "media_combined_not_protest"),
+]
+fig, axes = plt.subplots(2, 1, figsize=(6, 4))
+for i, (t, n) in enumerate(titlenames):
+    sc_plot(t, n, scale="demean", pre_period=2*360, post_period=180, rolling=7, ax=axes[i])
+    axes[i].set_xlim(-2*360, 180)
+fig.tight_layout()
+plt.show()
 ```
 
 #### Propensity scores
@@ -396,7 +407,7 @@ alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="methods", step=6)
 ```
 
-@fig-impact-groups-2 break down the 7-day cumulative impact for the different protest groups, as estimated by the synthetic control method.
+@fig-impact-groups-7 break down the 7-day cumulative impact for the different protest groups, as estimated by the synthetic control method.
 
 ```{python}
 # | label: fig-impact-groups-7

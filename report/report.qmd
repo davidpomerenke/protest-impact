@@ -9,6 +9,8 @@ toc-depth: 3
 
 {{< pagebreak >}}
 
+TODO: use official frontpage, add abstract
+
 {{< include 1-introduction.qmd >}}
 
 {{< pagebreak >}}

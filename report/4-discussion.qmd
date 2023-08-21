@@ -21,7 +21,7 @@ __Correlation and Wald estimate.__ The correlation between the instruments and t
 
 <!-- __Principal component analysis.__ P-values for multiple regression with all instruments are generally low, and PCA successfully helps to recover  -->
 
-- interpret principal components: weather, especially seasonal one; unclear, movement?
+<!-- - interpret principal components: weather, especially seasonal one; unclear, movement?
 - interpret deseasoned principal components: movement?; weather and stringency -> going outside?; weather
 - problem: how to argue for not really interpretable components?
 - first stage: plausible
@@ -30,8 +30,9 @@ __Correlation and Wald estimate.__ The correlation between the instruments and t
 - future work: use other weak variable methods such as Ding, that are only implemented in r
 - related work probably relies on seasonal effect, which may be legitimate with controlling, whcih they do! alternative in the absence of clear instruments might also be double machine learning
 
-__Significance of precipitation.__- weird finding that the weather is not relevant, compare with literature
+__Significance of precipitation.__- weird finding that the weather is not relevant, compare with literature -->
 
+TODO: finish IV discussion
 
 ### Synthetic control {#sec-disc-synth}
 
@@ -67,4 +68,4 @@ __Extensions.__ IPW does not consider the effect of the confounders on the treat
 
 __Convergence.__ A plausible property of the causal impact is that the absolute impact converges to zero over time, and the cumulative impact thus converges to some total number of additional newspaper articles. This behaviour can be clearly seen for the protest-mentioning articles with regression, synthetic control, and to some extent with instrumental variables.
 
-__Comparisons between protest groups.__ The results are not very significant. FFF, ALG, and XR cause a statistically significant (at p<0.05) increase in protest-mentioning articles over the course of a week. The increase in other climate change articles is only significant for XR, making a backfiring effect for them very unlikely. A significant increase in more dramatic framing is seen for Fridays for Future. These are all without adjusting for multiple testing.
+__Comparisons between protest groups.__ The results are not very significant. FFF, ALG, and XR cause a statistically significant (at p<0.05) increase in protest-mentioning articles over the course of a week. The increase in other climate change articles is only significant for XR. A significant increase in more dramatic framing is seen for Fridays for Future. These observations are all without adjusting for multiple testing.

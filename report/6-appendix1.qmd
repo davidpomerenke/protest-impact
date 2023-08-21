@@ -27,23 +27,6 @@ df.to_csv(tables / "gpreg-overview.csv", sep=";")
 
 Table: Overview of the German Protest Registrations (GPReg) dataset. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available; _incl?_ = whether the data is used in this thesis.
 
-
-#### Sociodemographic variables {#sec-app-sociodem}
-
-```{python}
-# | echo: false
-
-import pandas as pd
-from src.paths import interim_data
-
-df = pd.read_csv(
-    interim_data / "regionalatlas-statistikportal/sociodemographic-indicators.csv",
-    index_col=0,
-)
-Markdown("\n".join([f" - {a}" for a in df.index.to_list()]))
-```
-
-
 #### Queries for retrieving article counts {#sec-app-queries}
 
 ```{python}
@@ -78,15 +61,15 @@ Table: Queries for retrieving article counts from online and print newspapers. T
 # | fig-cap: "Detailed results for the best regression model from @sec-res-reg. Dependent variable is the absolute number of articles mentioning climate change from the treatment date and the following day. Due to including time series lags there are overall 140 parameters plus a constant term, so only the 20 parameters with lowest p-values are displayed. Note that for the weekday dummies the first value (Friday) is dropped and the other dummies are to be interpreted in relation to it."
 # | echo: False
 
-# import pandas as pd
-# from IPython.display import display
-# import warnings
-# from src.models.regression.hyperopt import best_regression
+import pandas as pd
+from IPython.display import display
+import warnings
+from src.models.regression.hyperopt import best_regression
 
-# warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
-# tables = best_regression().summary().tables
-# display(tables[0])
+tables = best_regression().summary().tables
+display(tables[0])
 # results_as_html = tables[1].as_html()
 # df = pd.read_html(results_as_html, header=0, index_col=0)[0]
 # display(df.sort_values("P>|z|").head(20).sort_index())
@@ -96,13 +79,31 @@ Table: Queries for retrieving article counts from online and print newspapers. T
 \begingroup
 \footnotesize\selectfont
 ```{python}
-# | label: fig-reg-details-occ
-# | fig-cap: "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
+# | fig-cap: Part 2 of the previous figure (some rendering issue TODO)
 # | echo: False
-# display(
-#     df[(df.index.str.startswith("occ") & df.index.str.endswith("lag0"))].sort_index()
-# )
+
+import pandas as pd
+from IPython.display import display
+import warnings
+from src.models.regression.hyperopt import best_regression
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+tables = best_regression().summary().tables
+results_as_html = tables[1].as_html()
+df = pd.read_html(results_as_html, header=0, index_col=0)[0]
+display(df.sort_values("P>|z|").head(20).sort_index())
 ```
 \endgroup
 
-#### Instrumental variables {#sec-app1-iv}
+\begingroup
+\footnotesize\selectfont
+```{python}
+# | label: fig-reg-details-occ
+# | fig-cap: "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
+# | echo: False
+display(
+    df[(df.index.str.startswith("occ") & df.index.str.endswith("lag0"))].sort_index()
+)
+```
+\endgroup

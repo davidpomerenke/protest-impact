@@ -147,7 +147,7 @@ In the case of protests, an instrumental variable approach would ignore the effe
 
 <!-- manually or https://www.pywhy.org/dowhy/v0.10/dowhy.causal_estimators.html#module-dowhy.causal_estimators.instrumental_variable_estimator -->
 
-### Synthetic control
+### Synthetic control {#sec-app2-synth}
 
 I assume that the outcome of each region $r \in R$ is given by a _factor model_ [inspired by @abadieSyntheticControlMethods2010]:
 
@@ -246,6 +246,6 @@ $$
 
 #### Doubly robust estimation {#sec-app2-dre}
 
-Both regression (@sec-reg) and IPW rely on the same assumptions of overlap and conditional unconfoundedness. They can be combined into a single estimator known as _augmented inverse propensity weighting_ or as the _doubly robust estimator_. It is consistent if at least one of the models is correctly specified -- that is, if either the treatment or the outcome is consistently estimated. If both models are correct, then it helps reducing the bias of the regression estimator, and reducing the variance of the propensity score estimator.
+Both regression (@sec-app2-reg) and IPW rely on the same assumptions of overlap and conditional unconfoundedness. They can be combined into a single estimator known as _augmented inverse propensity weighting_ or as the _doubly robust estimator_. It is consistent if at least one of the models is correctly specified -- that is, if either the treatment or the outcome is consistently estimated. If both models are correct, then it helps reducing the bias of the regression estimator, and reducing the variance of the propensity score estimator.
 
 Doubly robust estimation is defined, motivated, and proven in @dingFirstCourseCausal2023 [ch. 12, ch. 13.2].
