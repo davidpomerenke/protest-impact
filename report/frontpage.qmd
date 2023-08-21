@@ -1,0 +1,55 @@
+::: {.column-page}
+
+\begin{centering}
+\begin{large}
+
+Master Thesis
+
+\vspace{1cm}
+
+\rule{5cm}{0.4pt}
+
+\vspace{0.5cm}
+
+\textbf{\Huge Causal methods for determining the impact\\
+of protest events on newspaper coverage}
+
+\vspace{0.5cm}
+
+{\Large David Pomerenke}
+
+\vspace{0.5cm}
+
+\rule{5cm}{0.4pt}
+
+\vspace{4cm}
+
+Thesis submitted in partial fulfillment\\
+of the requirements for the degree of\\
+Master of Science of Artificial Intelligence<\\
+at the Department of Advanced Computing Sciences\\
+of Maastricht University
+
+\vspace{1cm}
+
+\textbf{Thesis Committee:}\\
+Christof Seiler, PhD\\
+Marijn ten Thij, PhD
+
+\vspace{4cm}
+
+Maastricht University\\
+Faculty of Science and Engineering\\
+Department of Advanced Computing Sciences
+
+\vspace{2cm}
+
+August 30, 2023
+
+\end{large}
+\end{centering}
+
+:::
+
+\thispagestyle{empty}
+\newpage
