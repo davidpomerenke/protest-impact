@@ -10,7 +10,7 @@ the introduction defines the problem, sets it in terms of the state-of-the-art a
 
 ### Problem statement
 
-__Research questions.__ ... lack of structured data (timewise and detailwise and biaswise) ... following research questions:
+Are protests effective, and how much? Or do they also backfire by distracting from the discussion of the protest concern and merely causing discussion about the protests themselves? Protest groups, participants, supporters, and opponents can use media impact analysis and count the number of newspaper articles that appear to be caused by a protest event. Such analyses may be biased due to possible confounding: Protests and increased media coverage may stem from shared sources. In the case of climate protests, extreme weather events, climate conferences, political decisions, or the intensity of public discussion are candidates for such confounders, and there may also be hidden confounders that do not easily come to mind.
 
 <!--
 
@@ -20,98 +20,42 @@ At least three research questions are present and relevant.
 
  -->
 
-- q1
-- q2
-- q3
+__Research questions.__ This master thesis applies and evaluates multiple causal inference techniques that aim to rigorously estimate the causal impact of protest events on regional newspaper coverage. The methods are _regression_, _instrumental variables_, _synthetic control_, and _propensity score_ methods. Specifically, I aim to answer the following research questions:
 
----
-
-This master thesis aims to find out whether, and to what extent, climate protests succeed in bringing more attention to the climate crisis, as measured by the amount of newspaper coverage that they and their topic receive. While I focus on climate protests in Germany, the methods that I use, and also a large part of the data sources that I use, are also transferable to other protest movements, not only those concerning the climate.
-
-Since this is a thesis in artificial intelligence, I focus on applying, evaluating, and comparing multiple causal inference methods, that all try to answer the research question from different assumptions and methodical perspectives.
-
----
-
-This poses the problem of confounding, that is, common causes of both newspaper attention and protest events: If, for example, extreme weather leads to more newspaper coverage on the one hand, and makes people more prone to protest, then it may seem as if the protest leads to more newspaper coverage, but it may not actually be the case. Other candidates for confounders include prior newspaper coverage and prior protest events themselves, as well as external events such as climate conferences, or the passing of laws. Due to these confounders, naively looking at the relationship between protests and discourse may give a biased impression, and causal inference techniques are required.
-
-I want to compare multiple causal methods and see what they can tell us about the impact of protests. My research questions are:
-
-1. Can the causal methods -- instrumental variable, synthetic control, and propensity score methods -- be applied to study the impact of protest events on newspaper attention? What limitations apply, and what problems occur? Are the estimates consistent, and how do they differ from each other and from simple regression estimates?
+1. Can the causal methods be applied to study the impact of protest events on newspaper attention? What limitations apply, and what problems occur? Are the estimates consistent, and how do they differ from each other?
 
 2. What is the _Average Treatment Effect on the Treated_[^ATT] (ATT) of protest events on newspaper coverage, for climate protests in general, and with respect to the protest group that organizes the protest?
 
 3. What can we say about the hypothesis that climate protests _distract_ from discussing solutions to the climate crisis constructively?
 
-[^ATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. It differs from the _Average Treatment Effect_ (ATE) by focusing on the treated units rather than the whole population.
+(4. Are datasets obtained (a) from authorities or (b) via semi-automated collection and processing suitable alternatives to manually curated protest event data?) - _I hope that I can still compare the datasets, otherwise I'll leave it out._
 
----
+[^ATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. It differs from the _Average Treatment Effect_ (ATE) by focusing on the effect of the protest days rather than the potential effect of all days. See @sec-reg for mathematical definition.
 
-<!-- Citizens in democracies have an interest in understanding the effectiveness of protest movements, and which factors make them effective.
+__Protest event analysis.__ @hutterProtestEventAnalysis2014 defines the sociological method of _protest event analysis_, and discusses coding methods for defining and distinguishing protest events.
 
-Protests play a _crucial role_ in democracies, complementing the sometimes insufficient institutional participation. Large protest movements are known to have brought about progress that we nowadays take as indispensable, especially in the areas of civil rights and women's rights.
-
-Yet, the different forms of protest have always caused and do still cause _controversy_: Are they an appropriate means to achieve their respective goal? Should they be less radical, or perhaps more so, in order to effectively achieve that goal? There are three levels on which such questions may be of interest.
-
-1.  The __general public__ wants to know what to think of protests. Especially persons who support the goal of the protest may wish to know whether they should endorse the protest; or oppose it and advocate for alternative means to achieve that goal. Opponents of the goal may wish to denounce the protest not only on the content-level, but also by claiming that the protest is an inappropriate way to achieve that goal. Supporters may then wish to prove them wrong by referring to evidence that proves the potential effectiveness of protesting.
-
-    Making a scientific investigation in this context is a bit weird, because the result may just perpetuate existing beliefs. If one finds that protests are effective, this may increase their support and thereby make them more effective; while a negative statement may weaken their result and their effectiveness. At the same time, any scientific result may be impacted in large part by the prevailing beliefs about the effectiveness of protest. Research on this topic should therefore at least make sure that it does not implicitly aim to increase or decrease the support for protests, and should keep in mind that existing beliefs may be an important factor impacting the effectiveness of protests.
-
-2.  __Protest supporters__ want to know which organizations they should support. Grassroots movements depend on funding, be it from individuals, from intermediary funds, or from philanthropists. These parties want to invest their donations efficiently, and can often choose from a pool of organizations that aim at similar goals with differing methods. The question of cost-effectiveness arises, and while cost is easy to count, effectiveness is very hard to estimate. Existing organizations use proxy measures including the number of press articles about the protest movement, which may not be ideal. Besides comparing different organizations, donors may also wish to compare protests with alternative methods such as lobbyism or individual action.
-
-deeply strategic: [@englerThisUprisingHow2016]
-
-@knuthFinanzierungKlimaaktivismusAm2023
-
-1.  __Protest organizations__ themselves want to know how they can best achieve their goals. They regularly plan new activities and need to decide on strategical points, such as:
-    -  Who do they want to address? (e. g., politicians, businesses, or the media)
-    -  How radical should they be? (e. g., whether they should respect the boundaries of public goodwill, of the law, or of nonviolence)
-    -  How much time should they invest into recruiting and marketing activities?
-    -  How much attention should they pay to symbolicism, and to an integral appearance?
-    -  What time periods should they choose? (e. g., whether to go along with external events and media attention waves, or to complement them)
-    -  What places and what timing works best?
-
-Answering these questions involves looking not only at the _impact_ of protests, but also at the _impact factors_. Here I do not study impact factors in detail, but I do compare the impacts of various climate protest movements, which may allow some inferences about strategy; and may enable further research about impact factors. -->
-
-__Protest event analysis.__
-
-<!-- Copy from below: Newspaper articles are primarily used in the existing literature. [@hutterProtestEventAnalysis2014] give a historical and systematic overview and highlight the problem that this source is biased. They describe how several definitions for protest event analysis (PEA) and the broader political claim analysis (PCA), as well as associated coding practices have helped to formalize the (manual) data extraction process, such that results have become more valid and comparable. -->
-
-__Protest impact.__
-
-Research into the impact of protest movements has recently been spearheaded by a series of literature reviews and expert interviews by Ozden and Glover. In the context of effective altruism, they aim to assess how effective protest movements are as a means for political change, and what factors determine their success. In their literature review on protest outcomes @jamesozdenLiteratureReviewProtest2022, they conclude that _causal inferences on protest outcomes are generally challenging to draw due to confounding, and it is even harder to determine the long-term effect_. They warn that the average effect size of protests is likely over-estimated in the existing literature, due to selection bias on the level of media coverage, researcher interest, and statistical significance (publication bias). Based on their review, they estimate that protest movements (consisting of many single protest events) may raise salience and support for the issue by 2-10%, and may influence voting behavior by 1-6 percentage points. The influence on public discourse may be high in certain cases, and in the case of the Black Lives Matter movement may have amplified coverage by a factor of 10.
+__Protest impact.__ Research into the impact of protest movements has recently been spearheaded by a series of literature reviews and expert interviews by Ozden and Glover. In the context of effective altruism, they aim to assess how effective protest movements are as a means for political change, and what factors determine their success. In their literature review on protest outcomes @jamesozdenLiteratureReviewProtest2022, they conclude that _causal inferences on protest outcomes are generally challenging to draw due to confounding, and it is even harder to determine the long-term effect_. They warn that the average effect size of protests is likely over-estimated in the existing literature, due to selection bias on the level of media coverage, researcher interest, and statistical significance (publication bias). Based on their review, they estimate that protest movements (consisting of many single protest events) may raise salience and support for the issue by 2-10%, and may influence voting behavior by 1-6 percentage points. The influence on public discourse may be high in certain cases, and in the case of the Black Lives Matter movement may have amplified coverage by a factor of 10.
 
 In interviews with researchers, @jamesozdenExpertInterviewsProtest2022 establish that while there is much research on protest outcomes, the causal connections between protests and their outcomes are an underexplored research area (interview with Robyn Gulliver in the cited report); that a causal link between protests and certain outcomes is plausible, but hard to attribute to any specific protest group (interview with Ruud Wouters in the cited report); and that causal effects are typically only measurable only on a local level due to the lack of a control group at the national level. More generally, protest outcomes may be subject to confounding, and the causal arrow between protests and increased concern may point in either direction. The interviews with researchers, as well as interviews with UK policymakers [@jamesozdenPolicymakerInterviewsProtest2022], suggest that the causal effect of protest on policy is strongly if not completely mediated by public opinion.
 
 In a follow-up, [@samgloverLiteratureReviewProtest2022; @jamesozdenWhatMakesProtest2023] review the factors that causally affect the success of protest movements. They attribute a high importance to the number of participants, and to the nonviolent nature of the protest, as well as a favourable sociopolitical context, including media coverage. A moderate effect is attributed to the diversity and the unity of the movement. They also look at the so-called _radical flank effect_, a theory that moderate movements benefit from the simultaneous presence of a more radical movement for the same issue. Their review finds moderate effects from a radical flank, but only if the radical flank is also nonviolent.
 
-__Relevance of newspaper coverage__ as an impact proxy
-
-There are multiple potential proxies for policy decisions: Election outcomes, public opinion measured by polling, and features of various levels of public discourse.
-
-Within public discourse, there is a gradual tradeoff of media that is close to the legislative process, and media that is close to current affairs such as protest events. Parliamentary debate accompanies legislation. Parliamentary questions have fewer impact on policy, but may reveal what politicians are concerned about. Political debates outside the parliament, such as talk shows on television, may be even more responsive to current affairs. National newspapers and magazines drive political discourse forward in smaller steps, and are in turn influenced by the reports and discussions emerging from local newspapers. They report on real-world events, and on press agency releases, and on issues that are reported and discussed by Twitter users.
-
-![Observable layers of public discourse. Adapted from a graphic from Stewart Brand [via @branderLayeredProtocols2022].](figures/discourse-layering.png){.column-margin #fig-wheel}
-
-The end of this ladder of discourse -- compare @fig-wheel -- is very remote from having influence on policy; but it has the benefit that data is available on a much grander scale and frequency, which facilitates big data analyses (see @fig-lamppost).
+__Relevance of newspaper coverage.__ Protest movements are often highly strategic [see @englerThisUprisingHow2016 for discussion]. Newspaper coverage is a typical criterion by which protest groups and funding organizations quantify impact: Four of the most relevant German climate protest groups maintain press review databases ([1](https://fridaysforfuture.de/presse/pressespiegel/), [2](https://letztegeneration.org/presse/berichterstattung-1/), [3](https://extinctionrebellion.de/presse/pressespiegel/), [4](https://www.ende-gelaende.org/pressespiegel/)), and a major international protest funding organizations usesthe "number of triggered media items" as one of three evaluation criteria [@knuthFinanzierungKlimaaktivismusAm2023]. The reason is either that the protests aim to raise public attention in the first place, or that they consider media coverage as a proxy for further impact, including eventually policy change. Protests are directly observed by typically only a small number of people, and it is plausible that media coverage is an important mediator for further impact (todo: find citation). Alternative plausible mediators are social media posts, public opinion (as measured in opinion surveys), or parliamentary speech. For methodical reasons (see @sec-data-discourse), I focus on newspaper data, and more specifically _regional_ newspaper articles, because they allow for the application of the synthetic control method. These methodical decisions may well be considered as "looking under the lamppost" (@fig-lamppost), but they may enable the analysis of more interesting data in the future.
 
 !["Looking under the lamppost" by [Sketchplanations](https://sketchplanations.com/) (CC-BY-NC)](figures/lamppost.png){.column-margin #fig-lamppost}
 
-__Causal impact evaluation.__
+__Causal impact evaluation.__ Academic work on protest impact analysis has identified the problem of confounding. Previous work has used _regression_, _difference-in-differences_, and to a large extent the _instrumental variables_ method (see @sec-lit-causal). With a single exception, the aggregate impact of protest movements that stretch over longer timespans is evaluated. Causal inference has developed the _synthetic control_ [@abadieSyntheticControlMethods2010] method for the analysis of single events, as well as extensions including _synthetic difference-in-differences_ [@arkhangelskySyntheticDifferenceinDifferences2021] and _Bayesian structural time series_ (@brodersenInferringCausalImpact2015a). _Propensity score methods_ are not specifically made for the analysis of events but can be easily adapted by using time series data for the estimation of the propensity scores. Alternatively, they can be estimated from full text data [@keithTextCausalInference2020, @weldAdjustingConfoundersText2022]. _Event history analysis_ [@tekleEventHistoryAnalysis2012] is concerned with estimating the risk of the occurrence of events, which is not directly relevant, but is similar to estimating propensity scores from time series. Related work using causal approaches for protest impact analysis is reviewed in more detail in @sec-lit-causal.
 
 <!--
 
 Research has advanced state of the art. Described thesis research would lead to a publication in an international peer-reviewed journal or an international peer-reviewed conference.
 
- -->
-
-__Contribution.__
-
-<!--
-
 The research itself is very theoretical or highly interdisciplinary requiring the student to read into both challenging and theoretical material well beyond the scope of the programme.
 + this attitude is constructive and well-balanced.
 
  -->
+
+__Contribution.__
 
 - IV for single events
 - SC for many single events
@@ -123,7 +67,8 @@ The research itself is very theoretical or highly interdisciplinary requiring th
 
 #### Impact of protests on newspaper coverage
 
-<!--
+WIP, still have to tidy this up and maybe add some more sources.
+
 The "protest paradigm" [@mcleodManufacturePublicOpinion1992] theorizes that news coverage of protesters tends to be a double-edged sword, because the coverage of protests that challenge the status quo is usually negative. This paradigm is recently being challenged, and the formation of amore nuanced theory is underway that considers under what conditions the protest paradigm does or does not hold [see @harlowNewProtestParadigm2023].
 
 @schwartzParadoxConfrontationExperimental2016: protests themselves have a negative impact on public support, but media coverage has a positive impact
@@ -132,22 +77,21 @@ The "protest paradigm" [@mcleodManufacturePublicOpinion1992] theorizes that news
 
 @hellmeierSpotlightAnalyzingSequential2018 find support for their hypothesis that salient protest events that receive a lot of media coverage lead to a higher coverage of subsequent protest events, and that the effect decreases with spatial and temporal distance.
 
-cite Teune, Wasow, maybe Repke
-
 @barrieDoesProtestInfluence: time series effects on tweets by uk mps, recent and very nice (not strictly causal, but really plausible; or could perhaps consider it a discontinuity design)
 
 @chenHowClimateMovement2023a analyze the coverage of the climate movement on Twitter as well as in online newspapers. They use topic modelling to find major themes in discourse, and plot the quantitative evolution of these themes over time from 2018 to 2021, overlaying it with information about the occurrence of the semi-annual global climate strikes.
 
 @AttentionClimateChange2023 find that the Covid-19 pandemic has led to a fewer discussion of climate protests on Twitter, albeit not to fewer discussion of the climate crisis itself.
--->
 
-#### Causal approaches to protest event analysis {#sec-weatherlit}
+Todo: Teune, Wasow, maybe Repke.
+
+#### Causal approaches to protest event analysis {#sec-lit-causal}
 
 In the context of protest event analysis, the most commonly used methods are: regression with an extensive set of control variables; and the instrumental variable method using rainfall as an instrument.
 <!-- and _difference in differences_, which is conceptually similar to the synthetic control method. -->
-To my best knowledge, the synthetic control method and propensity score methods with text have not previously been applied to protest event analysis.
+To my best knowledge, the synthetic control method and propensity score methods have not previously been applied to protest event analysis.
 
----
+__Instrumental variables.__
 
 Among the protest effects literature that employs causal methods, the instrumental variable method is the most commonly used method. Usually, rainfall over a period ranging from one day up to one month is used to estimate the effect of protests during that timeframe on a later outcome, where a direct influence of the weather is very unlikely. With the exception of @huet-vaughnQuietRiotCausal2013, all previous literature has a setting where they look at a fixed timeframe and compare effects across regional units. Only Huet-Vaughn (2013) have a methodical approach that is more similar to mine, looking at a larger dataset where events are scattered across regions and also across time.
 
@@ -165,23 +109,19 @@ Among the protest effects literature that employs causal methods, the instrument
 
 - @carenBlackLivesMatter2023 use multiple weather variables, also to estimate the effect of the _Black Lives Matter_ protests on votes for the Democratic Party in the US. They operationalize days with _bad weather_ as days with either a maximum temperature above 90° Fahrenheit (32° Celsius), more than 0.1 inches (2.5 mm) of precipitation, or a wind speed of more than 10 mph (16 km/h). As their instrument they use the number of days with bad weather during the month that followed the murder of George Floyd by the police. Their treatment is _protest intensity_, which they define as the inverse hyperbolic sine (which behaves similarly to the logarithm) of the cumulative protest size, divided by the population size of the county. They use a large list of sociodemographic and political variables on the county level as control variables for all regression steps.
 
-TODO: make a neat overview table of the different methodologies.
+Other literature uses instruments that are less clearly random, such as whether the protest took place on a Friday, its distance to focal points, the commute time in the city where the protest takes place, or even sociological variables concerning the political structure and efficiency. Arguing that such instruments are valid requires solid expert knowledge (and perhaps insider knowledge), and such instruments are therefore less suitable for a data-driven analysis as I envision it here. (Even the weather variable is not completely free from such problems, unfortunately, as is discussed in the next section.) TODO: add citations
 
-Other literature uses instruments that are less clearly random, such as whether the protest took place on a Friday, its distance to focal points, the commute time in the city where the protest takes place, or even sociological variables concerning the political structure and efficiency. Arguing that such instruments are valid requires solid expert knowledge (and perhaps insider knowledge), and such instruments are therefore less suitable for a data-driven analysis as I envision it here. (Even the weather variable is not completely free from such problems, unfortunately, as is discussed in the next section.)
-
-__Causes of protests__
-
-cite Seitz
+TODO literature that uses diff-in-diff
 
 ### Causal impact estimation {#intro-causal}
 
-Causality[^invented by Spohn xxxx]
+TODO: I'll go over this again, tidy it up and make it a bit more precise.
 
-Here I give an overview of the causal model that I generally assume. Then I give an overview of the different causal methods used in this project, how they exploit the causal model, and what additional assumptions they make. Since _time series methods_ may be used in various contexts, I also briefly introduce their structure and show how they can be applied to various machine learning problems that arise as part of the causal methods.
+<!-- Causality[^invented by Spohn xxxx] -->
 
+Here I give an overview of the causal model that I generally assume. Then I give an overview of the different causal methods used in this project, how they exploit the causal model, and what additional assumptions they make.
 
-
-@fig-causal-graph-simple shows the causal relations between the 5 categories graphically.
+<!-- Since _time series methods_ may be used in various contexts, I also briefly introduce their structure and show how they can be applied to various machine learning problems that arise as part of the causal methods. -->
 
 ```{dot}
 // | label: fig-causal-graph-simple
@@ -197,6 +137,8 @@ digraph D {
   {W} -> {Y} [color=green]
 }
 ```
+
+@fig-causal-graph-simple shows a typical causal situation: The impact of the treatment __W__ on the outcome __Y__ is of interest. Both treatment and outcome are also affected by known confounders __X__ and unknown confounders __U__. Instruments __Z__ affect the treatment, but do not have a direct impact on the outcome.
 
 The core of the model is the relation $W \rightarrow Y$ that I want to investigate. However, there are multiple problems of increasing difficulty:
 
@@ -231,12 +173,10 @@ Core assumptions:$^1$ Linearity;$^2$ Valid instrument;$^3$ No regional confoundi
 
 :::
 
-Here I give a conceptual overview of the 3 mentioned methods that are potentially suitable for dealing with unknown confounders. Their exact assumptions and limitations will be discussed in their respective chapters.
-
-__Regression__
+Here I give a conceptual overview of the 3 mentioned methods that are potentially suitable for dealing with unknown confounders. Mathematical assumptions and definitions are given in @sec-app2.
 
 ```{dot}
-// | label: fig-causal-graph-reg
+// | label: fig-causal-graph-corr
 // | fig-cap: Causal graph for naive analysis.
 // | fig-width: 100px
 // | fig-height: 100px
@@ -246,11 +186,20 @@ digraph D {
 }
 ```
 
-Naive regression is not a causal method, but is used for comparison with the causal methods. It neglects most of the causal model and only regards the direct relationship between treatment and outcome, possibly controlling for covariates, but neglecting their role as confounders. The result is known as the _prima facie_ causal effect. It suffers from _selection bias_, because the model does not take the treatment assignment process into account -- but it should, because the treatment is not randomized.
+__Correlation.__ Naive regression is not a causal method, but is used for comparison with the causal methods. It neglects most of the causal model and only regards the direct relationship between treatment and outcome, possibly controlling for covariates, but neglecting their role as confounders. The result is known as the _prima facie_ causal effect. It suffers from _selection bias_, because the model does not take the treatment assignment process into account -- but it should, because the treatment is not randomized.
 
-Controlling for the known confounders can already help to substantially reduce the bias, especially if the relationships are linear, and may as well be considered a causal method.
+```{dot}
+// | label: fig-causal-graph-reg
+// | fig-cap: Causal graph for regression.
+// | fig-width: 100px
+// | fig-height: 100px
+// | column: margin
+digraph D {
+  {W, X} -> {Y} [color=blue]
+}
+```
 
-__Instrumental variables__
+__Regression.__ Controlling for the known confounders can already help to substantially reduce the bias, especially if the relationships are linear, and may as well be considered a causal method.
 
 ```{dot}
 // | label: fig-causal-graph-iv
@@ -265,15 +214,13 @@ digraph D {
 }
 ```
 
-<!-- The _instrumental variable_ approach leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. The _exclusion restriction_ (see @sec-app2-iv) assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome. -->
+__Instrumental variables.__ The _instrumental variable_ approach leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. The _exclusion restriction_ (see @sec-app2-iv) assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome.
 
-This method utilizes one or more instrumental variables. Valid isntruments affect the treatment but do not directly affect the outcome -- not via other paths and not even via confounding. This is especially true for approximately random variables, such as the weather. (The weather is not purely random but also contains regional and seasonal components; but we can try to isolate them or work around the problem.)
+... This is especially true for approximately random variables, such as the weather. (The weather is not purely random but also contains regional and seasonal components; but we can try to isolate them or work around the problem.)
 
 In the simplest case, we can compare the effect of __Z__ on __W__ with the effect of __Z__ on __Y__ to obtain the desired estimate for the effect of __W__ on __Y__. We can also apply _two-stage_ approaches to first isolate the part of __W__ that is caused by __Z__, and then estimate its impact on __Y__.
 
-Thanks to instrumental variables, we can legitimately ignore the unknown confounders, which is really nice. A requirement is always that the instrument is valid and sufficiently strong, that is, that it has a strong effect on the treatment __W__.
-
-__Synthetic control__
+Thanks to instrumental variables, we can legitimately ignore the unknown confounders. A requirement is always that the instrument is valid and sufficiently strong, that is, that it has a strong effect on the treatment __W__.
 
 ```{dot}
 // | label: fig-causal-graph-synth
@@ -289,15 +236,13 @@ digraph D {
 }
 ```
 
-<!-- The synthetic control method [@abadieSyntheticControlMethods2010; @cunninghamCausalInferenceMixtape2021, ch. 10] leverages the idea of comparing a region where a protest happens with other regions where no protest happens on the same day. However it goes beyond a simple comparison. Instead it constructs a _synthetic region_ from all the control regions that is as close as possible to the treatment region. The synthetic region can then be used to model the counterfactual of no protest for the treatment region. -->
+__Synthetic control.__ The synthetic control method [@abadieSyntheticControlMethods2010; @cunninghamCausalInferenceMixtape2021, ch. 10] leverages the idea of comparing a region where a protest happens with other regions where no protest happens on the same day. However it goes beyond a simple comparison. Instead it constructs a _synthetic region_ from all the control regions that is as close as possible to the treatment region. The synthetic region can then be used to model the counterfactual of no protest for the treatment region.
 
 The underlying assumption for the synthetic control method is that the unknown confounders affect the different regions uniformly: On any given day, the impact of the confounders is the same for all regions. This assumption is plausible especially for confounders coming from global and national politics and events; it is violated by regional confounders, but maybe they are not so important and we can live with it.
 
 Under this assumption, we can perform matching based on the date: To estimate the impact of a protest group in one region on a given date, we find other regions where no such event has taken place, and compare the effect.
 
 The synthetic control method goes a bit further and also takes the effect of known differences between the regions into account. From all the available control regions, it constructs a _synthetic region_. The synthetic region interpolates between the control regions such that the interpolated region is as close as possible to the treatment region in some respect. This interpolation can be performed in terms of sociodemographic similarity, or in terms of maximizing the predictive accuracy of the outcome variable, based on past observations. (This is a bit of a simplification, the details are explained in @sec-synth.)
-
-__Propensity scores__
 
 ```{dot}
 // | label: fig-causal-graph-prop
@@ -312,19 +257,17 @@ digraph D {
 }
 ```
 
-<!-- Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events. -->
+__Propensity scores.__ Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events.
 
 Propensity score methods estimate the probability (propensity) of receiving the treatment. There are various strategies for eliminating selection bias with the use of propensity scores: notably propensity score matching, propensity score stratification, inverse propensity weighting. Double machine learning estimators such as causal forests help with estimating heterogenous treatment effects.
 
 Propensity score methods still suffer from _omitted variable bias_ if there are unknown confounders. This can be mitigated by learning propensity scores from less structured big data such as texts, using classification models from natural language processing. The advantage of doing so is that the unknown confounders need not be pre-specified. The assumption is that the texts need to contain all of the unknown confounders, and in some detectable form. While this will never completely be the case (and cannot be verified anyway), I can hope that it at least substantially reduces the bias.
 
-__Time-series modelling__ {#sec-time-series}
-
-The variables on one day may also be influenced by the same set of variables from the previous day. On the one hand, this makes modeling more complicated. On the other hand, it is an advantage, because we have the data from the previous days already in the dataset, and using them can help reduce the amount of unknown confounding. Specifically, I consider all variables from the previous day as potential confounders for the current day. Variables from multiple days earlier may still be relevant, but less so, so it will be acceptable to make a cutoff at some point. We can restrict the previous variables to those from the same region, or we can also include previous variables from other regions where it seems useful.
+__Time-series modelling.__ The variables on one day may also be influenced by the same set of variables from the previous day. On the one hand, this makes modeling more complicated. On the other hand, it is an advantage, because we have the data from the previous days already in the dataset, and using them can help reduce the amount of unknown confounding. Specifically, I consider all variables from the previous day as potential confounders for the current day. Variables from multiple days earlier may still be relevant, but less so, so it will be acceptable to make a cutoff at some point. We can restrict the previous variables to those from the same region, or we can also include previous variables from other regions where it seems useful. ...
 
 ```{dot}
 // | label: fig-causal-graph-time-series
-// | fig-cap: Version of the causal graph (@fig-causal-graph-simple) from a time series perspective. The variables of each day are influenced by the variables from the previous days in the same region. We can model that by including all variables from one day as potential confounders for the following day.
+// | fig-cap: TODO fix the graph! Version of the causal graph (@fig-causal-graph-simple) from a time series perspective. The variables of each day are influenced by the variables from the previous days in the same region. We can model that by including all variables from one day as potential confounders for the following day.
 // | fig-width: 200px
 // | fig-height: 400px
 // | column: margin
@@ -376,33 +319,6 @@ digraph D {
   dummy_1 -> X2 [ltail=cluster_1 style=dotted label="include\nvariables" constraint=False]
 }
 ```
-
-<!--
-In time-series models, be it for forecasting or classification, the predictor variables usually fall into 3 categories:
-
-- __Historic variables:__ Variables that are only available for past dates but not for the date of the prediction. This is especially true for the target variable^[The lags of the target variable are more specifically called an __autoregressive__ variable.]; since its future value should be predicted, it should not be present as a predictor.
-- __Future variables:__ Variables whose values are available for past dates as well as the date of the prediction.
-- __Static variables:__ These are time-independent.
-
-@tbl-time-series gives an overview how these categories are applicable within the different causal methods.
-
-::: {#tbl-time-series}
-
-| Target | Predictors | Method |
-| ------ | ---------- | ------ |
-| __Y__ | \boldmath$X_{f,s}, Y_h, W_f$ | Regression |
-| __Y__ | \boldmath$X_{f,s}, Y_h, W_f, Z_f$ | IV stage 1 |
-| __W__ | \boldmath$X_{f,s}, Y_h, W_h, Z_f$ | IV stage 1 |
-| __Y__ | \boldmath$X_{f,s}, Y_h, W_h, \hat W_f$ | IV stage 2 |
-| __Y__ | \boldmath$X_{f,s}, Y_h, Y_{R_0f}$ | Synthetic control |
-| __W__ | \boldmath$X_{f,s}, Y_h, W_h$ | Propensity score |
-
-: Subscripts $\scriptsize f, h, s$ denote future, historic and static variables.
-
-:::
-
-\begingroup
-\color{Blue} -->
 
 
 ### Case study

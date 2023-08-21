@@ -1,4 +1,4 @@
-## Appendix 2: Theory {#sec-reg}
+## Appendix 2: Theory {#sec-app2}
 
 I want to determine the _Average Treatment Effect on the Treated (ATT)_ $\tau_T$ for different protest groups[^CATT], and along multiple dimensions of newspaper coverage. I am not interested in the _Average Treatment Effect_ [on the whole population] that is often denoted by $\tau$, so I write $\tau:=\tau_T$.
 
