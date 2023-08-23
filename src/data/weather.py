@@ -42,6 +42,10 @@ def get_weather_history(location: str, country: str) -> pd.DataFrame:
 
 @cache
 def impute_weather_history(df: pd.DataFrame) -> pd.DataFrame:
+    # ugly hack for dealing with nan's
+    # for deseasoned variables it's probably okay (?)
+    nan_columns = df.columns[df.isna().all()]
+    df[nan_columns] = df[nan_columns].fillna(0)
     imp = IterativeImputer(
         max_iter=10, random_state=0, estimator=RandomForestRegressor()
     )

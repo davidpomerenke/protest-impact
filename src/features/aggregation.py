@@ -45,6 +45,8 @@ def treatment_unaggregated(source: str) -> pd.DataFrame:
     elif source == "gpreg":
         df = df[df["source"] == "gpreg"]
         df["size"] = df["size_pre"]
+        # Sachsen data only begins in 2020 and seems incomplete
+        df = df[df.region != "Sachsen"]
         return df.drop(columns=["size_pre", "size_post", "source"])
     elif source == "mean":
         # only for the synthetic control method
@@ -92,6 +94,9 @@ def treatment(region: str, source: str = "acled") -> pd.DataFrame:
     ]
     for col in bool_cols:
         df[col] = df[col].astype(int)
+    occ_protest = df[[c for c in df.columns if c.startswith("occ_")]]
+    if occ_protest.query("date.dt.year == 2020").sum().sum() == 0:
+        return None
     # create index for the whole time range and fill missing values with 0
     index = pd.date_range(start=start, end=end, freq="D")
     df = df.reindex(index, fill_value=0)
@@ -219,6 +224,8 @@ def one_region(
     if ignore_medium:
         df_y = ignore_medium_(df_y)
     df_w = treatment(region, protest_source)
+    if df_w is None:
+        return None
     df_w = df_w[[c for c in df_w.columns if c.startswith("occ_")]]
     if ignore_group:
         df_w = df_w.any(axis=1).astype(int).to_frame("occ_protest")
@@ -232,7 +239,7 @@ def one_region(
             frac=1, replace=True, ignore_index=True, random_state=random_state
         ).set_index(df_w.index)
     if add_features is not None:
-        if "size" in add_features:
+        if "size" in add_features and protest_source in ["acled"]:
             df_w_ = treatment(region, protest_source)
             df_w_size = df_w_[[c for c in df_w_.columns if c.startswith("size_")]]
             df_w_size = np.arcsinh(df_w_size)

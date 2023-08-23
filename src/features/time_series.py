@@ -26,6 +26,7 @@ def get_lagged_df(
     add_features: list[str] | None = None,
     return_loadings: bool = False,
     shift_instruments: bool = False,
+    protest_source: str = "acled",
 ):
     """
     Include time-series lags, that is, past values of the various variables.
@@ -69,6 +70,7 @@ def get_lagged_df(
         random_treatment_regional=random_treatment_regional,
         add_features=add_features,
         instrument_shift=step if shift_instruments else 0,
+        protest_source=protest_source,
     ):
         lagged_df = pd.concat(
             [df.shift(-lag).add_suffix(f"_lag{lag}") for lag in lags], axis=1

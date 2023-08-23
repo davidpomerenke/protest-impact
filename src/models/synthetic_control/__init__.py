@@ -122,12 +122,13 @@ def synthetic_control_multiple(
     add_features: list[str] | None = None,
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
+    protest_source: str = "acled",
     n_jobs: int = 4,
     show_progress: bool = True,
 ):
     dfs = all_regions(
         ignore_group=ignore_group,
-        protest_source="acled",
+        protest_source=protest_source,
         positive_queries=True,
         ignore_medium=ignore_medium,
         add_features=add_features,
@@ -197,6 +198,7 @@ def synthetic_control(
     positive_queries: bool = True,
     random_treatment_regional: bool = None,
     random_treatment_global: bool = None,
+    protest_source: str = "acled",
     n_jobs: int = 4,
     show_progress: bool = True,
 ) -> pd.DataFrame:
@@ -214,6 +216,7 @@ def synthetic_control(
         add_features=add_features,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
+        protest_source=protest_source,
         n_jobs=n_jobs,
         show_progress=show_progress,
     )

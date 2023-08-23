@@ -59,6 +59,7 @@ def _apply_method(
     shift_instruments: bool = False,
     random_treatment_regional: int | None = None,
     random_treatment_global: int | None = None,
+    protest_source: str = "acled",
     **kwargs,
 ):
     """
@@ -89,6 +90,7 @@ def _apply_method(
         add_features=add_features,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
+        protest_source=protest_source,
     )
     coefs = method(target=target, lagged_df=lagged_df, **kwargs)
     coefs["step"] = step

@@ -92,6 +92,7 @@ def plot_trends(
     steps=range(0, 15),
     random_treatment_regional=None,
     random_treatment_global=None,
+    protest_source="acled",
     n_jobs=4,
     show_progress=True,
 ):
@@ -111,6 +112,7 @@ def plot_trends(
         add_features=["size", "ewm"],
         n_jobs=n_jobs,
         show_progress=show_progress,
+        protest_source=protest_source,
     )
     fig_params = dict(predictor=treatment, targets=targets)
     for i, (mname, m) in enumerate(_methods.items()):
@@ -135,6 +137,7 @@ def compute_groups(
     random_treatment_regional=None,
     random_treatment_global=None,
     treatments="occ_protest",
+    protest_source="acled",
 ):
     targets = [
         "media_combined_protest",
@@ -156,6 +159,7 @@ def compute_groups(
             positive_queries=False,
             random_treatment_regional=random_treatment_regional,
             random_treatment_global=random_treatment_global,
+            protest_source=protest_source,
         )
         for mname, m in _methods.items():
             if mname not in methods:
@@ -169,17 +173,22 @@ def compute_groups(
 
 
 def plot_groups(
-    step, kind, random_treatment_regional=None, random_treatment_global=None
+    step,
+    kind,
+    random_treatment_regional=None,
+    random_treatment_global=None,
+    protest_source="acled",
 ):
     match kind:
         case "groups":
             groups = [
                 "occ_FFF",
                 # "occ_FFFX",
-                "occ_ALG",
+                *(["occ_ALG"] if protest_source != "gpreg" else []),
                 "occ_XR",
-                "occ_EG",
+                *(["occ_EG"] if protest_source != "gpreg" else []),
                 "occ_GP",
+                # "occ_OTHER_CLIMATE_ORG",
             ]
             methods = ["synthetic_control"]
         case "methods":
@@ -191,8 +200,14 @@ def plot_groups(
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
         treatments=groups,
+        protest_source=protest_source,
     )
     results = results[results["treatment"].isin(groups)]
+    results["treatment"] = (
+        results["treatment"]
+        .str.replace("occ_", "")
+        .str.replace("OTHER_CLIMATE_ORG", "other")
+    )
     results["target"] = results["target"].str.replace("media_combined_", "")
     dimensions = ["protest", "not_protest", "framing", "goal", "subsidiary_goal"]
     x = alt.X(
