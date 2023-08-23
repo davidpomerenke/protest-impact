@@ -5545,6 +5545,20 @@ files = [
 decorator = "*"
 
 [[package]]
+name = "ratelimiter"
+version = "1.2.0.post0"
+description = "Simple python rate limiting object"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ratelimiter-1.2.0.post0-py3-none-any.whl", hash = "sha256:a52be07bc0bb0b3674b4b304550f10c769bbb00fead3072e035904474259809f"},
+    {file = "ratelimiter-1.2.0.post0.tar.gz", hash = "sha256:5c395dcabdbbde2e5178ef3f89b568a3066454a6ddc223b76473dac22f89b4f7"},
+]
+
+[package.extras]
+test = ["pytest (>=3.0)", "pytest-asyncio"]
+
+[[package]]
 name = "readability-lxml"
 version = "0.8.1"
 description = "fast html to text parser (article readability tool) with python 3 support"
@@ -7662,4 +7676,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "c09beb5b14952fdd24739c1cf0cce1f08eee1e6d5e98a3b3c015b8f3f11d9c8f"
+content-hash = "68ca06ebd379db4a1c753f543d2bdf32e01332e934eeecc9b940742e51d50a08"
