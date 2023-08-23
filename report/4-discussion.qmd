@@ -17,7 +17,7 @@ __Placebo behaviour.__ The estimated effects for the pre-treatment clearly diffe
 
 ### Instrumental variables
 
-__Correlation and Wald estimate.__ The correlation between the instruments and the treatment is generally very low. Wald estimates are scaled inversely by this first-stage correlations, and measurement errors make them unreliable when they are close to zero. We can assume with certainty that the first-stage correlations are smaller than 1, so the correlation between the instruments and the outcome can be taken as a lower bound for the causal impact of the protests, but they are low and we have no confidence intervals. We could compute confidence intervals for them, but they are implausibly low anyway.
+__Correlation and Wald estimate.__ The correlation between the instruments and the treatment is generally very low. Wald estimates are scaled inversely by this first-stage correlations, and measurement errors make them unreliable when they are close to zero. We can assume with certainty that the first-stage correlations are smaller than 1, so the correlation between the instruments and the outcome can be taken as a lower bound for the causal impact of the protests, but they are very low.
 
 <!-- __Principal component analysis.__ P-values for multiple regression with all instruments are generally low, and PCA successfully helps to recover  -->
 

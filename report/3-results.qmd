@@ -465,7 +465,7 @@ plot_groups(kind="groups", step=6)
 To do: impact by dataset.
 
 ```{python}
-# | label: fig-impact-ts
+# | label: fig-impact-ts-gpreg
 # | fig-cap: Causal impact estimates by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
 # | column: page
 # | echo: false
@@ -484,7 +484,7 @@ plt.show()
 ```
 
 ```{python}
-# | label: fig-impact-groups-7
+# | label: fig-impact-groups-7-gpreg
 # | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | column: page
 # | echo: false

@@ -42,6 +42,7 @@ def objective(params):
     return params
 
 
+@cache
 def hyperopt(n_jobs=4, show_progress=True):
     lags = [1, 7, 30, 90, 180, 270, 360]
     # lags = range(84, 169, 28)

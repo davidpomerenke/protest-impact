@@ -16,7 +16,7 @@ from src.models.propensity_scores import _doubly_robust, _propensity_weighting
 from src.models.regression import _regression
 
 
-# @cache
+@cache
 def apply_method(
     target: str | list[str] | Literal["protest", "goals", "all"],
     steps: Iterable[int] = range(7),

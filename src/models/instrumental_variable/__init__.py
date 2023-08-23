@@ -53,6 +53,7 @@ def get_data(instruments_, loadings=False):
     return df, instruments, treatment, outcome, confounders
 
 
+@cache
 def get_covariances(instruments):
     df, instruments, treatment, outcome, _ = get_data(instruments)
 
@@ -89,6 +90,7 @@ def get_covariances(instruments):
     return covs
 
 
+@cache
 def get_coefficients(instruments_):
     df, instruments, treatment, outcome, confounders = get_data(instruments_)
     loadings_df = None
@@ -122,6 +124,7 @@ def get_coefficients(instruments_):
     return params, loadings_df
 
 
+@cache
 def pc_vis(instruments, numbers, dfs=slice(None)):
     loadings_dfs = get_data(instruments, loadings=True)
     for loadings_df in loadings_dfs[dfs]:
