@@ -407,7 +407,47 @@ alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="methods", step=6)
 ```
 
-@fig-impact-groups-7 break down the 7-day cumulative impact for the different protest groups, as estimated by the synthetic control method.
+@fig-impact-medium differentiates between the impact on online newspapers and on print newspapers, only for the synthetic control method. @fig-impact-groups-7 break down the 7-day cumulative impact for the different protest groups, as estimated by the synthetic control method.
+
+```{python}
+# | label: fig-impact-medium
+# | fig-cap: Causal impact estimates for online vs print newspapers, as estimated by the synthetic control method. The protest day is at x=0.
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import _synthetic_control, plot_impact_ts
+
+fig, axes = plt.subplots(1, 2, figsize=(6, 4), sharey=True, sharex=True)
+targets = [
+    "media_online_protest",
+    "media_online_not_protest",
+    "media_print_protest",
+    "media_print_not_protest",
+]
+
+results = _synthetic_control(
+    target=targets,
+    treatment="occ_protest",
+    steps=range(15),
+    ignore_group=True,
+    ignore_medium=False,
+    positive_queries=False,
+    add_features=["size", "ewm"],
+    lags=range(-180,1),
+)
+plot_impact_ts(results, "occ_protest", targets[:2], ax=axes[0])
+axes[0].set_title("Online newspapers")
+plot_impact_ts(results, "occ_protest", targets[2:], ax=axes[1])
+axes[1].set_title("Print newspapers")
+handles, labels = axes[0].get_legend_handles_labels()
+labels = [
+    "articles mentioning climate change AND protest",
+    "articles mentioning climate change AND NOT protest",
+]
+fig.legend(handles, labels, loc="lower center", ncol=1, bbox_to_anchor=(0.5, -0.1))
+fig.tight_layout()
+plt.show()
+```
 
 ```{python}
 # | label: fig-impact-groups-7
@@ -422,4 +462,4 @@ alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="groups", step=6)
 ```
 
-To do: Impact by online vs print newspapers; impact by dataset.
+To do: impact by dataset.

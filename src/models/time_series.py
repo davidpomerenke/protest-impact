@@ -43,6 +43,7 @@ def apply_method(
     return pd.concat(results).reset_index(drop=True)
 
 
+@cache
 def _apply_method(
     method_name: str,
     target: str,

@@ -223,7 +223,6 @@ def check_for_improvement(instrument_prefix="weather_"):
 # time series methods:
 
 
-@cache
 def _instrumental_variable(
     target: str, treatment: str, instrument: str, lagged_df: pd.DataFrame
 ):
@@ -263,7 +262,6 @@ def _instrumental_variable(
     return estimator, coefs
 
 
-@cache
 def _instrumental_variable_liml(
     target: str,
     treatment: str,

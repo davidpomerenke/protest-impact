@@ -1,10 +1,7 @@
 import pandas as pd
 import statsmodels.api as sm
 
-from src.cache import cache
 
-
-@cache
 def _regression(
     target: str, lagged_df: pd.DataFrame, treatment=None, no_controls: bool = False
 ):

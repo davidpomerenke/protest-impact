@@ -114,6 +114,8 @@ def plot_trends(
     )
     fig_params = dict(predictor=treatment, targets=targets)
     for i, (mname, m) in enumerate(_methods.items()):
+        if show_progress:
+            print(mname)
         ax = axes[i]
         plot_impact_ts(m(**params), ax=ax, **fig_params)
         ax.set_title(mname)

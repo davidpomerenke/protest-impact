@@ -123,7 +123,7 @@ class CachedLogisticRegression(BaseEstimator, ClassifierMixin):
         return (probas > 0.5).astype(int)
 
 
-propensity_model = LogisticRegression(
+propensity_model = CachedLogisticRegression(
     solver="liblinear",  # alternative: newton-cholesky
     max_iter=100,
     # class_weight="balanced",
@@ -131,7 +131,6 @@ propensity_model = LogisticRegression(
 )
 
 
-@cache
 def _propensity_weighting(
     target: str, treatment: str, lagged_df: pd.DataFrame, **kwargs
 ):
@@ -146,7 +145,6 @@ def _propensity_weighting(
     return _dowhy_model_estimation(estimator, target, treatment, lagged_df, **kwargs)
 
 
-@cache
 def _doubly_robust(target: str, treatment: str, lagged_df: pd.DataFrame, **kwargs):
     """
     For use with models.time_series.apply_method.
