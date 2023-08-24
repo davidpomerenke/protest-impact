@@ -49,6 +49,8 @@ TODO: use official frontpage, add abstract
 
 {{< pagebreak >}}
 
+\renewcommand{\thesection}{}
+
 ## References
 
 <!--

@@ -137,7 +137,7 @@ def compute_groups(
     random_treatment_regional=None,
     random_treatment_global=None,
     treatments="occ_protest",
-    protest_source="acled",
+    protest_sources=["acled"],
 ):
     targets = [
         "media_combined_protest",
@@ -149,25 +149,27 @@ def compute_groups(
     cumulative = True
     data = []
     for treatment in treatments:
-        params = dict(
-            target=targets,
-            treatment=treatment,
-            steps=[step],
-            cumulative=cumulative,
-            ignore_group=treatment == "occ_protest",
-            ignore_medium=True,
-            positive_queries=False,
-            random_treatment_regional=random_treatment_regional,
-            random_treatment_global=random_treatment_global,
-            protest_source=protest_source,
-        )
-        for mname, m in _methods.items():
-            if mname not in methods:
-                continue
-            results = m(**params)
-            results["method"] = mname
-            results["treatment"] = treatment
-            data.append(results)
+        for protest_source in protest_sources:
+            params = dict(
+                target=targets,
+                treatment=treatment,
+                steps=[step],
+                cumulative=cumulative,
+                ignore_group=treatment == "occ_protest",
+                ignore_medium=True,
+                positive_queries=False,
+                random_treatment_regional=random_treatment_regional,
+                random_treatment_global=random_treatment_global,
+                protest_source=protest_source,
+            )
+            for mname, m in _methods.items():
+                if mname not in methods:
+                    continue
+                results = m(**params)
+                results["method"] = mname
+                results["treatment"] = treatment
+                results["source"] = protest_source
+                data.append(results)
     results = pd.concat(data)
     return results
 
@@ -191,16 +193,28 @@ def plot_groups(
                 # "occ_OTHER_CLIMATE_ORG",
             ]
             methods = ["synthetic_control"]
+            sources = ["acled"]
         case "methods":
             groups = ["occ_protest"]
             methods = list(_methods.keys())
+            sources = ["acled"]
+        case "sources":
+            groups = ["occ_protest"]
+            methods = ["synthetic_control"]
+            sources = ["acled", "gpreg", "gprep"]
     results = compute_groups(
         methods,
         step,
         random_treatment_regional=random_treatment_regional,
         random_treatment_global=random_treatment_global,
         treatments=groups,
-        protest_source=protest_source,
+        protest_sources=sources,
+    )
+    results["source"] = (
+        results["source"]
+        .str.replace("gpreg", "Registrations (GPReg)")
+        .str.replace("gprep", "Reports automated (GPRep)")
+        .str.replace("acled", "Reports curated (ACLED)")
     )
     results = results[results["treatment"].isin(groups)]
     results["treatment"] = (
@@ -261,6 +275,10 @@ def plot_groups(
                     column=alt.Column("method:N", title="", sort=list(_methods.keys())),
                 )
                 .resolve_scale(y="independent")
+            )
+        case "sources":
+            return alt.layer(bars, error_bars, data=results).facet(
+                column=alt.Column("source:N", title=""),
             )
 
 

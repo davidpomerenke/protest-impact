@@ -6,6 +6,9 @@ bibliography: [references.bib]
 csl: chicago-author-date.csl
 reference-location: margin
 citation-location: document
+license: "CC BY-NC"
+date: "2023-08-30"
+author: "David Pomerenke"
 execute:
   freeze: true
 format:

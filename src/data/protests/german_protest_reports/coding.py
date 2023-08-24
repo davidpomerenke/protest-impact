@@ -165,19 +165,20 @@ def coding(limit: int = None):
     df = pd.DataFrame(items)
     df = df.rename(
         columns={
+            "protest_date": "date",
             "protest_group": "actor",
             "n_participants": "size",
             "city": "location",
             "description": "notes",
         }
     )
-    df = df[["protest_date", "region", "location", "actor", "size", "notes"]]
+    df["country"] = "Germany"
+    df = df[["date", "country", "region", "location", "actor", "size", "notes"]]
     df = df[df.location.notna() & df.region.notna()]
+    df = df[df.date.notna()]
     print(df.columns)
     print(len(df))
-    df = df.drop_duplicates().sort_values(
-        ["protest_date", "region", "location", "actor"]
-    )
+    df = df.drop_duplicates().sort_values(["date", "region", "location", "actor"])
     df.to_csv(interim_data / "german-protest-reports/protests.csv", index=False)
 
 

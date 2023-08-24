@@ -25,7 +25,7 @@ from src.data.protests import (
     load_protests,
 )
 
-query = "date.dt.year in [2020, 2021, 2022] & country == 'Germany'"
+query = "date.dt.year in [2019, 2020, 2021, 2022] & country == 'Germany'"
 protests = load_protests().query(query)
 climate_protests = load_climate_protests_with_labels().query(query)
 ```
@@ -54,7 +54,7 @@ df = (
     .reset_index()
 )
 df = df.set_index("date")
-df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg"))
+df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg", gprep="GPRep"))
 df = df.resample("1W").sum()
 df.plot(
     figsize=(14, 1.5),
@@ -62,6 +62,7 @@ df.plot(
     linewidth=1,
     ylabel="#protests",
 )
+plt.legend(loc="upper center", ncol=3, bbox_to_anchor=(0.5, -0.4))
 plt.show()
 ```
 
@@ -373,7 +374,7 @@ I have 16 candidate variables for potential instruments. Their nature and validi
 
 1. __Correlation.__ I compute correlations and Wald estimates (see @sec-app2-iv-ils) and compare them to each other. The Wald estimator is only valid for strong instruments.
 2. __Regression.__ I perform first-stage regression, that is, I regress protest occurrence on all instruments, controlling for the known confounders (time series data, in the same format of the hyperparameter optimization from @sec-res-reg). I adjust p-values for multiple testing via the Benjamini-Yekutieli procedure [@benjaminiControlFalseDiscovery2001a] because the variables are likely very correlated.
-3. __Deseasoning.__ Instrumental variables should be (almost) random, which is violated by seasonality, and most candidate variables have obvious seasonal patters. I compute seasonal components by taking 90-day rolling averages with a Gaussian window with a standard deviation of 30 days. I consider only the nonseasonal components, that is the residuals of the seasonal components, are potentially valid instruments. Again I perform first-stage regression on these residuals, controlling for the knwon confounders and the seasonal components. <!-- (The residual components seem much more meaningful when given the seasonal components.) -->
+3. __Deseasoning.__ Instrumental variables should be (almost) random, which is violated by seasonality, and most candidate variables have obvious seasonal patters.^[This problem is not present in most prior work, because it typically compares the impact during a single fixed timespan across geographical units (see @sec-weatherlit).] I compute seasonal components by taking 90-day rolling averages with a Gaussian window with a standard deviation of 30 days. I consider only the nonseasonal components, that is the residuals of the seasonal components, are potentially valid instruments. Again I perform first-stage regression on these residuals, controlling for the knwon confounders and the seasonal components. <!-- (The residual components seem much more meaningful when given the seasonal components.) -->
 4. __Principal components.__ Since there is probably a high correlation among the covid variables as well as among the weather variables, I compute principal components both for the seasonal and for the nonseasonal components, separately. The intent is (a) to potentially find components that have a higher impact than the individual instruments, because they may find and isolate patters, and (b) to account for the problem that regression may underestimate the impact of multicollinear variables.
 
 Then I use an alternative of two-stage least squares (see @sec-app2-2sls) that is more robust to weak instruments, namely _limited information maximum likelihood_ (LIML) to estimate the causal effect. I include the same confounders as from the optimized regression model (@sec-res-reg). I use the `IVLIML` implementation from the `linearmodels` library [@sheppardBashtageLinearmodelsRelease2023a].
