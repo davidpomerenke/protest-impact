@@ -130,11 +130,19 @@ def parse_response(response):
         for parsed_response in responses_:
             if not isinstance(parsed_response, dict):
                 continue
-            if parsed_response["IS_CLIMATE_PROTEST_EVENT"]:
-                parsed_response["CITY"] = parsed_response["CITY"].split(",")[0]
+            if (
+                parsed_response["IS_CLIMATE_PROTEST_EVENT"] is True
+                and parsed_response["PAST_OR_FUTURE"] == "PAST"
+            ):
+                city = (parsed_response["CITY"] or "").split(",")
+                parsed_response["CITY"] = city[0]
                 parsed_response["PROTEST_DATE"] = parse(
                     f"{parsed_response['PROTEST_DATE_DAY']} {parsed_response['PROTEST_DATE_MONTH']} {parsed_response['PROTEST_DATE_YEAR']}"
                 )
+                del parsed_response["PROTEST_DATE_DAY"]
+                del parsed_response["PROTEST_DATE_MONTH"]
+                del parsed_response["PROTEST_DATE_YEAR"]
+                del parsed_response["IS_CLIMATE_PROTEST_EVENT"]
                 parsed_response["REGION"] = get_region(parsed_response["CITY"])
                 parsed_response = {k.lower(): v for k, v in parsed_response.items()}
                 parsed_responses.append(parsed_response)
@@ -153,15 +161,28 @@ def coding(limit: int = None):
     responses = Parallel(n_jobs=1)(
         delayed(get_coding)(row) for i, row in tqdm(list(df.iterrows())[:limit])
     )
+    responses = [r for r in responses if r is not None]
     print("Done")
     costs, responses = zip(*responses)
     print(f"Total cost: {sum(costs)}")
-    parsed_responses = Parallel(n_jobs=4)(
+    parsed_responses = Parallel(n_jobs=1)(
         delayed(parse_response)(response) for response in tqdm(responses)
     )
     items = [item for sublist in parsed_responses for item in sublist]
     df = pd.DataFrame(items)
+    df = df.rename(
+        columns={
+            "protest_group": "actor",
+            "n_participants": "size",
+            "city": "location",
+            "description": "notes",
+        }
+    )
+    df = df[["protest_date", "region", "location", "actor", "size", "notes"]]
+    df.to_csv(interim_data / "german_protest_reports/protests.csv", index=False)
     print(df.columns)
+    print(len(df))
 
 
-coding()
+if __name__ == "__main__":
+    coding()
