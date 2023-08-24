@@ -21,10 +21,6 @@ def read_data():
     return items
 
 
-# path = interim_data / "german_protest_reports"
-# labelpath = path / "labels"
-# labelpath.mkdir(exist_ok=True, parents=True)
-
 schema = """
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
