@@ -30,6 +30,17 @@ TODO: use official frontpage, add abstract
 
 {{< pagebreak >}}
 
+<!-- \setcounter{section}{0}
+\renewcommand{\thesection}{\Alph{section}}
+
+\setcounter{table}{0}
+\renewcommand{\thetable}{A\arabic{table}}
+
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{A\arabic{figure}} -->
+
+\appendix
+
 {{< include 6-appendix1.qmd >}}
 
 {{< pagebreak >}}
