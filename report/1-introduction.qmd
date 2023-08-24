@@ -83,6 +83,8 @@ The "protest paradigm" [@mcleodManufacturePublicOpinion1992] theorizes that news
 
 @AttentionClimateChange2023 find that the Covid-19 pandemic has led to a fewer discussion of climate protests on Twitter, albeit not to fewer discussion of the climate crisis itself.
 
+@seitzWhoCaresClimate2021 find that certain innate personality traits of German citizens strongly predict the priority given to climate change policy and the support for specific climate policies. They call on future work to investigate the causal pathway and suggest that personal media attention might be an important mediator.
+
 Todo: Teune, Wasow, maybe Repke.
 
 #### Causal approaches to protest event analysis {#sec-lit-causal}
@@ -114,6 +116,8 @@ TODO: add citations
 TODO literature that uses diff-in-diff
 
 ### Causal impact estimation {#intro-causal}
+
+Causality [@humeEnquiryConcerningHuman2008; @spohnStochasticIndependenceCausal1980; @spirtesCausationPredictionSearch1993; @pearlCausalityModelsReasoning2000; @imbensCausalInferenceStatistics2015]
 
 TODO: I'll go over this again, tidy it up and make it a bit more precise. And add citations for the methods and references to @sec-app2 with the formulas.
 
