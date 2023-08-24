@@ -7,6 +7,7 @@ from src.data.protests.acled import load_acled_protests
 from src.data.protests.german_protest_registrations import (
     load_german_protest_registrations,
 )
+from src.data.protests.german_protest_reports import load_german_protest_reports
 from src.data.protests.keywords import all_keywords, movement_keywords
 
 
@@ -59,7 +60,10 @@ def load_protests():
     gpreg = load_german_protest_registrations()
     gpreg["source"] = "gpreg"
     gpreg.location = gpreg.location.apply(kill_umlauts_without_mercy)
-    protests = pd.concat([acled, gpreg])
+    gprep = load_german_protest_reports()
+    gprep["source"] = "gprep"
+    gprep.location = gprep.location.apply(kill_umlauts_without_mercy)
+    protests = pd.concat([acled, gpreg, gprep])
     protests = protests.reset_index(drop=True)
     protests["moderate"] = protests["type"].isin(["Peaceful protest"])
     protests["radical"] = protests["type"].isin(

@@ -4,16 +4,19 @@ import numpy as np
 import pandas as pd
 from geopy.geocoders import Nominatim
 from meteostat import Daily, Monthly, Point
+from ratelimiter import RateLimiter
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 
 from src.cache import cache
 
-geolocator = Nominatim(user_agent="protest-impact")
+geolocator = Nominatim(user_agent="protest-impact", domain="geocode.maps.co/")
 Daily.cache_dir = ".cache/meteostat"
+rate_limiter = RateLimiter(max_calls=1, period=1)
 
 
+@rate_limiter
 @cache
 def _get_weather_history(location, accessor, country):
     coordinates = geolocator.geocode(location + ", " + country)

@@ -133,16 +133,13 @@ def parse_response(response):
             if (
                 parsed_response["IS_CLIMATE_PROTEST_EVENT"] is True
                 and parsed_response["PAST_OR_FUTURE"] == "PAST"
+                and parsed_response["COUNTRY"] == "DE"
             ):
                 city = (parsed_response["CITY"] or "").split(",")
                 parsed_response["CITY"] = city[0]
                 parsed_response["PROTEST_DATE"] = parse(
                     f"{parsed_response['PROTEST_DATE_DAY']} {parsed_response['PROTEST_DATE_MONTH']} {parsed_response['PROTEST_DATE_YEAR']}"
                 )
-                del parsed_response["PROTEST_DATE_DAY"]
-                del parsed_response["PROTEST_DATE_MONTH"]
-                del parsed_response["PROTEST_DATE_YEAR"]
-                del parsed_response["IS_CLIMATE_PROTEST_EVENT"]
                 parsed_response["REGION"] = get_region(parsed_response["CITY"])
                 parsed_response = {k.lower(): v for k, v in parsed_response.items()}
                 parsed_responses.append(parsed_response)
@@ -179,9 +176,13 @@ def coding(limit: int = None):
         }
     )
     df = df[["protest_date", "region", "location", "actor", "size", "notes"]]
-    df.to_csv(interim_data / "german_protest_reports/protests.csv", index=False)
+    df = df[df.location.notna() & df.region.notna()]
     print(df.columns)
     print(len(df))
+    df = df.drop_duplicates().sort_values(
+        ["protest_date", "region", "location", "actor"]
+    )
+    df.to_csv(interim_data / "german-protest-reports/protests.csv", index=False)
 
 
 if __name__ == "__main__":

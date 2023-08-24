@@ -464,6 +464,8 @@ plot_groups(kind="groups", step=6)
 
 To do: impact by dataset.
 
+GPReg:
+
 ```{python}
 # | label: fig-impact-ts-gpreg
 # | fig-cap: Causal impact estimates by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
@@ -494,4 +496,28 @@ from src.visualization.impacts import plot_groups
 
 alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="groups", step=6, protest_source="gpreg")
+```
+
+GPRep:
+
+1401 overall
+1360 with nonnull region
+
+```{python}
+# | label: fig-impact-ts-gpreg
+# | fig-cap: Causal impact estimates by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
+fig, axes = plot_trends(cumulative=False, show_progress=True, protest_source="gprep")
+fig.suptitle("Time series of the causal impact by method and coverage dimension")
+axes[0].set_ylim(-30, 30)
+axes[1].set_ylim(-30, 30)
+axes[2].set_ylim(-5, 5)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-300, 300)
+plt.tight_layout()
+plt.show()
 ```
