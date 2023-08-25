@@ -24,6 +24,7 @@ from src.paths import models
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
+@cache
 def get_data(instruments_, loadings=False):
     df = get_lagged_df(
         "media_combined_protest",
@@ -124,7 +125,6 @@ def get_coefficients(instruments_):
     return params, loadings_df
 
 
-@cache
 def pc_vis(instruments, numbers, dfs=slice(None)):
     loadings_dfs = get_data(instruments, loadings=True)
     for loadings_df in loadings_dfs[dfs]:
