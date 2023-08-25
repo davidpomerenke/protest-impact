@@ -67,7 +67,7 @@ Automatically binarizing the variables based on an optimally chosen threshold do
 \begingroup
 \scriptsize\selectfont
 ```{python}
-# | label: fig-iv-basic
+# | label: tbl-iv-basic
 # | fig-cap: First-stage impact of the original instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed.
 # | echo: False
 
@@ -80,7 +80,7 @@ get_coefficients("weather_covid")[0].sort_values(by="p")
 \begingroup
 \scriptsize\selectfont
 ```{python}
-# | label: fig-iv-deseason
+# | label: tbl-iv-deseason
 # | fig-cap: First-stage impact of the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
 # | echo: False
 
@@ -93,7 +93,7 @@ get_coefficients("weather_covid_season")[0].sort_values(by="p").head(10)
 \begingroup
 \footnotesize\selectfont
 ```{python}
-# | label: fig-iv-deseason-pc
+# | label: tbl-iv-deseason-pc
 # | fig-cap: First-stage impact of principal components calculated separately for the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
 # | echo: False
 
@@ -116,9 +116,9 @@ pc_vis("pc_weather_covid_season", numbers=[9, 8, 11], dfs=slice(1, 2))
 
 Multiple steps are shown for the impact of the instruments on the treatment while controlling for known confounders and other instruments:
 
-1. @fig-iv-basic shows the impact of the original instruments. Three of the covid variables are relatively significant, the weather variables less so, with _wind speed_ being most significant and precipitation least significant.
-2. @fig-iv-deseason shows the impact for the variables after splitting them into seasonal and residual components. The most significant variables are seasonal ones derived from covid variables. Of the residuals, the _stringency index_, the movement data for "grocery and pharmacy", and _wind speed_ are most significant.
-3. @fig-iv-deseason-pc shows the principal components for the seasonal and residual variables from the previous step. The top two variables are much more significant than without PC, and one of them is a residual variable. The meaning of the three most significant reidual variables is shown in @fig-iv-pc-vis. According to the "rule of thumb" (@InstrumentalVariablesEstimation2023) the threshold for weak instruments is around f=10, so pc_resid_9 would be a strong instrument but the other ones would all be weak.
+1. @tbl-iv-basic shows the impact of the original instruments. Three of the covid variables are relatively significant, the weather variables less so, with _wind speed_ being most significant and precipitation least significant.
+2. @tbl-iv-deseason shows the impact for the variables after splitting them into seasonal and residual components. The most significant variables are seasonal ones derived from covid variables. Of the residuals, the _stringency index_, the movement data for "grocery and pharmacy", and _wind speed_ are most significant.
+3. @tbl-iv-deseason-pc shows the principal components for the seasonal and residual variables from the previous step. The top two variables are much more significant than without PC, and one of them is a residual variable. The meaning of the three most significant reidual variables is shown in @fig-iv-pc-vis. According to the "rule of thumb" (@InstrumentalVariablesEstimation2023) the threshold for weak instruments is around f=10, so pc_resid_9 would be a strong instrument but the other ones would all be weak.
 
 Placebo tests for the first stage are given in @fig-iv-1-placebo. The instrument has a significant impact on protest occurrence for a few days around the date where the instrument was measured. For days that are further away there is less impact, but not exactly zero. Placebo tests for the second stage are shown together with the other methods in @sec-res-placebo.
 
@@ -315,7 +315,7 @@ axes[0].set_ylim(-30, 30)
 axes[1].set_ylim(-30, 30)
 axes[2].set_ylim(-5, 5)
 axes[3].set_ylim(-5, 5)
-axes[4].set_ylim(-3000, 3000)
+axes[4].set_ylim(-1000, 1000)
 plt.tight_layout()
 plt.show()
 ```
