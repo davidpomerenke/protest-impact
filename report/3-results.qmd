@@ -259,6 +259,8 @@ fig.tight_layout()
 plt.show()
 ```
 
+In the _ACLED_ dataset there is a protest in every single region on March 19, 2021, so no control region can be constructed. For the _GPRep_ dataset this also occurs on September 9, 2021 and on March 25, 2022.
+
 #### Propensity scores
 
 Hyperparameter optimization shows that the best model is a logistic regression model without balanced class weights, using all available features (moving averages, differences, and log-scaled protest sizes), 4 days of time-series lags, and z-score standardization of all feature variables.
@@ -462,71 +464,7 @@ alt.renderers.enable("altair_saver", fmts=["html", "svg"])
 plot_groups(kind="groups", step=6)
 ```
 
-To do: impact by dataset.
-
-GPReg:
-
-```{python}
-# | label: fig-impact-ts-gpreg
-# | fig-cap: Causal impact estimates by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
-# | column: page
-# | echo: false
-import matplotlib.pyplot as plt
-from src.visualization.impacts import plot_trends
-
-fig, axes = plot_trends(cumulative=False, show_progress=False, protest_source="gpreg")
-fig.suptitle("Time series of the causal impact by method and coverage dimension")
-axes[0].set_ylim(-30, 30)
-axes[1].set_ylim(-30, 30)
-axes[2].set_ylim(-5, 5)
-axes[3].set_ylim(-5, 5)
-axes[4].set_ylim(-200, 200)
-plt.tight_layout()
-plt.show()
-```
-
-```{python}
-# | label: fig-impact-groups-sources
-# | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
-# | column: page
-# | echo: false
-
-import altair as alt
-from src.visualization.impacts import plot_groups
-
-alt.renderers.enable("altair_saver", fmts=["html", "svg"])
-plot_groups(kind="sources", step=6)
-```
-
-GPRep:
-
-1401 overall
-1353 with nonnull region and nonnull date
-
-dates without control regions:
-- 2021-03-19
-- 2021-09-24
-- 2022-03-25
-
-
-```{python}
-# | label: fig-impact-ts-gprep
-# | fig-cap: Causal impact estimates by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
-# | column: page
-# | echo: false
-import matplotlib.pyplot as plt
-from src.visualization.impacts import plot_trends
-
-fig, axes = plot_trends(cumulative=False, show_progress=False, protest_source="gprep")
-fig.suptitle("Time series of the causal impact by method and coverage dimension")
-axes[0].set_ylim(-30, 30)
-axes[1].set_ylim(-30, 30)
-axes[2].set_ylim(-5, 5)
-axes[3].set_ylim(-5, 5)
-axes[4].set_ylim(-200, 200)
-plt.tight_layout()
-plt.show()
-```
+@fig-impact-dataset and @fig-impact-groups-sources show how the impact estimates differ by dataset, for using the synthetic control method. Detailed results for the _GPReg_ and _GPRep_ datasets for all causal methods are in the appendix in @fig-impact-ts-gpreg and @fig-impact-ts-gprep, respectively.
 
 ```{python}
 # | label: fig-impact-dataset
@@ -538,9 +476,9 @@ from src.visualization.impacts import _synthetic_control, plot_impact_ts
 
 fig, axes = plt.subplots(1, 3, figsize=(9, 4), sharey=True, sharex=True)
 titles = [
-    "Registrations (GPReg)",
-    "Reports automated (GPRep)",
-    "Reports curated (ACLED)"
+    "Registrations data (GPReg)",
+    "Reports data automated (GPRep)",
+    "Reports data curated (ACLED)"
 ]
 targets = [
     "media_combined_protest",
@@ -568,4 +506,18 @@ labels = [
 fig.legend(handles, labels, loc="lower center", ncol=1, bbox_to_anchor=(0.5, -0.1))
 fig.tight_layout()
 plt.show()
+```
+
+
+```{python}
+# | label: fig-impact-groups-sources
+# | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
+# | column: page
+# | echo: false
+
+import altair as alt
+from src.visualization.impacts import plot_groups
+
+alt.renderers.enable("altair_saver", fmts=["html", "svg"])
+plot_groups(kind="sources", step=6)
 ```

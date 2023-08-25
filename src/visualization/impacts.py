@@ -212,9 +212,9 @@ def plot_groups(
     )
     results["source"] = (
         results["source"]
-        .str.replace("gpreg", "Registrations (GPReg)")
-        .str.replace("gprep", "Reports automated (GPRep)")
-        .str.replace("acled", "Reports curated (ACLED)")
+        .str.replace("gpreg", "Registrations data (GPReg)")
+        .str.replace("gprep", "Reports data automated (GPRep)")
+        .str.replace("acled", "Reports data curated (ACLED)")
     )
     results = results[results["treatment"].isin(groups)]
     results["treatment"] = (

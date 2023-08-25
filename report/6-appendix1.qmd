@@ -107,3 +107,44 @@ display(
 )
 ```
 \endgroup
+
+#### Impact estimates for the other datasets
+
+
+```{python}
+# | label: fig-impact-ts-gpreg
+# | fig-cap: Causal impact estimates on the _German protest registrations_ dataset by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
+fig, axes = plot_trends(cumulative=False, show_progress=False, protest_source="gpreg")
+fig.suptitle("GPReg: Time series of the causal impact by method and coverage dimension")
+axes[0].set_ylim(-30, 30)
+axes[1].set_ylim(-30, 30)
+axes[2].set_ylim(-5, 5)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-200, 200)
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+# | label: fig-impact-ts-gprep
+# | fig-cap: Causal impact estimates on the _German protest reports_ dataset by method and newspaper coverage dimension. The protest day is at x=0. Pay attention to the differences in the y-axis scale.
+# | column: page
+# | echo: false
+import matplotlib.pyplot as plt
+from src.visualization.impacts import plot_trends
+
+fig, axes = plot_trends(cumulative=False, show_progress=False, protest_source="gprep")
+fig.suptitle("GPRep: Time series of the causal impact by method and coverage dimension")
+axes[0].set_ylim(-30, 30)
+axes[1].set_ylim(-30, 30)
+axes[2].set_ylim(-5, 5)
+axes[3].set_ylim(-5, 5)
+axes[4].set_ylim(-200, 200)
+plt.tight_layout()
+plt.show()
+```

@@ -175,7 +175,7 @@ __Replication and experiments:__ I replicate their results and obtain F1-scores 
 
 \endgroup
 
-In order to obtain protest events from a broader geographic spectrum, I retrieve metadata of online newspaper articles from MediaCloud (see @sec-data-discourse) for a query containing protest-related keywords.^[The query is based on the query used by Wiedemann, and reads: _'protest* OR demo OR demonstr* OR kundgebung OR versamm* OR "soziale bewegung" OR hausbesetz* OR streik* OR unterschriften* OR petition OR hasskriminalität OR unruhen OR aufruhr OR aufstand OR rebell* OR blockade OR blockier* OR sitzblock* OR boykott* OR riot OR aktivis* OR bürgerinitiative OR bürgerbegehren OR marsch OR aufmarsch OR parade OR mahnwache OR hungerstreik OR "ziviler ungehorsam"'_] From the obtained metadata, I scrape full-texts where possible. Special care is taken of websites that appear scrapeable but contain only gibberish because the actual content is paywalled: The letters on these websites appear not to be shuffled but transformed by some other processing methods, so the frequency of common characters is very different on these websites than in actual texts, and the websites can be detected and ignored.
+In order to obtain protest events from a broader geographic spectrum, I retrieve metadata of online newspaper articles from MediaCloud (see @sec-data-discourse) for a query containing protest-related keywords.^[The query is based on the query used by Wiedemann, and reads: _'protest* OR demo OR demonstr* OR kundgebung OR versamm* OR "soziale bewegung" OR hausbesetz* OR streik* OR unterschriften* OR petition OR hasskriminalität OR unruhen OR aufruhr OR aufstand OR rebell* OR blockade OR blockier* OR sitzblock* OR boykott* OR riot OR aktivis* OR bürgerinitiative OR bürgerbegehren OR marsch OR aufmarsch OR parade OR mahnwache OR hungerstreik OR "ziviler ungehorsam"'_] From the obtained metadata, I scrape full-texts where possible. Special care is taken of websites that appear scrapeable but contain only gibberish because the actual content is paywalled: The letters on these websites appear not to be shuffled but transformed by some other processing methods, so the frequency of common characters is very different on these websites than in actual texts, and the websites can be detected and ignored. Note that this dataset starts already in 2019 and has very little data for the end of 2021 and for all of 2022 due to issues with my scraping implementation. Future work may consider the use of commercial scraping tools to simplify this step.
 
 {{< embed ../src/data/protests/german_protest_reports/03_dataset_stats.ipynb#aglpn-ts >}}
 
@@ -185,9 +185,7 @@ I label the texts myself using [Prodigy](https://prodi.gy/). For the positive cl
 
 In a first labeling phase, I annotate 650 random articles for training and 500 random articles for evaluation. I train the model and use 500 articles that are predicted positive and label them as well and add them to the training data, in order to combat class imbalance. Training the `gelectra-large` model with the overall 1150 training samples and according to the hyperparameters suggested by Wiedemann, I finally obtain an in-distribution F1-score of 0.78 (precision=0.81, recall=0.75). Then, I use this model to predict the relevance of all the other scraped articles that contain protest-related keywords. Only 11% are relevant, resulting in 20,879 articles of which the (relatively good) model believes that they describe protest events.
 
-\begingroup
-\color{Red}TODO: Extraction of dates, locations, protest groups.
-\endgroup
+For the current study I filter the set of relevant articles for thos that contain "Klima" in their full text. For entity extraction of dates and places I use the GPT3.5 large language model (a finetuned version of @brownLanguageModelsAre2020); I do not perform an evaluation of this step. Places are matched to regions by using OpenStreetMap's [Nominatim](https://nominatim.org/) service. This yields 1401 climate protest events, and for 1353 of them both the date and the region can be extracted.
 
 #### Newspaper coverage {#sec-data-discourse}
 
@@ -335,8 +333,7 @@ The data is aggregated by region and date. For every day and region there is a r
   - Time-series lags of all variables (with variable number of lags, subject to hyperparameter optimization)
   - Exponential moving averages of $W$ to account for the long-term impact of previous protests (with spans of 7, 28, 112, 224 days each)
   - Time-series differences of $Y$ to account for trends in media coverage (with distances of 1, 7, 28, 91, 182, 364 days each)
-- Unknown confounders __U__:
-  - __*?*__
+- Unknown confounders __U__.
 
 __Regional aggregation__. My setting throughout all methods is that I estimate models based on regional data. However, I do not fit separate models for each region, but always a single model on a dataset that includes all regions. This has the benefits that _(a)_ it leads to more generalizable results and _(b)_ it increases the size of the dataset by a factor of 14 (in comparison to using national data, or to estimating single regional models), and thereby increases statistical power. To integrate multiple time series from the various regions into a single dataset, I add static _dummy variables_ for each region. Limitations of this approach are:
 
@@ -352,7 +349,7 @@ __Outcome time series.__ Protests may have an impact on newspaper converage not 
 
 For the selection of suitable models, I specify the treatment as the occurrence of a protest event by any protest group, and the outcome as the one-week amount of total newspaper coverage mentioning the climate crisis. I then use these models to also estimate more specific impacts for events from specific groups; and for the coverage during single days, in order to build impact estimate time series.
 
-For the main experiments I use the ACLED dataset as source for protest events; and as source for media coverage I use the sum of both online and print newspaper articles.
+For the main experiments I use the _ACLED_ dataset as source for protest events; and as source for media coverage I use the sum of both online and print newspaper articles. I also compute results for the _GPReg_ and _GPRep_ datasets and compare them, but I do not run hyperparameter optimization specific to these datasets.
 
 #### Regression {#sec-meth-reg}
 
