@@ -55,17 +55,11 @@ The research itself is very theoretical or highly interdisciplinary requiring th
 
  -->
 
-__Contribution.__ TODO
+__Contribution.__ I study the causal impact of disaggregated protest events. This is different from the mainstream of the protest impact literature (see @sec-lit-causal) and similar only to @huet-vaughnQuietRiotCausal2013 -- but unlike them I leverage the setting to determine the individual impacts of protest groups that act during the same timespan in a shared geographic space. I simultaneously apply multiple causal methods, optimize their hyperparameters with respect to bias, and evaluate them in three different placebo tests; while @wasowAgendaSeedingHow2020 excellently combines multiple causal methods, I also compare them systematically. I consider eight different weather variables and covid-19-related variables and perform preprocessing and variable selection for instrumental variables, whereas the previous literature focuses on one or two hand-selected variables (see @sec-weatherlit). I use multiple aggregated synthetic controls, allowing for debiasing via hyperparameter optimization, rather than ad-hoc debiasing as suggested by @facurealvesCausalInferenceBrave2022. I compute propensity scores for single protests, rather than just for matching geographic regions as in @wasowAgendaSeedingHow2020. Like @walgraveComplexAgendaSettingPower2012 I use time series data, but I use it with daily resolution and basic trend features, and not just for regression. While previous work has measured the impact of protests on newspaper coverage (see @sec-newslit), I use multiple queries to logically subdivide the article space; this allows me to analyze backfiring effects that have previously only been debated theoretically @harlowNewProtestParadigm2023. Impressive datasets have previously been created via searching and manual annotation [@raleighIntroducingACLEDArmed2010a]. Due to the advancement in transparency laws and natural language processing, I introduce two new types of datasets: one is based on official records by municipalities -- the most similar dataset has been created by the German government itself and is specific to right-wing extremism [@kanolRightWingExtremistMobilization2021]; the other dataset is based on semi-automated protest event detection, where I replicate and apply the approach from @wiedemannGeneralizedApproachProtest2022 on a larger scale.
 
-<!-- - IV for single events
-- SC for many single events
-- PS for texts
-- automated dataset
-- complete dataset -->
+### Literature review {#sec-lit}
 
-### Literature review
-
-#### Impact of protests on newspaper coverage
+#### Impact of protests on newspaper coverage {#sec-newslit}
 
 WIP: still have to tidy this up.
 
