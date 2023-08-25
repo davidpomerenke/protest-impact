@@ -1,14 +1,15 @@
 ---
-author: David Pomerenke
+author-meta: David Pomerenke
 toc: true
 toc-depth: 3
+title-meta: How do protests shape discourse? - Causal methods for determining the impact of protest events on newspaper coverage
+license: CC BY-NC
+date-meta: August 30, 2023
+include-before-body: titlepage.tex
+title: " "
 ---
 
-# Causal methods for determining the impact of protest events on newspaper coverage
-
 {{< pagebreak >}}
-
-TODO: use official frontpage, add abstract
 
 {{< include 1-introduction.qmd >}}
 
