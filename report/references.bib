@@ -750,6 +750,24 @@ typically use external variables and restrictions on the model, while it’ bett
   keywords = {/unread}
 }
 
+@online{dettmersQLoRAEfficientFinetuning2023,
+  title = {{{QLoRA}}: {{Efficient Finetuning}} of {{Quantized LLMs}}},
+  shorttitle = {{{QLoRA}}},
+  author = {Dettmers, Tim and Pagnoni, Artidoro and Holtzman, Ari and Zettlemoyer, Luke},
+  date = {2023-05-23},
+  eprint = {2305.14314},
+  eprinttype = {arxiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2305.14314},
+  url = {http://arxiv.org/abs/2305.14314},
+  urldate = {2023-08-25},
+  abstract = {We present QLoRA, an efficient finetuning approach that reduces memory usage enough to finetune a 65B parameter model on a single 48GB GPU while preserving full 16-bit finetuning task performance. QLoRA backpropagates gradients through a frozen, 4-bit quantized pretrained language model into Low Rank Adapters\textasciitilde (LoRA). Our best model family, which we name Guanaco, outperforms all previous openly released models on the Vicuna benchmark, reaching 99.3\% of the performance level of ChatGPT while only requiring 24 hours of finetuning on a single GPU. QLoRA introduces a number of innovations to save memory without sacrificing performance: (a) 4-bit NormalFloat (NF4), a new data type that is information theoretically optimal for normally distributed weights (b) double quantization to reduce the average memory footprint by quantizing the quantization constants, and (c) paged optimziers to manage memory spikes. We use QLoRA to finetune more than 1,000 models, providing a detailed analysis of instruction following and chatbot performance across 8 instruction datasets, multiple model types (LLaMA, T5), and model scales that would be infeasible to run with regular finetuning (e.g. 33B and 65B parameter models). Our results show that QLoRA finetuning on a small high-quality dataset leads to state-of-the-art results, even when using smaller models than the previous SoTA. We provide a detailed analysis of chatbot performance based on both human and GPT-4 evaluations showing that GPT-4 evaluations are a cheap and reasonable alternative to human evaluation. Furthermore, we find that current chatbot benchmarks are not trustworthy to accurately evaluate the performance levels of chatbots. A lemon-picked analysis demonstrates where Guanaco fails compared to ChatGPT. We release all of our models and code, including CUDA kernels for 4-bit training.},
+  pubstate = {preprint},
+  keywords = {/unread},
+  note = {Comment: Extended NeurIPS submission},
+  file = {/Users/david/Zotero/storage/W8SIVEM6/Dettmers et al_2023_QLoRA.pdf;/Users/david/Zotero/storage/5CCM5KN2/2305.html}
+}
+
 @online{dingFirstCourseCausal2023,
   title = {A {{First Course}} in {{Causal Inference}}},
   author = {Ding, Peng},
@@ -1330,7 +1348,7 @@ only for communicative domain
   urldate = {2023-02-20},
   abstract = {Social media activity is driven by real-world events (natural disasters, political unrest, etc.) and by processes within the platform itself (viral content, posts by influentials, etc). Understanding how these different factors affect social media conversations in polarized communities has practical implications, from identifying polarizing users to designing content promotion algorithms that alleviate polarization. Based on two datasets that record real-world events (ACLED and GDELT), we investigate how internal and external factors drive related Twitter activity in the highly polarizing context of the Venezuela’s political crisis from early 2019. Our findings show that antagonistic communities react differently to different exogenous sources depending on the language they tweet. The engagement of influential users within particular topics seem to match the different levels of polarization observed in the networks.},
   isbn = {978-1-4503-8330-1},
-  keywords = {/unread,📌,📰,🪧},
+  keywords = {📌,📰,🪧},
   file = {/Users/david/Zotero/storage/95NN8THN/Horawalavithana et al. - 2021 - Drivers of Polarized Discussions on Twitter during.pdf;/Users/david/Zotero/storage/K9XWPTWU/Horawalavithana et al_2021_Drivers of Polarized Discussions on Twitter during Venezuela Political Crisis.pdf}
 }
 
@@ -3218,6 +3236,15 @@ seems useful for censoring twitter
   langid = {english},
   keywords = {/unread},
   file = {/Users/david/Zotero/storage/IKG34X79/Torgovitsky - When is TSLS Actually LATE.pdf}
+}
+
+@article{touvronLlamaOpenFoundation,
+  title = {Llama 2: {{Open Foundation}} and {{Fine-Tuned Chat Models}}},
+  author = {Touvron, Hugo and Martin, Louis and Stone, Kevin},
+  abstract = {In this work, we develop and release Llama 2, a collection of pretrained and fine-tuned large language models (LLMs) ranging in scale from 7 billion to 70 billion parameters. Our fine-tuned LLMs, called Llama 2-Chat, are optimized for dialogue use cases. Our models outperform open-source chat models on most benchmarks we tested, and based on our human evaluations for helpfulness and safety, may be a suitable substitute for closedsource models. We provide a detailed description of our approach to fine-tuning and safety improvements of Llama 2-Chat in order to enable the community to build on our work and contribute to the responsible development of LLMs.},
+  langid = {english},
+  keywords = {/unread},
+  file = {/Users/david/Zotero/storage/HESK4C9J/Touvron et al. - Llama 2 Open Foundation and Fine-Tuned Chat Model.pdf}
 }
 
 @article{vandegeerAsymptoticallyOptimalConfidence2014,
