@@ -8,7 +8,7 @@ from src import end, start
 from src.cache import cache
 from src.data import german_regions
 from src.data.covid_restrictions import load_covid
-from src.data.fulltexts import fulltexts
+from src.data.fulltexts import fulltexts, press_releases
 from src.data.news import counts_for_region
 from src.data.protests import load_climate_protests_with_labels
 from src.data.protests.keywords import climate_queries
@@ -201,6 +201,7 @@ def one_region(
     region: str,
     instruments: str | None = None,
     include_texts: bool = False,
+    include_press: bool = False,
     ignore_group: bool = False,
     ignore_medium: bool = False,
     positive_queries: bool = True,
@@ -263,9 +264,9 @@ def one_region(
                     df_y.diff(1).add_suffix("_diff1"),
                     df_y.diff(7).add_suffix("_diff7"),
                     df_y.diff(28).add_suffix("_diff28"),
-                    df_y.diff(91).add_suffix("_diff112"),
-                    df_y.diff(182).add_suffix("_diff224"),
-                    df_y.diff(364).add_suffix("_diff448"),
+                    df_y.diff(91).add_suffix("_diff91"),
+                    df_y.diff(182).add_suffix("_diff182"),
+                    df_y.diff(364).add_suffix("_diff364"),
                 ],
                 axis=1,
             )
@@ -292,6 +293,9 @@ def one_region(
     if include_texts:
         df_t = fulltexts(region, text_cutoff)
         dfs.append(df_t)
+    if include_press:
+        df_p = press_releases(text_cutoff)
+        dfs.append(df_p)
     df = pd.concat(dfs, axis=1)
     return df
 

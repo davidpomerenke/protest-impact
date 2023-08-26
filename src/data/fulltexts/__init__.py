@@ -10,7 +10,8 @@ from src.paths import external_data
 
 
 @cache
-def press_releases(cutoff: int = 500) -> pd.Series:
+def press_releases(cutoff: int | str | None = 500) -> pd.Series:
+    title_only = isinstance(cutoff, str) and cutoff == "title"
     data = []
     for file in tqdm(list(external_data.glob("nexis/climate/json/**/*.json"))):
         with open(file) as f:
@@ -20,14 +21,17 @@ def press_releases(cutoff: int = 500) -> pd.Series:
             data.append(item)
     df = pd.DataFrame(data)
     df["text"] = df["text"].str.removeprefix(")").str.strip()
-    # group texts and titles for each date together
-    df["text"] = (
-        df["title"]
-        + "\n\n"
-        + df["location"].fillna("")
-        + " "
-        + df["text"].fillna("").str[:cutoff]
-    )
+    if title_only:
+        df["text"] = df["title"]
+    else:
+        # group texts and titles for each date together
+        df["text"] = (
+            df["title"]
+            + "\n\n"
+            + df["location"].fillna("")
+            + " "
+            + df["text"].fillna("").str[:cutoff]
+        )
     df["date"] = df["date"].dt.date
     s = df.groupby("date").agg({"text": "\n\n".join})["text"]
     # fill missing dates with empty strings
@@ -38,6 +42,7 @@ def press_releases(cutoff: int = 500) -> pd.Series:
         ),
         fill_value="",
     )
+    s.name = "press"
     return s
 
 
