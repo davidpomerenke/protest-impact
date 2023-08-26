@@ -75,7 +75,6 @@ __Other existing protest datasets.__ Alternative existing sources of German or i
 
 #### The German Protest Registrations dataset
 
-
 \begingroup
 \scriptsize\selectfont
 ```{python}

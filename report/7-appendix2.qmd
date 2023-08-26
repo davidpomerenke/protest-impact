@@ -4,7 +4,7 @@ I want to determine the _Average Treatment Effect on the Treated (ATT)_ $\tau_T$
 
 [^CATT]: This could also be framed as the _Conditional ATT_ (CATT), because the treatment effect is conditional on which group has protested on the day. I prefer to frame it as multiple separate ATTs. This has the benefit that I can control (where the methods allows for it) for the occurrence of other treatments on the same day, and thus better isolate the effects of single protest groups.
 
-The ATT is generally defined as follows [@dingFirstCourseCausal2023, ch. 13]:
+I use the notation of the potential outcomes framework [@imbensCausalInferenceStatistics2015], where $Y(0)$ denotes the potential outcome under no treatment, and $Y(1)$ denotes the potential outcome under treatment. The ATT is generally defined as follows [@dingFirstCourseCausal2023, ch. 13]:
 
 $$
 \tau = E(Y|W=1) - E(Y(0) | W=1)
@@ -125,7 +125,7 @@ In the case of a single instrument and a single treatment, two-stage least squar
 
 __Including covariates:__ Instrumental variable methods do not generally require the specification of any covariates or confounders. In the case that randomization holds only conditionally, we need to control for all covariates conditional to which the instrument is random. Besides this, adding covariates may also be useful for reducing variance and increasing statistical power. @torgovitskyWhenTSLSActually point out that adding covariates causes the estimate to differ from the LATE, which poses a problem that has often been ignored in practice.
 
-__Weak instrumental variables:__ When the instruments are weak, indirect and two-stage least squares become biased. There are adaptations specifically for weak instruments. Instead of indirect least squares, the _Weak IV_ estimator can be used [@dingFirstCourseCausal2023, ch. 21 & 23]; and an alternative to two-stage least squares is _limited information maximum likelihood_ [LIML; see @pischkeLabourEconomicsPhD2019, slides on weak instruments].
+__Weak instrumental variables:__ When the instruments are weak, indirect and two-stage least squares become biased. There are adaptations specifically for weak instruments. Instead of indirect least squares, the _Weak IV_ estimator can be used [@dingFirstCourseCausal2023, ch. 21 & 23]; and an alternative to two-stage least squares is _limited information maximum likelihood_ (LIML) [@staigerInstrumentalVariablesRegression1997; @pischkeLabourEconomicsPhD2019, slides on weak instruments].
 
 #### Local treatment effects
 
@@ -209,7 +209,7 @@ Various methods make use of propensity scores, mainly: _Propensity stratificatio
 
 #### Inverse propensity weighting {#sec-app2-ipw}
 
-Inverse propensity weighting (IPW) gives every sample a weight that is inverse to the propensity score: $\frac{1}{e(X)}$ for treated units and $\frac{1}{1-e(X)}$ for control units. We use the same assumptions as for regression (@sec-app2-reg):
+Inverse propensity weighting (IPW) [@rosenbaumModelBasedDirectAdjustment1987] gives every sample a weight that is inverse to the propensity score: $\frac{1}{e(X)}$ for treated units and $\frac{1}{1-e(X)}$ for control units. We use the same assumptions as for regression (@sec-app2-reg):
 
 - __Unconfoundedness__, $W \perp\!\!\!\perp Y(0) | X$: The counterfactual outcome if there was no treatment is independent from the actual treatment. (For @eq-prop we need the same not only for $Y(0)$ but also for $Y(1)$; but the calculation of the _ATT_ does not require this.)
 - __Overlap__, $e(X) < 1$: The treatment assignment is not deterministic.

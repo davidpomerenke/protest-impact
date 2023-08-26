@@ -10,7 +10,7 @@ the introduction defines the problem, sets it in terms of the state-of-the-art a
 
 ### Problem statement
 
-Are protests effective, and how much? Or do they also backfire, by distracting from the discussion of the protest concern, and by merely causing discussion about the protests themselves? Protest groups, participants, supporters, and opponents can use media impact analysis and count the number of newspaper articles that appear to be caused by a protest event. Such analyses may be biased due to possible confounding: Protests and increased media coverage may stem from shared sources. In the case of climate protests, extreme weather events, climate conferences, political decisions, or the intensity of public discussion are candidates for such confounders, and there may also be hidden confounders that do not easily come to mind.
+Are protests effective, and how much? Or do they also backfire, by distracting from the discussion of the protest concern, and by merely causing discussion about the protests themselves? Protest groups, participants, supporters, and opponents can use media impact analysis and count the number of newspaper articles that appear to be caused by a protest event. Such analyses may be biased due to possible confounding: Protests and increased media coverage may stem from shared sources. For climate protests such confounding may come from extreme weather events, climate conferences, political decisions, or the intensity of public discussion, and there may also be hidden confounders that do not easily come to mind.
 
 <!--
 
@@ -24,27 +24,27 @@ __Research questions.__ This master thesis applies and evaluates multiple causal
 
 1. Can the causal methods be applied to study the impact of protest events on newspaper attention? What limitations apply, and what problems occur? Are the estimates consistent, and how do they differ from each other?
 
-2. What is the _Average Treatment Effect on the Treated_[^ATT] (ATT) of protest events on newspaper coverage; for climate protests in general, and with respect to the protest group that organizes the protest?
+2. What is the _Average Treatment Effect on the Treated_[^ATT] (ATT) of protest events on newspaper coverage -- for climate protests in general, and with respect to the protest group that organizes the protest?
 
 3. What can we say about the hypothesis that climate protests _distract_ from discussing solutions to the climate crisis constructively?
 
-4. (Are datasets obtained (a) from authorities or (b) via semi-automated collection and processing suitable alternatives to manually curated protest event data?) - _I hope that I can still compare the datasets, otherwise I'll leave it out._
+4. Are datasets obtained (a) from authorities or (b) via semi-automated collection and processing suitable alternatives to manually curated protest event data?
 
 [^ATT]: The _Average Treatment Effect on the Treated_ (ATT) is the effect that the protests that took place have actually caused, on average, in comparison to the case that they had not taken place. It differs from the _Average Treatment Effect_ (ATE) by focusing on the effect of the protest days rather than the potential effect of all days. See @sec-app2-reg for mathematical definition.
 
-__Protest event analysis.__ @hutterProtestEventAnalysis2014 gives the sociological foundations by definint the method of _protest event analysis_, and discusses coding methods for defining and distinguishing protest events.
+__Protest event analysis.__ @hutterProtestEventAnalysis2014 gives the sociological foundations by defining the method of _protest event analysis_, and discusses coding methods for defining and distinguishing protest events.
 
-__Protest impact.__ Research into the impact of protest movements has recently been spearheaded by a series of literature reviews and expert interviews by Ozden and Glover. In the context of effective altruism, they aim to assess how effective protest movements are as a means for political change, and what factors determine their success. In their literature review on protest outcomes @jamesozdenLiteratureReviewProtest2022, they conclude that _causal inferences on protest outcomes are generally challenging to draw due to confounding, and it is even harder to determine the long-term effect_. They warn that the average effect size of protests is likely over-estimated in the existing literature, due to selection bias on the level of media coverage, researcher interest, and statistical significance (publication bias). Based on their review, they estimate that protest movements (consisting of many single protest events) may raise salience and support for the issue by 2-10%, and may influence voting behavior by 1-6 percentage points. The influence on public discourse may be high in certain cases, and in the case of the Black Lives Matter movement may have amplified coverage by a factor of 10.
+__Protest impact.__ Ozden and Glover conduct a series of literature reviews and expert interviews to assess how effective protest movements are as a means for political change, and what factors determine their success. In their literature review on protest outcomes [@jamesozdenLiteratureReviewProtest2022], they conclude that _causal inferences on protest outcomes are generally challenging to draw due to confounding, and it is even harder to determine the long-term effect_. They warn that the average effect size of protests is likely over-estimated in the existing literature, due to selection bias on the levels of (a) media coverage, (b) researcher interest, and (c) statistical significance (that is, publication bias). Based on their review, they estimate that protest movements (consisting of many single protest events) may raise salience and support for the issue by 2-10%, and may influence voting behavior by 1-6 percentage points. The influence on public discourse may be high in certain cases, and in the case of the _Black Lives Matter_ movement may have amplified coverage by a factor of 10.
 
 In interviews with researchers, @jamesozdenExpertInterviewsProtest2022 establish that while there is much research on protest outcomes, the causal connections between protests and their outcomes are an underexplored research area (interview with Robyn Gulliver in the cited report); that a causal link between protests and certain outcomes is plausible, but hard to attribute to any specific protest group (interview with Ruud Wouters in the cited report); and that causal effects are typically measurable only on a local level due to the lack of a control group at the national level. More generally, protest outcomes may be subject to confounding, and the causal arrow between protests and increased concern may point in either direction. The interviews with researchers, as well as interviews with UK policymakers [@jamesozdenPolicymakerInterviewsProtest2022], suggest that the causal effect of protest on policy is strongly if not completely mediated by public opinion.
 
 In a follow-up, [@samgloverLiteratureReviewProtest2022; @jamesozdenWhatMakesProtest2023] review the factors that causally affect the success of protest movements. They attribute a high importance to the number of participants, and to the nonviolent nature of the protest, as well as a favourable sociopolitical context, including media coverage. A moderate effect is attributed to the diversity and the unity of the movement. They also look at the so-called _radical flank effect_, a theory that moderate movements benefit from the simultaneous presence of a more radical movement for the same issue. Their review finds moderate effects from a radical flank, but only if the radical flank is also nonviolent.
 
-__Relevance of newspaper coverage.__ Protest movements are often highly strategic [see @englerThisUprisingHow2016 for discussion]. Newspaper coverage is a typical criterion by which protest groups and funding organizations quantify impact: Four of the most relevant German climate protest groups maintain press review databases ([1](https://fridaysforfuture.de/presse/pressespiegel/), [2](https://letztegeneration.org/presse/berichterstattung-1/), [3](https://extinctionrebellion.de/presse/pressespiegel/), [4](https://www.ende-gelaende.org/pressespiegel/)), and a major international protest funding organization uses the "number of triggered media items" as one of three evaluation criteria [@knuthFinanzierungKlimaaktivismusAm2023]. The reason is either that the protests aim to raise public attention in the first place, or that they consider media coverage as a proxy for further impact, including eventually policy change. Protests are directly observed by typically only a small number of people, and it is plausible that media coverage is an important mediator for further impact (todo: find citation). Alternative plausible mediators are social media posts, public opinion (as measured in opinion surveys), or parliamentary speech. For methodical reasons (see @sec-data-discourse), I focus on newspaper data, and more specifically _regional_ newspaper articles, because they allow for the application of the synthetic control method. These methodical decisions may well be considered as "looking under the lamppost" (@fig-lamppost), but they may enable the analysis of more interesting data in the future.
+__Relevance of newspaper coverage.__ Protest movements are often highly strategic [see @englerThisUprisingHow2016 for discussion]. Newspaper coverage is a typical criterion by which protest groups and funding organizations quantify impact: Four of the most relevant German climate protest groups maintain press review databases ([1](https://fridaysforfuture.de/presse/pressespiegel/), [2](https://letztegeneration.org/presse/berichterstattung-1/), [3](https://extinctionrebellion.de/presse/pressespiegel/), [4](https://www.ende-gelaende.org/pressespiegel/)), and a major international protest funding organization uses the "number of triggered media items" as one of three evaluation criteria [@knuthFinanzierungKlimaaktivismusAm2023]. The reason is either that the protests aim to raise public attention in the first place, or that they consider media coverage as a proxy for further impact, including eventually policy change. Protests are directly observed by typically only a small number of people, and it is plausible that media coverage is an important mediator for further impact [@walgraveComplexAgendaSettingPower2012]. Alternative plausible mediators are social media posts, public opinion (as measured in opinion surveys), or parliamentary speech. For methodical reasons (see @sec-data-discourse), I focus on newspaper data, and more specifically _regional_ newspaper articles, because they allow for the application of the synthetic control method. These methodical decisions may well be considered as "looking under the lamppost" (@fig-lamppost), but they may enable the analysis of more interesting data in the future.
 
 !["Looking under the lamppost" by [Sketchplanations](https://sketchplanations.com/) (CC-BY-NC)](figures/lamppost.png){.column-margin #fig-lamppost}
 
-__Causal impact evaluation.__ Academic work on protest impact analysis is aware of the problem of confounding. Previous work has used _regression_, _difference-in-differences_, and to a large extent the _instrumental variables_ method (see @sec-lit-causal). With a single exception [@huet-vaughnQuietRiotCausal2013], the aggregate impact of protest movements that stretch over longer timespans is evaluated, rather than the impact of single events. Causal inference has developed the _synthetic control method_ [@abadieSyntheticControlMethods2010] for the analysis of single events, as well as extensions including _synthetic difference-in-differences_ [@arkhangelskySyntheticDifferenceinDifferences2021] and _Bayesian structural time series_ [@brodersenInferringCausalImpact2015a]. _Propensity score methods_ are not specifically made for the analysis of events but can be easily adapted by using time series data for the estimation of the propensity scores. Alternatively, they can be estimated from full text data [@keithTextCausalInference2020; @weldAdjustingConfoundersText2022]. _Event history analysis_ [@tekleEventHistoryAnalysis2012] is concerned with estimating the risk of the occurrence of events, which is not my research objective, but is relevant because it is similar to estimating propensity scores from time series. Related work using causal approaches for protest impact analysis is reviewed in more detail in @sec-lit-causal.
+__Causal impact evaluation.__ Academic work on protest impact analysis is aware of the problem of confounding. Previous work has used _regression_, _difference-in-differences_, and to a large extent the _instrumental variables_ method (see @sec-lit-causal). With a single exception [@huet-vaughnQuietRiotCausal2013], prior work evaluates the aggregate impact of protest movements that stretch over longer timespans, rather than the impact of single events. Causal inference has developed the _synthetic control method_ [@abadieSyntheticControlMethods2010] for the analysis of single events, as well as extensions including _synthetic difference-in-differences_ [@arkhangelskySyntheticDifferenceinDifferences2021] and _Bayesian structural time series_ [@brodersenInferringCausalImpact2015a]. _Propensity score methods_ are not specifically made for the analysis of events but can be adapted by using time series data for the estimation of the propensity scores. Alternatively, the scores can be estimated from full text data [@keithTextCausalInference2020; @weldAdjustingConfoundersText2022]. _Event history analysis_ [@tekleEventHistoryAnalysis2012] is concerned with estimating the risk of the occurrence of events, which is not my primary concern, but secondarily relevant for estimating propensity scores from time series. Related work using causal approaches for protest impact analysis is reviewed in more detail in @sec-lit-causal.
 
 <!--
 
@@ -55,41 +55,27 @@ The research itself is very theoretical or highly interdisciplinary requiring th
 
  -->
 
-__Contribution.__ I study the causal impact of disaggregated protest events. This is different from the mainstream of the protest impact literature (see @sec-lit-causal) and similar only to @huet-vaughnQuietRiotCausal2013 -- but unlike them I leverage the setting to determine the individual impacts of protest groups that act during the same timespan in a shared geographic space. I simultaneously apply multiple causal methods, optimize their hyperparameters with respect to bias, and evaluate them in three different placebo tests; while @wasowAgendaSeedingHow2020 excellently combines multiple causal methods, I also compare them systematically. I consider eight different weather variables and covid-19-related variables and perform preprocessing and variable selection for instrumental variables, whereas the previous literature focuses on one or two hand-selected variables (see @sec-weatherlit). I use multiple aggregated synthetic controls, allowing for debiasing via hyperparameter optimization, rather than ad-hoc debiasing as suggested by @facurealvesCausalInferenceBrave2022. I compute propensity scores for single protests, rather than just for matching geographic regions as in @wasowAgendaSeedingHow2020. Like @walgraveComplexAgendaSettingPower2012 I use time series data, but I use it with daily resolution and basic trend features, and not just for regression. While previous work has measured the impact of protests on newspaper coverage (see @sec-newslit), I use multiple queries to logically subdivide the article space; this allows me to analyze backfiring effects that have previously only been debated theoretically @harlowNewProtestParadigm2023. Impressive datasets have previously been created via searching and manual annotation [@raleighIntroducingACLEDArmed2010a]. Due to the advancement in transparency laws and natural language processing, I introduce two new types of datasets: one is based on official records by municipalities -- the most similar dataset has been created by the German government itself and is specific to right-wing extremism [@kanolRightWingExtremistMobilization2021]; the other dataset is based on semi-automated protest event detection, where I replicate and apply the approach from @wiedemannGeneralizedApproachProtest2022 on a larger scale.
+__Contribution.__ I study the causal impact of disaggregated protest events. This is different from the mainstream of the protest impact literature (see @sec-lit-causal) and similar only to @huet-vaughnQuietRiotCausal2013 -- but unlike them I leverage this setting to determine the individual impacts of protest groups, even though they act during the same timespan in a shared geographic space. I simultaneously apply multiple causal methods, optimize their hyperparameters with respect to bias, and evaluate them in three different placebo tests; while @wasowAgendaSeedingHow2020 excellently combines multiple causal methods, I also compare them systematically. I consider eight different weather variables and covid-19-related variables and perform preprocessing and variable selection for instrumental variables, whereas the previous literature focuses on one or two hand-selected variables (see @sec-weatherlit). Due to my setting I can fit many synthetic controls rather than just a single one, allowing for debiasing via hyperparameter optimization, rather than ad-hoc debiasing as suggested by @facurealvesCausalInferenceBrave2022. I compute propensity scores for single protests, rather than just for matching geographic regions as in @wasowAgendaSeedingHow2020. Like @walgraveComplexAgendaSettingPower2012 I use time series data, but I use it with daily resolution and basic trend features, and not only for regression but also for the other methods. While previous work has measured the impact of protests on newspaper coverage (see @sec-newslit), I use multiple queries to logically subdivide the article space; this allows me to analyze backfiring effects that have previously only been debated theoretically [see @harlowNewProtestParadigm2023]. Datasets have previously been created via searching and manual annotation [@raleighIntroducingACLEDArmed2010a]. I introduce two new types of datasets: one is based on official municipal records from freedom-of-information requests -- the most similar dataset has been created by the German government itself and is specific to right-wing extremism [@kanolRightWingExtremistMobilization2021]; the other dataset is based on semi-automated protest event detection, where I replicate and apply the approach from @wiedemannGeneralizedApproachProtest2022.
 
 ### Literature review {#sec-lit}
 
 #### Impact of protests on newspaper coverage {#sec-newslit}
 
-WIP: still have to tidy this up.
+__Backfiring effects.__ The "protest paradigm" [@mcleodManufacturePublicOpinion1992] theorizes that news coverage of protesters tends to be a double-edged sword, because the coverage of protests that challenge the status quo is usually negative. This paradigm is recently being challenged, and the formation of amore nuanced theory is underway that considers under what conditions the protest paradigm does or does not hold [see @harlowNewProtestParadigm2023]. @schwartzParadoxConfrontationExperimental2016 conduct experimental and obervational studies and conclude that directly observing a protest has a negative impact on public support, while media coverage of protests has a positive impact.
 
-@walgraveComplexAgendaSettingPower2012 use time-series regression on a substantive set of political variables in Berlgium from 1993 to 2000. They find significant impacts of protests on newspaper attention, as well as a significant impact of newspaper coverage on parliamentary questions, although not on governmental decisions. This gives empirical evidence that media coverage may indeed play an important mediating role.
+__Causal pathways.__ @walgraveComplexAgendaSettingPower2012 use time-series regression on a substantive set of political variables in Belgium from 1993 to 2000. They find significant impacts of protests on newspaper attention, as well as a significant impact of newspaper coverage on parliamentary questions, although not on governmental decisions. This gives empirical evidence that media coverage may indeed play an important mediating role. @seitzWhoCaresClimate2021 find that certain innate personality traits of German citizens strongly predict the priority given to climate change policy and the support for specific climate policies. They call on future work to investigate the causal pathway and suggest that personal media attention might be an important mediator.
 
-The "protest paradigm" [@mcleodManufacturePublicOpinion1992] theorizes that news coverage of protesters tends to be a double-edged sword, because the coverage of protests that challenge the status quo is usually negative. This paradigm is recently being challenged, and the formation of amore nuanced theory is underway that considers under what conditions the protest paradigm does or does not hold [see @harlowNewProtestParadigm2023].
+__Impact factors.__ @cristanchoProtestersNewsGates2022 investigate experimentally how features of protests as well as features of journalists have an impact on the prominence of the protests in the news (measured by front-page placement), finding that protest size is the most important feature. @hellmeierSpotlightAnalyzingSequential2018 find support for their hypothesis that salient protest events that receive a lot of media coverage lead to a higher coverage of subsequent protest events, and that the effect decreases with spatial and temporal distance.
 
-@schwartzParadoxConfrontationExperimental2016: protests themselves have a negative impact on public support, but media coverage has a positive impact
+__Interactions.__ @simonteuneZwischenEmphaseUnd2017 implicitly investigate causal questions about the relation between single protest events and media coverage cycles. They characterize four possible "ideal types" of interaction: _Superposition_, where protests tend to happen when coverage increases; _trigger_, where the protest causes the coverage to rise; _show-down_, where the protest approximately marks the tip of a period of heightened media attention, suggesting a more complex causal picture; and _reminder_, where continuously repeated protests serve to keep the topic on the newspaper agenda, but each single event has only a small impact. They use case studies for protest events relating to various topics in Germany to assess the theory.
 
-@cristanchoProtestersNewsGates2022 investigate experimentally how different features of protests as well as of journalists have an impact on the prominence of the protests in the news (measured by front-page placement), finding that protest size is the most important feature
-
-@hellmeierSpotlightAnalyzingSequential2018 find support for their hypothesis that salient protest events that receive a lot of media coverage lead to a higher coverage of subsequent protest events, and that the effect decreases with spatial and temporal distance.
-
-@barrieDoesProtestInfluence: time series effects on tweets by uk mps, recent and very nice (not strictly causal, but really plausible; or could perhaps consider it a discontinuity design)
-
-@chenHowClimateMovement2023a analyze the coverage of the climate movement on Twitter as well as in online newspapers. They use topic modelling to find major themes in discourse, and plot the quantitative evolution of these themes over time from 2018 to 2021, overlaying it with information about the occurrence of the semi-annual global climate strikes.
-
-@AttentionClimateChange2023 find that the Covid-19 pandemic has led to a fewer discussion of climate protests on Twitter, albeit not to fewer discussion of the climate crisis itself.
-
-@seitzWhoCaresClimate2021 find that certain innate personality traits of German citizens strongly predict the priority given to climate change policy and the support for specific climate policies. They call on future work to investigate the causal pathway and suggest that personal media attention might be an important mediator.
-
-@repkeAttentionClimateChange2023 explore the impact of the covid-19 pandemic on climate discourse on Twitter. They report that in general there is only a temporary negative attention decrease, but that topics related to protest movements have been very strong in 2019 before the pandemic and much less so in 2020 and 2021.
-
-@simonteuneZwischenEmphaseUnd2017 implicitly investigate causal questions about the relation between single protest events and media coverage cycles. They characterize four possible "ideal types" of (non)interaction: _Superposition_, where protests tend to happen when coverage increases; _trigger_, where the protest causes the coverage to rise; _show-down_, where the protest approximately marks the tip of a period of heightened media attention, suggesting a more complex causal picture; and _reminder_, where continuously repeated protests serve to keep the topic on the newspaper agenda, but each single event has only a small impact. They use case studies for protest events relating to various topics in Germany to assess the theory.
+__Topic modeling.__ @chenHowClimateMovement2023a analyze the coverage of the climate movement on Twitter and in online newspapers. They use topic modelling to find major themes in discourse, and plot the quantitative evolution of these themes over time from 2018 to 2021, overlaying it with information about the occurrence of the semi-annual global climate strikes. @repkeAttentionClimateChange2023 explore the impact of the covid-19 pandemic on climate discourse on Twitter. They observe that in general there is only a temporary negative attention decrease, but that topics related to protest movements have been very strong in 2019 before the pandemic and much less so in 2020 and 2021.
 
 #### Causal approaches to protest event analysis {#sec-lit-causal}
 
 In the context of protest event analysis, the most commonly used methods are: _regression_ with an extensive set of control variables; the _instrumental variable_ method, mostly using rainfall or precipitation as an instrument; and _difference in differences_.
 
-__Regression.__ The traditional standard method in protest impact research is linear regression. @walgraveComplexAgendaSettingPower2012 conduct an elaborate regression study themselves, and they also give a clear review of related regression studies on protest impacts.
+__Regression.__ The traditional standard method in protest impact research is linear regression. @walgraveComplexAgendaSettingPower2012 conduct an elaborate regression study themselves, and they also give a clear review of related regression studies on protest impacts. @barrieDoesProtestInfluence2023a use regression to analyze the impact of local climate protests in the UK on the tweeting behaviour of the respective members of parliament. They estimate time series effects and find a 21% increase in climate tweets on the day of the protest and receding on the following days. They estimate the outcome placebo effect for days prior to the protest events and do not find an effect; this adds causal credibility to the approach.
 
 __Instrumental variables.__ This is a very common approach to causal impact estimation. Most related work investigates aggregate impacts from longer timespans (a week or a month), and the causal outcomes are often temporally separate (for example, the outcome of protests on election is estimated, where the election takes place multiple months after the protest period); With the exception of @huet-vaughnQuietRiotCausal2013, all previous literature has a setting where they look at a fixed timeframe and compare effects across regional units. Only @huet-vaughnQuietRiotCausal2013 have a methodical approach that is more similar to mine, looking at a larger dataset where events are scattered across regions and also across time.
 
@@ -109,9 +95,9 @@ __Instrumental variables.__ This is a very common approach to causal impact esti
 
 - Other literature uses instruments that are less clearly random, such as whether the protest took place on a Friday [@butcherFridayMyMind2022], its distance to focal points[@ketchleyUnpopularProtestMass2021], or the commute time in the city where the protest takes place [@carenBlackLivesMatter2023].
 <!-- or even sociological variables concerning the political structure and efficiency.  -->
-Arguing that such instruments are valid requires solid expert knowledge (and perhaps insider knowledge), and such instruments are therefore less suitable for a data-driven analysis as I envision it here. (Even the weather variable is not completely free from such problems, unfortunately, as is discussed in the next section.)
+Arguing that such instruments are valid requires solid expert knowledge, and such instruments are therefore less suitable for a data-driven analysis as I envision it here.
 
-__Synthetic control.__ The synthetic control method has not seen much use for protest impact estimation. @tianSyntheticControlMethod2023 estimate the impact of the Hong Kong 2019 protests on the national economy. They construct a control from 48 other national economies that is fitted from 2011 to 2018, and evaluate the cumulative impact in 2019, when the protests took place. For this purpose, they extend the method for nonlinear synthetic controls.
+__Synthetic control.__ The synthetic control method has not seen much use for protest impact estimation. @tianSyntheticControlMethod2023 estimate the impact of the Hong Kong 2019 protests on the national economy. They construct a control from 48 other national economies that is fitted from 2011 to 2018, and evaluate the impact in 2019, when the protests took place. For this purpose, they extend the method for _nonlinear_ synthetic controls.
 
 __Propensity scores.__ @wasowAgendaSeedingHow2020 substantially leverage causal inference techniques for protest impact estimation: They use instrumental variables, as well as propensity matching and inverse propensity weighting with covariate-balanced propensity scores (CBPS) from logistic regression. The treatment units are counties, and the effect of the occurrence of a protest in April 1968 (after the assassination of Martin Luther King) on democratic vote share is estimated. Using simulations, they conclude that the protests likely tipped the presidential election in November 1986. More details on the instrumental variable approach in this paper are in the instrumental variable review below.
 
@@ -119,19 +105,11 @@ __Other methods.__ Besides the methods mentioned above, the _difference in diffe
 
 ### Causal impact estimation {#intro-causal}
 
-Causality [@humeEnquiryConcerningHuman2008; @spohnStochasticIndependenceCausal1980; @spirtesCausationPredictionSearch1993; @pearlCausalityModelsReasoning2000; @imbensCausalInferenceStatistics2015]
+The theoretical view on causality has been developed by @humeEnquiryConcerningHuman2008, @spohnStochasticIndependenceCausal1980, @spirtesCausationPredictionSearch1993, @pearlCausalityModelsReasoning2000, and @imbensCausalInferenceStatistics2015. Mathematical definitions of the problem and the methods are given in @sec-app2. Here I summarize the specific situation for protest impact estimation as a generic causal graph, and explain intuitively how the causal methods relate to the graphical model.
 
-TODO: I'll go over this again, tidy it up and make it a bit more precise. And add citations for the methods and references to @sec-app2 with the formulas.
-
-<!-- Causality[^invented by Spohn xxxx] -->
-
-Here I give an overview of the causal model that I generally assume. Then I give an overview of the different causal methods used in this project, how they exploit the causal model, and what additional assumptions they make.
-
-<!-- Since _time series methods_ may be used in various contexts, I also briefly introduce their structure and show how they can be applied to various machine learning problems that arise as part of the causal methods. -->
+When estimating a causal impact, the cause and effect variables are usually called _treatment_ (__W__) and _outcome_ (__Y__). In our context the treatment is applied to _days_: For each day, either there is a protest (__W__=1), or there is no protest (__W__=0). My outcome variable __Y__ is the number of relevant newspaper articles after the protest. Known confounders __X__ may have an impact on both the treatment and the outcome, and they include, for example, information about what has happened on the days before the protest in terms of newspaper coverage and protests. Hidden confounders __U__ play the same causal role as __X__, but we do not have data about them or do not even know what they are about. Instruments __Z__ are random variables that have a direct impact on the treatment but not on the outcome, their special role is explained below. This gives us the following generic causal graph:
 
 ```{dot}
-// | label: fig-causal-graph-simple
-// | fig-cap: Simple causal graph showing the structure of the research problem, ignoring the time-series aspect. I want to determine the effect of the treatment __W__ on the outcome __Y__, and there are known confounders __X__, but also unknown confounders __U__ that influence both treatment and outcome and thus complicate the matter. Instrumental variables __Z__ may help, because they only affect the outcome via their effect on the treatment.
 // | fig-width: 180px
 // | fig-height: 120px
 // | column: body
@@ -144,13 +122,9 @@ digraph D {
 }
 ```
 
-TODO: fix figure number
+The core of the model is the relation __W__ $\rightarrow$ __Y__ that I want to investigate. However, there are multiple problems of increasing difficulty:
 
-@fig-causal-graph-simple shows a typical causal situation: The impact of the treatment __W__ on the outcome __Y__ is of interest. Both treatment and outcome are also affected by known confounders __X__ and unknown confounders __U__. Instruments __Z__ affect the treatment, but do not have a direct impact on the outcome.
-
-The core of the model is the relation $W \rightarrow Y$ that I want to investigate. However, there are multiple problems of increasing difficulty:
-
-1. The outcome __Y__ is affected not only by the treatment but also by the covariates __X__. This is a common situation, even in experiments that are randomized, and we can approach it, for example, by using regression to control for the covariates.
+1. The outcome __Y__ is affected not only by the treatment but also by the covariates __X__. This is a common situation, even in experiments that are randomized, and we can approach it by using regression to control for the covariates.
 2. Not only the outcome __Y__, but also the treatment __W__ is affected by the covariates __X__, which makes them _confounders_. This is a common feature of observational studies. We can use methods based on the _propensity score_ (the probability of receiving the treatment) to approach this problem, as long as we know all relevant confounders.
 3. There are likely unknown confounders __U__. We are dealing with a sociological situation where a lot of variables could potentially be relevant. For example, external events like elections, legislative processes, or conferences could play a big role. Or the current mindset and stress level of journalists could play a role. Or many other things, that we may not even think of. Even though we cannot list all of these variables, there are alternative approaches:
    1. Assuming that the unknown confounders affect all regions similarly, we can make cross-region comparisons, for example, by using the __*synthetic control*__ method.
@@ -173,28 +147,26 @@ Regions &  &  & \bullet &  \\
 Weather &  & \bullet &  &  \\
 Texts &  &  &  & (\bullet) \\
 \hline
-Confounders? & $\checkmark^1$ & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^4$ \\
-Hidden conf.? &  & $\checkmark^2$ & $\checkmark^3$ & $\checkmark^{4,5}$ \\
+Confounders? & $\bullet^1$ & $\bullet^2$ & $\bullet^3$ & $\bullet^4$ \\
+Hidden conf.? &  & $\bullet^2$ & $\bullet^3$ & $\bullet^{4,5}$ \\
 \end{tabular}
 
 Core assumptions:$^1$ Linearity;$^2$ Valid instrument;$^3$ No regional confounding;$^4$ Overlap;$^5$ Hidden confounding is captured by text.
 
 :::
 
-Here I give a conceptual overview of the 3 mentioned methods that are potentially suitable for dealing with unknown confounders. Mathematical assumptions and definitions are given in @sec-app2.
-
 ```{dot}
 // | label: fig-causal-graph-corr
-// | fig-cap: Causal graph for naive analysis.
+// | fig-cap: Causal graph for correlation.
 // | fig-width: 100px
 // | fig-height: 100px
 // | column: margin
 digraph D {
-  {W, X} -> {Y} [color=blue]
+  {W} -> {Y} [color=blue]
 }
 ```
 
-__Correlation.__ Naive regression is not a causal method, but is used for comparison with the causal methods. It neglects most of the causal model and only regards the direct relationship between treatment and outcome, possibly controlling for covariates, but neglecting their role as confounders. The result is known as the _prima facie_ causal effect. It suffers from _selection bias_, because the model does not take the treatment assignment process into account -- but it should, because the treatment is not randomized.
+__Correlation.__ Correlation is not a causal method, but is used for comparison with the causal methods. It neglects most of the causal model and only regards the direct relationship between treatment and outcome. The result is the _prima facie_ causal effect, and it suffers from _selection bias_.
 
 ```{dot}
 // | label: fig-causal-graph-reg
@@ -203,11 +175,12 @@ __Correlation.__ Naive regression is not a causal method, but is used for compar
 // | fig-height: 100px
 // | column: margin
 digraph D {
-  {W, X} -> {Y} [color=blue]
+  {W} -> {Y}
+  {X} -> {Y} [color=blue]
 }
 ```
 
-__Regression.__ Controlling for the known confounders can already help to substantially reduce the bias, especially if the relationships are linear, and may as well be considered a causal method.
+__Regression.__ Controlling for the known confounders can already help to substantially reduce the bias. If the outcome linearly depends on the treatment and the confounders, and if all confounders are included in the model, then regression is a valid causal method.
 
 ```{dot}
 // | label: fig-causal-graph-iv
@@ -222,9 +195,7 @@ digraph D {
 }
 ```
 
-__Instrumental variables.__ The _instrumental variable_ approach leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. The _exclusion restriction_ (see @sec-app2-iv) assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome.
-
-... This is especially true for approximately random variables, such as the weather. (The weather is not purely random but also contains regional and seasonal components; but we can try to isolate them or work around the problem.)
+__Instrumental variables.__ The _instrumental variable_ approach [@staigerInstrumentalVariablesRegression1997] leverages _natural experiments_, where a random variable (or an almost random variable) influences the treatment. A typical example for such a variable is the weather. The _exclusion restriction_ assumes that the instrument does not have a direct impact on the outcome, but only via the treatment. We can then trace how the instrument affects the outcome via the treatment, and thereby establish the causal impact of the treatment on the outcome.
 
 In the simplest case, we can compare the effect of __Z__ on __W__ with the effect of __Z__ on __Y__ to obtain the desired estimate for the effect of __W__ on __Y__. We can also apply _two-stage_ approaches to first isolate the part of __W__ that is caused by __Z__, and then estimate its impact on __Y__.
 
@@ -248,10 +219,6 @@ __Synthetic control.__ The synthetic control method [@abadieSyntheticControlMeth
 
 The underlying assumption for the synthetic control method is that the unknown confounders affect the different regions uniformly: On any given day, the impact of the confounders is the same for all regions. This assumption is plausible especially for confounders coming from global and national politics and events; it is violated by regional confounders, but maybe they are not so important and we can live with it.
 
-Under this assumption, we can perform matching based on the date: To estimate the impact of a protest group in one region on a given date, we find other regions where no such event has taken place, and compare the effect.
-
-The synthetic control method goes a bit further and also takes the effect of known differences between the regions into account. From all the available control regions, it constructs a _synthetic region_. The synthetic region interpolates between the control regions such that the interpolated region is as close as possible to the treatment region in some respect. This interpolation can be performed in terms of sociodemographic similarity, or in terms of maximizing the predictive accuracy of the outcome variable, based on past observations. (This is a bit of a simplification, the details are explained in @sec-synth.)
-
 ```{dot}
 // | label: fig-causal-graph-prop
 // | fig-cap: Causal graph for propensity score methods.
@@ -265,69 +232,12 @@ digraph D {
 }
 ```
 
-__Propensity scores.__ Propensity score methods help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days. To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events.
+__Propensity scores.__ Propensity score methods [@staigerInstrumentalVariablesRegression1997] help to remove the impact of _known_ confounders. They rely on the propensity score that specifies how likely it is that a protest occurs on a given date and in a given region. They can be computed from knowledge about the region and the date, and from lagged treatment and outcome data from the previous days.
+<!-- To account to some extent for the impact of _unknown_ confounders, I also obtain propensity scores from press releases about climate-related events. -->
 
-Propensity score methods estimate the probability (propensity) of receiving the treatment. There are various strategies for eliminating selection bias with the use of propensity scores: notably propensity score matching, propensity score stratification, inverse propensity weighting. Double machine learning estimators such as causal forests help with estimating heterogenous treatment effects.
+There are various strategies for eliminating selection bias with the use of propensity scores: notably propensity score matching, propensity score stratification, inverse propensity weighting. Double machine learning estimators such as causal forests help with estimating heterogenous treatment effects.
 
 Propensity score methods still suffer from _omitted variable bias_ if there are unknown confounders. This can be mitigated by learning propensity scores from less structured big data such as texts, using classification models from natural language processing. The advantage of doing so is that the unknown confounders need not be pre-specified. The assumption is that the texts need to contain all of the unknown confounders, and in some detectable form. While this will never completely be the case (and cannot be verified anyway), I can hope that it at least substantially reduces the bias.
-
-__Time-series modelling.__ The variables on one day may also be influenced by the same set of variables from the previous day. On the one hand, this makes modeling more complicated. On the other hand, it is an advantage, because we have the data from the previous days already in the dataset, and using them can help reduce the amount of unknown confounding. Specifically, I consider all variables from the previous day as potential confounders for the current day. Variables from multiple days earlier may still be relevant, but less so, so it will be acceptable to make a cutoff at some point. We can restrict the previous variables to those from the same region, or we can also include previous variables from other regions where it seems useful. ...
-
-```{dot}
-// | label: fig-causal-graph-time-series
-// | fig-cap: TODO fix the graph! Version of the causal graph (@fig-causal-graph-simple) from a time series perspective. The variables of each day are influenced by the variables from the previous days in the same region. We can model that by including all variables from one day as potential confounders for the following day.
-// | fig-width: 200px
-// | fig-height: 400px
-// | column: margin
-
-digraph D {
-  rankdir=LR
-  compound=true
-
-  U0 [label="U"]
-  W0 [label="W"]
-  X0 [label="X"]
-  Y0 [label="Y"]
-  Z0 [label="Z"]
-
-  U1 [label="U"]
-  W1 [label="W"]
-  X1 [label="X"]
-  Y1 [label="Y"]
-  Z1 [label="Z"]
-
-  U2 [label="U"]
-  W2 [label="W"]
-  X2 [label="X"]
-  Y2 [label="Y"]
-  Z2 [label="Z"]
-
-  subgraph cluster_0 {
-    label="Day -2"
-    {X0, U0} -> {W0} -> {Y0}
-    {X0, U0} -> {Y0}
-    {Z0} -> {W0}
-    dummy_0 [shape=point style=invis constraint=false]
-  }
-  subgraph cluster_1 {
-    label="Day -1"
-    {X1, U1} -> {W1} -> {Y1}
-    {X1, U1} -> {Y1}
-    {Z1} -> {W1}
-    dummy_1 [shape=point style=invis constraint=false]
-  }
-  subgraph cluster_2 {
-    label="Day 0"
-    {X2, U2} -> {W2} -> {Y2}
-    {X2, U2} -> {Y2}
-    {Z2} -> {W2}
-    dummy_2 [shape=point style=invis constraint=false]
-  }
-  dummy_0 -> X1 [ltail=cluster_0 style=dotted label="include\nvariables" constraint=false]
-  dummy_1 -> X2 [ltail=cluster_1 style=dotted label="include\nvariables" constraint=False]
-}
-```
-
 
 ### Case study
 
@@ -335,6 +245,6 @@ __Greenpeace (GP), Ende Gelände (EG), Extinction Rebellion (XR).__ The climate 
 
 __Fridays for Future (FFF).__ Around the same time, the global _Fridays for Future_ (FFF) movement gained traction in Germany, accumulating a huge momentum -- more than a million protesters --, especially among high school and university students, and later also among other social groups with sub-movements such as _Scientists for Future_, _Parents for Future_, and _Grandparents for Future_ [@FridaysFuture2023]. They emphasize constructive discourse and inclusivity, organize exclusively pre-registered demonstrations, and often collaborate with other protest groups. However, they mostly protest on Fridays, that is, during school time, which has caused outrage from conservative politicians and media. As part of this outrage, the argument was first raised that the protests may run counter to their goals by stirring discussions about the appropriateness of their methods, and thereby divert attention from climate policy issues themselves.^[Supporters of the movement may claim that the argument is hypocritical and is mostly used by persons who are actually opposed to climate policy.]
 
-__Letzte Generation (ALG) and controversy.__ A contrary (or complimentary) strategy is taken by _Letzte Generation_ (originally _Aufstand der Letzten Generation_, ALG), which was founded by the participants of a hunger strike during the pre-election phase in 2021 [@LetzteGeneration2023]. Since 2021 the group -- consisting only of dozens or hundreds of members -- employs highly disruptive tactics: most prominently unregistered sit-ins on car highways, as well as supplementary action forms including throwing soup at paintings (which are protected by glass sheets), turning off oil pipelines, or vandalizing symbols of climate-afflicting luxury. The group has concrete demands including a citizen's assembly on climate policy, a ban on food waste, a speed limit for cars, and heavily subsidized public transport tickets. The protesters face a vast backlash, are criticized by politicians from across the poltical spectrum as well as by many media formats, and are pursued under terrorism laws by public prosecutors (who in Germany report to the regional governments); at the same time they have successfully negotiated with multiple mayors to support their concern, have held talks with the chancellor and the minister for traffic, and have been endorsed by the UN general secretary and by some religious organizations. Again, and this time perhaps with even more plausibility, the argument has been raised that the caused disruption runs counter to the goals of the group by diverting attention from climate change policy issues themselves, and by annoying the public.^[A version of this argument is presented by @jansteckelKlimaprotestAufAbwegen2022, and not without [controversy](https://twitter.com/jan_c_steckel/status/1601048858129477632).]
+__Letzte Generation (ALG) and controversy.__ A contrary (or complimentary) strategy is taken by _Letzte Generation_ (originally _Aufstand der Letzten Generation_, ALG), which was founded by the participants of a hunger strike during the pre-election phase in 2021 [@LetzteGeneration2023]. Since 2021 the group -- consisting only of dozens or hundreds of members -- employs highly disruptive tactics: most prominently unregistered sit-ins on car highways, as well as supplementary action forms including throwing soup at paintings (which are protected by glass sheets), turning off oil pipelines, or vandalizing symbols of climate-afflicting luxury. The group has concrete demands including a citizen's assembly on climate policy, a ban on food waste, a speed limit for cars, and heavily subsidized public transport tickets. The protesters face a vast backlash, are criticized by politicians from across the poltical spectrum as well as by many media formats, and are pursued under terrorism laws by public prosecutors (who in Germany report to the regional governments); at the same time they have successfully negotiated with multiple mayors to support their concern, have held talks with the chancellor and the minister for traffic, and have been endorsed by the UN general secretary and by some religious organizations. Again, and this time perhaps with even more plausibility, the argument has been raised that the caused disruption runs counter to the goals of the group by diverting attention from climate change policy issues themselves, and by annoying the public [see @jansteckelKlimaprotestAufAbwegen2022; @hillenkampKlimaaktivismusStoerungUnd2022a].
 
 __Related work on the German climate movement.__ @moreincommonWieSchautDeutsche2023 is a survey on support for the German climate protest movement in 2021 and 2023. Over this period they find a roughly 50% decline in support across the sociopolitical spectrum, which is accompanied by widespread disapproval of street blockades (mostly associated with ALG). @gonzattiAnalyseberichtZurStudie2023 use an "experimental" setting where participants are told about a fictitious climate protest in Germany, and also find low approval for street blockades and soup throwing, but do not find a positive or negative impact on support for climate policy for any protest form.

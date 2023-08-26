@@ -13,7 +13,7 @@ Managerial/societal recommendations are well-derived from findings, original and
 I find the following answers to my research questions:
 
 1. __How well do the methods work and how do they compare to each other?__
-   - The _instrumental variable_ method is not suitable for my setting of measuring the impact of single events because most instruments are very weak, and the only strong instrument clearly fails the placebo checks.
+   - The __instrumental variable__ method is not suitable for my setting of measuring the impact of single events because most instruments are very weak, and the only strong instrument clearly fails the placebo checks.
    - The other three methods -- regression, inverse propensity weighting, and synthetic control -- all reduce bias in comparison to simple correlation.
      - Based on __propensity scores__, IPW exhibits systematic bias in both types of placebo tests.
      - __Regression__ shows bias in outcome placebo tests; the bias has weekly patterns, suggesting insufficient interaction modeling that may also involve other variables than only weekdays.
@@ -23,9 +23,17 @@ I find the following answers to my research questions:
 2. __What is the general ATT and what are the ATTs for the protest groups?__ TODO: fill in the numbers
 <!-- According to the synthetic control method -- which is not clearly valid -- the ATT on cumulative regional newspaper converage in the first week after the protests is 7.XX±X.XX. The ATTs for the individual groups are ... (not significant?) TODO -->
 
-3. __Do protests distract from constructive discussion of the climate crisis?__
+1. __Do protests distract from constructive discussion of the climate crisis?__
    - According to the synthetic control method -- which is not clearly valid -- the ATT is positive (according to synthetic control) or close to zero (according to regression) for the number of articles that do not mention any protest activity. This suggests that there is no backfiring effect on constructive discussion, but the results are not statistically significant at p=0.05.
    - This also holds specifically for _Fridays for Future_ and for _Greenpeace_. For _Letzte Generation_ and _Ende Gelände_ the results suggest a non-significant decrease in coverage that does not mention protest articles; further research, for example using full texts, would be necessary to determine whether this distracts from constructive discussion. For _Extinction Rebellion_ there is a significant increase in coverage that does not mention protest activity; if the synthetic control method is valid, this is strong evidence that their protests do not distract from constructive discussion.
+
+2. __How suitable are datasets from authorities or from semi-automatic collection and processing?__
+   - It is feasible to collect a comprehensive dataset from protest registration authorities, covering 8 out of 16 regions with high quality data and 3 further regions with lower quality data. It comprises more climate protests than ACLED, except for days where protest activity peaks. This is helpful for obtaining more reliable estimates from the synthetic control method (see @sec-disc-synth).
+   - Prior work on protest event detection [@wiedemannGeneralizedApproachProtest2022] can be successfully applied to detect protests at an F1-score of 0.78. The temporal distribution of the dataset is imbalanced due to technical difficulties with web scraping.
+   - Both new datasets yield similar impact estimates to ACLED, except that both show a less "spikey" pattern for the impact on protest-related coverage; presumably due to unregistered protests in 2022 that are not included in either of the new datasets but in ACLED.
+   - This suggests that more refined and more large-scale analyses are possible with new types of datasets; but they are not fully leveraged in this analysis, where optimization and detailed checks have only been performed for the ACLED dataset.
+
+My results contribute to closing the large research gap on causal methods that is attested by @jamesozdenLiteratureReviewProtest2022, and may serve as a baseline for further efforts.
 
 ### Future work
 
@@ -39,16 +47,20 @@ __Improving the causal methods:__
 - The propensity score method can be improved by (a) using dedicated time-series models and (b) using small or large language models for the estimation of propensity scores (see @sec-disc-ps). Problems with the doubly robust method should be investigated in more depth.
 - Double machine learning [@chernozhukovDoubleDebiasedMachine2017] is a promising nonparametric method to improve on both regression and propensity score models, while using ideas from the two-stage least squares instrumental variable method.
 
+### Limitations
+
+- It should be noted that the results apply to _regional_ newspaper coverage due to methodical reasons, but the focus of many protest groups may be on _national_ newspaper coverage.
+- media coverage frames may not matter
+- climate protests are pro status quo
+
 ### Societal implications
 
-Given my methods, it is not possible to obtain results that are clearly unbiased. The estimates by the synthetic control method are probably least biased. They weakly suggest that it is generally _not_ the case that protests backfire by distracting from the climate discourse and by instead focusing the discourse on the protests themselves. This implies that protests may indeed be a suitable tool for drawing attention to the topic matter of the concern -- at least in the case of climate protests in Germany from 2020-2022, with the possible exception of specific protest groups. The results also suggest that the various protest groups have very different effects on media coverage. Improving the causal methods may help to make less biased and more significant statements about these issues.
+Given my methods, it is not possible to obtain results that are clearly unbiased. The estimates by the synthetic control method are probably least biased. They weakly suggest that it is generally _not_ the case that the studied protests backfire by distracting from the climate discourse and by instead focusing the discourse on the protests themselves. This implies that protests may indeed be a suitable tool for drawing attention to the topic matter of the concern -- at least in the case of climate protests in Germany from 2020-2022, with the possible exception of specific protest groups. The results also suggest that the various protest groups have very different effects on media coverage. Improving the causal methods may help to make less biased and more significant statements about these issues.
 
-It should be noted that the results apply to _regional_ newspaper coverage due to methodical reasons, but the focus of many protest groups may be on _national_ newspaper coverage.
-
-A more concrete result is that naive media impact evaluation evaluation methods do not work:
+A methodological result is that naive media impact evaluation evaluation methods do not work:
 
 - Only counting the number of articles that explicitly mention a protest event or protest group ignores the impact on the articles that do not do so, and this impact may be substantial -- positively or negatively.
 - A correlation-based analysis is highly biased, and even an optimized regression analysis is somewhat biased. This applies to the absolute numbers as well as to comparisons between different topics, and potentially between different protest groups.
-- Even the best causal method used here exhibits many methodical flaws, but there is a lot of potential for improvement in future work.
+- Even the best causal methods used here may be biased, but the synthetic control probably reduces bias the most.
 
-Protest groups and funding bodies that care about quantitative media impact evaluation should therefore invest into the advancement of causal methods and their application to protest events.
+Protest groups and funding bodies that care about quantitative media impact evaluation should be aware of these limitations, and should explore the application and perhaps the advancement of causal methods for protest impact evaluation.
