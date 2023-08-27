@@ -54,7 +54,7 @@ The table below shows the queries for retrieving article counts from online and 
 
 #### Regression {#sec-app1-reg}
 
-Detailed regression results are in @tbl-reg-detailed and @tbl-reg-details-occ.
+Detailed regression results are in @tbl-reg-detailed.
 
 ```{python}
 # | echo: False
@@ -89,7 +89,7 @@ display(
 
 @fig-loss-curves shows the loss curves for finetuning the transformer text classification model.
 
-The following is an example text that has been used for the finetuning process. This text has the label `no`. The format is conceived so that it could also be used with _causal_ language models^[This is confusing terminology: A causal language model is not related to causal inference, but merely predicts a word given the previous words, and this is called "causal" in natural language processing.], but here I train a _classification_ language model, because it is more straightforward to convert the classification logits to probabilities. (For a classification model there are only two possible classes, while a causal model can answer with any word from its vocabulary, but only two of them correspond to the class labels.)
+The following is an example text that has been used for the finetuning process. This text has the label `no`. The format is conceived so that it could also be used with _causal_ language models^[This is confusing terminology: A causal language model is not related to causal inference, but merely predicts a word given the previous words, and this is called "causal" in natural language processing.], but here I train a _classification_ language model, because it is more straightforward to convert the classification logits to probabilities. (For a classification model there are only two possible classes, whereas a causal model can answer with any word from its vocabulary, but only two of them correspond to the class labels.)
 
 \begingroup
 \footnotesize\selectfont

@@ -67,7 +67,7 @@ plt.show()
 ```
 
 
-__ACLED.__ My main data source for protest events is the [_Armed Conflict Location and Event Dataset_](https://acleddata.com/) (ACLED; @raleighIntroducingACLEDArmed2010a). ACLED is a grand effort that keeps track not only of violent conflicts and riots, but also of ordinary protest events. The data is human-curated based on newspaper reports, and contains coded information on dates, locations, actor groups, police interventions, and more, as well as a short free-text summary for each event, containing an estimate of the size as per the newspaper data source. Data for Germany is available starting from 2020 and is continuously updated. For the period from 2020-2022, it contains 13235 protest events, 1314 of which are organized by climate protest groups or mention the climate in their description.
+__ACLED.__ My main data source for protest events is the [_Armed Conflict Location and Event Dataset_](https://acleddata.com/) [ACLED; @raleighIntroducingACLEDArmed2010a]. ACLED is a grand effort that keeps track not only of violent conflicts and riots, but also of ordinary protest events. The data is human-curated based on newspaper reports, and contains coded information on dates, locations, actor groups, police interventions, and more, as well as a short free-text summary for each event, containing an estimate of the size as per the newspaper data source. Data for Germany is available starting from 2020 and is continuously updated. For the period from 2020-2022, it contains 13235 protest events, 1314 of which are organized by climate protest groups or mention the climate in their description.
 
 <!-- For the period from 2020-2022, it contains `{python} len(protests.query("source == 'acled'"))` protest events, `{python} len(climate_protests.query("source == 'acled'"))` of which are organized by climate protest groups or mention the climate in their description. -->
 
@@ -101,7 +101,7 @@ df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg", gprep="GPRep"))
 df = df.sort_values("actor")
 df = df.set_index("actor")
 df.index.name = None
-df
+Markdown(df.to_markdown())
 ```
 \endgroup
 
@@ -135,7 +135,7 @@ df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg", gprep="GPRep"))
 df = df.set_index("date")
 df.index.name = None
 df = df.rename_axis(None, axis=1)
-df
+Markdown(df.to_markdown())
 ```
 \endgroup
 
@@ -368,7 +368,7 @@ I have 16 candidate variables for potential instruments. Their nature and validi
 
 1. __Correlation.__ I compute correlations and Wald estimates (see @sec-app2-iv-ils) and compare them to each other. The Wald estimator is only valid for strong instruments.
 2. __Regression.__ I perform first-stage regression, that is, I regress protest occurrence on all instruments, controlling for the known confounders (time series data, in the same format of the hyperparameter optimization from @sec-res-reg). I adjust p-values for multiple testing via the Benjamini-Yekutieli procedure [@benjaminiControlFalseDiscovery2001a] because the variables are likely very correlated.
-3. __Deseasoning.__ Instrumental variables should be (almost) random, which is violated by seasonality, and most candidate variables have obvious seasonal patters.^[This problem is not present in most prior work, because it typically compares the impact during a single fixed timespan across geographical units (see @sec-weatherlit).] I compute seasonal components by taking 90-day rolling averages with a Gaussian window with a standard deviation of 30 days. I consider only the nonseasonal components, that is the residuals of the seasonal components, are potentially valid instruments. Again I perform first-stage regression on these residuals, controlling for the knwon confounders and the seasonal components. <!-- (The residual components seem much more meaningful when given the seasonal components.) -->
+3. __Deseasoning.__ Instrumental variables should be (almost) random, which is violated by seasonality, and most candidate variables have obvious seasonal patters.^[This problem is not present in most prior work, because it typically compares the impact during a single fixed timespan across geographical units (see @sec-lit-causal).] I compute seasonal components by taking 90-day rolling averages with a Gaussian window with a standard deviation of 30 days. I consider only the nonseasonal components, that is the residuals of the seasonal components, are potentially valid instruments. Again I perform first-stage regression on these residuals, controlling for the knwon confounders and the seasonal components. <!-- (The residual components seem much more meaningful when given the seasonal components.) -->
 4. __Principal components.__ Since there is probably a high correlation among the covid variables as well as among the weather variables, I compute principal components both for the seasonal and for the nonseasonal components, separately. The intent is (a) to potentially find components that have a higher impact than the individual instruments, because they may find and isolate patters, and (b) to account for the problem that regression may underestimate the impact of multicollinear variables.
 
 Then I use an alternative of two-stage least squares (see @sec-app2-2sls) that is more robust to weak instruments, namely _limited information maximum likelihood_ (LIML) to estimate the causal effect. I include the same confounders as from the optimized regression model (@sec-res-reg). I use the `IVLIML` implementation from the `linearmodels` library [@sheppardBashtageLinearmodelsRelease2023a].

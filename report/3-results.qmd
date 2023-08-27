@@ -51,8 +51,8 @@ results = r.params[t], tuple(r.conf_int().loc[t]), r.pvalues[t]
 \begingroup
 \scriptsize\selectfont
 ```{python}
-# | label: fig-iv-wald
-# | fig-cap: Correlations between the instruments and the treatment (corr_w) and between the instruments and the outcome (corr_y), and Wald estimator results.
+# | label: tbl-iv-wald
+# | tbl-cap: Correlations between the instruments and the treatment (corr_w) and between the instruments and the outcome (corr_y), and Wald estimator results.
 # | echo: false
 from src.models.instrumental_variable import get_covariances
 
@@ -68,7 +68,7 @@ Automatically binarizing the variables based on an optimally chosen threshold do
 \scriptsize\selectfont
 ```{python}
 # | label: tbl-iv-basic
-# | fig-cap: First-stage impact of the original instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed.
+# | tbl-cap: First-stage impact of the original instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed.
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients
@@ -81,7 +81,7 @@ get_coefficients("weather_covid")[0].sort_values(by="p")
 \scriptsize\selectfont
 ```{python}
 # | label: tbl-iv-deseason
-# | fig-cap: First-stage impact of the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
+# | tbl-cap: First-stage impact of the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients
@@ -94,7 +94,7 @@ get_coefficients("weather_covid_season")[0].sort_values(by="p").head(10)
 \footnotesize\selectfont
 ```{python}
 # | label: tbl-iv-deseason-pc
-# | fig-cap: First-stage impact of principal components calculated separately for the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
+# | tbl-cap: First-stage impact of principal components calculated separately for the seasonal and residual parts of the instruments. Regression coefficients and p-values for the impact of the standardized instruments on the treatment, controlling for known confounders. Results are sorted by original p-values and adjusted p-values (p_bh = Benjamini-Hochberg, p_by=Benjamini-Yekutieli) and first-stage f-statistics for using each variable as an instrument on its own are displayed. Only the 10 most significant variables are displayed.
 # | echo: False
 
 from src.models.instrumental_variable import get_coefficients
@@ -416,7 +416,6 @@ plot_groups(kind="methods", step=6)
 ```{python}
 # | label: fig-impact-medium
 # | fig-cap: Causal impact estimates for online vs print newspapers, as estimated by the synthetic control method. The protest day is at x=0.
-# | column: page
 # | echo: false
 import matplotlib.pyplot as plt
 from src.visualization.impacts import _synthetic_control, plot_impact_ts
@@ -471,7 +470,6 @@ plot_groups(kind="groups", step=6)
 ```{python}
 # | label: fig-impact-dataset
 # | fig-cap: Causal impact estimates by dataset, as estimated by the synthetic control method. The protest day is at x=0.
-# | column: page
 # | echo: false
 import matplotlib.pyplot as plt
 from src.visualization.impacts import _synthetic_control, plot_impact_ts
@@ -514,7 +512,6 @@ plt.show()
 ```{python}
 # | label: fig-impact-groups-sources
 # | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
-# | column: page
 # | echo: false
 
 import altair as alt

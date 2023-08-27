@@ -53,7 +53,7 @@ res = _synthetic_control(
 
 ### Limitations
 
-- Al contentwise results depend on the validity of the synthetic control method, and its validity is very much unclear (see @sec-disc-synth).
+- All contentwise results depend on the validity of the synthetic control method, and its validity is very much unclear (see @sec-disc-synth).
 - My results apply to _regional_ newspaper coverage due to methodical reasons, but the focus of many protest groups may be on _national_ newspaper coverage.
 - Media coverage overall may not be so important for protest movements. @walgraveComplexAgendaSettingPower2012 do not find a significant impact of protests on the legislative agenda. @harlowNewProtestParadigm2023 suggest that especially the importance of the _framing_ of articles may be overestimated.
 - The results may not generalize well to other protest movements. Climate protests in Germany are somewhat of an outlier among protests: Their concern already has relatively large support and they can refer to existing laws and international agreements. For example, it seems possible that even if backfiring effects do not generally exist for this movement, they may well exist for other less popular movements.
@@ -64,7 +64,7 @@ __Clarifying my results:__
 
 - For some protest groups, a backfiring effect seems possible. Full-text analyses or topic models could address this open question.
 - The validity of the synthetic control method depends on whether a coverage rise before the protests can be explained as anticipation effects (see @sec-disc-synth). This could also be investigated using full texts.
-- It is very surprising and not conclusively explained that the weather is no valid instrument in my setting (see @sec-disc-iv). Although I have full trust in my results, I believe that a replication could help to confirm or falsify this finding, and could potentially bring about further insight.
+- It is very surprising and not conclusively explained that the weather is no valid instrument in my setting (see @sec-disc-iv). Although I have trust in my results, I believe that a replication could help to confirm or falsify this finding, and could potentially bring about further insight.
 
 __Extending the scope of the content.__ The methods can be applied to national newspaper coverage, social media data, or parliamentary speech [see @sec-data-discourse]. Topic models [see @chenHowClimateMovement2023a] can be used to get finer insights into the impact on different topics.
 
