@@ -139,7 +139,6 @@ A subtlety is that all of the above methods do not actually give us the ATT or A
 - _defiers_: days where the rainfall _negatively_ determines whether there is a protest. This is often implausible (also in our context) and therefore it is assumed that there are no defiers.
 
 It can be proven that indirect least squares and other instrumental variable methods only estimate the treatment effect for the group of compliers [@dingFirstCourseCausal2023, ch. 21; @pischkeLabourEconomicsPhD2019, slides on the LATE theorem; @facurealvesCausalInferenceBrave2022, ch. 9].
-<!-- In the deduction above, this assumption is implicit in the form of the regression model (TODO: is it?), where $Z$ is assumed to have a constant effect on $Y$. -->
 
 In the case of protests, an instrumental variable approach would ignore the effect of protests where the organizers and participants are very weather-resistant. If such protests are systematically more or less effective than the weather-complying protests, this will introduce bias. For Covid restrictions as an instrument, the instrumental variable approach would ignore the effect of protests that violate the restrictions.
 

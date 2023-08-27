@@ -97,12 +97,11 @@ df = (
     .reset_index()
 )
 df["actor"] = df["actor"].apply(lambda x: abbreviations[x])
-df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg"))
-df["GPRep"] = "?"
+df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg", gprep="GPRep"))
 df = df.sort_values("actor")
 df = df.set_index("actor")
 df.index.name = None
-Markdown(df.to_markdown())
+df
 ```
 \endgroup
 
@@ -132,12 +131,11 @@ df = df.drop(columns=["mean"])
 df = df.head(5).sort_values("date")
 df = df.reset_index()
 df["date"] = df["date"].dt.strftime("%Y-%m-%d")
-df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg"))
+df = df.rename(columns=dict(acled="ACLED", gpreg="GPReg", gprep="GPRep"))
 df = df.set_index("date")
 df.index.name = None
 df = df.rename_axis(None, axis=1)
-df["GPRep"] = "?"
-Markdown(df.to_markdown())
+df
 ```
 \endgroup
 
@@ -251,7 +249,7 @@ The queries allow me to study not only research question 2 (how much overall cov
 
 - The other queries (_topic `and` framing_, _topic `and` goal_, _topic `and` subisidiary goal_) aim to look at topics where it would be a success for the protests if they occur more in public discourse. If their article counts increase due to protests, then backfiring is unlikely (but still possible in other topic niches that I am not querying for); and if they decrease, it is strong evidence that the protests are indeed backfiring. A result where the counts for some of these queries increase, while they decrease for others may indicate more complicated effects of protests that warrant further research.
 
-- The _topic `and` protest_ query can serve as a sanity check: It would be very surprising if protest events did not cause the counts for this query to markedly increase. This is even more true for the _ACLED_ and _GPRep_ datasets, where the events are (manually or automatically) extracted from newspaper articles.
+- The _topic `and` protest_ query can serve as a sanity check: It would be very surprising if protest events did not cause the counts for this query to markedly increase. This is even more true for the _ACLED_ and _German Protest Reports_ datasets, where the events are (manually or automatically) extracted from newspaper articles.
 
 ![The queries produce different lenses on the mass of articles about climate change. The left lens has the disadvantage that we do not know how much the articles that also mention the protests contribute to the discourse about the topic. The right lens has the disadvantage that it ignores aspects that we do not explicitly query for.](figures/queries.svg){.column-margin}
 
@@ -403,7 +401,7 @@ I use _inverse propensity weighting_ (IPW) as a pure propensity score model. IPW
 
 I use the IPW implementation from the `DoWhy` Python package [@sharmaDoWhyEndtoEndLibrary2020], with a normalized weighting scheme (that is, the Hájek estimator, see @sec-app2-ps) for ATT estimation. As an implementation for DRE I use the `LinearDRLearner` from the `EconML` Python package [@econml] with their `StatsModelsLinearRegression` model as regression model. For the computation of propensity scores I use `LogisticRegressionCV` from `scikit-learn` [@pedregosaScikitlearnMachineLearning2011] with the `liblinear` solver.
 
-__Propensity scores from text.__ I aim to leverage natural language processing models for incorporating hidden confounders that may be incorporated in texts. Plausible candidates for hidden confounders are the occurrence of related non-protest events [@bundeskriminalamtbkaLagebildLetzteGeneration2023], or the intensity of previous public discourse. I use national press releases and regional print newspaper articles, and query them for `klima*`. Since the context windows of transformer models are limited, I only use the titles, and further filter whether the title contains any of the words from @sec-app-queries. Then I construct time-series of titles from the pre-event days, and add the region name, dates, weekdays, and holidays as further textual components; an example is given in TODO.
+__Propensity scores from text.__ I aim to leverage natural language processing models for incorporating hidden confounders that may be incorporated in texts. Plausible candidates for hidden confounders are the occurrence of related non-protest events [@bundeskriminalamtbkaLagebildLetzteGeneration2023], or the intensity of previous public discourse. I use national press releases and regional print newspaper articles, and query them for `klima*`. Since the context windows of transformer models are limited, I only use the titles, and further filter whether the title contains any of the words from @sec-app-queries. Then I construct time-series of titles from the pre-event days, and add the region name, dates, weekdays, and holidays as further textual components; an example is given in @sec-app1-ps.
 
 I use a Longformer model [@beltagyLongformerLongDocumentTransformer2020] because it has a context size of up to 8096 tokens, as opposed to 512 tokens for BERT and some Electra models (confer @sec-gprep). To reduce resources, I stick with a context window of 1024 tokens, and truncate longer texts _from the left side_, so that the information from the day(s) directly before the event is included in any case, and information for up to 30 prior days is included, depending on how many tokens the headlines from the later days take up. I finetune a model that has previously been finetuned on German texts from the [OSCAR](https://oscar-project.org/) project, the so-called [`longformer-gottbert`](https://huggingface.co/LennartKeller/longformer-gottbert-base-8192-aw512) model. I use the `transformers` libary [@wolfHuggingFaceTransformersStateoftheart2020] for finetuning, using 30 epochs with a linear schedule and a 20% warmup ratio, a learning rate of $5e^{-6}$, a weight decay of 20%, batch size 8, and otherwise default settings (including the `AdamW` optimizer). To save resources, the model is validated on a single 80% time-series train-test split, rather than cross-validated.
 

@@ -228,7 +228,7 @@ plt.show()
 
 {{< pagebreak >}}
 
-#### Impact estimates for the other datasets
+#### Impact estimates for the other datasets {#sec-app1-datasets}
 
 
 ```{python}
@@ -240,7 +240,9 @@ import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(cumulative=False, show_progress=False, protest_source="gpreg")
-fig.suptitle("GPReg: Time series of the causal impact by method and coverage dimension")
+fig.suptitle(
+    "German Protest Registrations dataset: Time series of the causal impact by method and coverage dimension"
+)
 axes[0].set_ylim(-30, 30)
 axes[1].set_ylim(-30, 30)
 axes[2].set_ylim(-5, 5)
@@ -259,7 +261,9 @@ import matplotlib.pyplot as plt
 from src.visualization.impacts import plot_trends
 
 fig, axes = plot_trends(cumulative=False, show_progress=False, protest_source="gprep")
-fig.suptitle("GPRep: Time series of the causal impact by method and coverage dimension")
+fig.suptitle(
+    "German Protest Reports dataset: Time series of the causal impact by method and coverage dimension"
+)
 axes[0].set_ylim(-30, 30)
 axes[1].set_ylim(-30, 30)
 axes[2].set_ylim(-5, 5)

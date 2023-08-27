@@ -15,7 +15,7 @@ __Bias.__ The results affirm that OLS is unbiased for in-distribution data, but 
 
 __Placebo behaviour.__ The estimated effects for the pre-treatment clearly differ from zero, and indicate bias. Bias may come from omitted variables, or from a misspecified model. The estimates exhibit weekly patterns during the placebo timespan. Weekdays are already controlled for, so this suggests a lack of interaction variables involving weekdays, or very nonlinear implications of weekdays. This could be cosmetically fixed by adding interaction terms for weekdays; but there may as well be other interactions that are not visible in the time series and also require modelling. Causal random forests [@wagerEstimationInferenceHeterogeneous2017] may provide a more systematic solution. The estimates for placebo treatments do not raise concerns.
 
-### Instrumental variables
+### Instrumental variables {#sec-disc-iv}
 
 __Correlation and Wald estimate.__ The correlation between the instruments and the treatment is generally very low. Wald estimates are scaled inversely by this first-stage correlations, and measurement errors make them unreliable when they are close to zero. We can assume with certainty that the first-stage correlations are smaller than 1, so the correlation between the instruments and the outcome can be taken as a lower bound for the causal impact of the protests, but they are very low.
 
@@ -61,6 +61,8 @@ __Spillover effects.__ The synthetic control method assumes that there are no sp
 __Bias.__ The placebo tests show that IPW consistently reduces the bias that pure correlation has, but not until zero. This is likely due to the rather low F1-score for the propensity scores. Future work may use dedicated time series forecasting or classification methods to improve performance; or may leverage text classification of prior discourse or of press releases about related events.
 
 __Extensions.__ IPW does not consider the effect of the confounders on the treatment. This is theoretically justified if the propensity scores are reliable (see @sec-app2-ipw). In the absence of good propensity scores, the model may benefit from combination with a model for the outcome. The _doubly robust estimator_ should be re-evaluated, and occcurring problems should be investigated in more depth. A nonparametric alternative would be _double machine learning_ [@chernozhukovDoubleDebiasedMachine2017]; it fits a regression model on the residuals of nonparametric propensity score and outcome models.
+
+__Propensity scores from texts.__ The results suggest that the text-based approach generally works: Without any of the numeric time series information that the logistic regression model uses, the text classifier can achieve a similar performance. But it does not seem to pick up any additional information from the text, and is thus ultimately not useful for improving the causal estimates. Since it is much more computationally expensive than logistic regression, it should not be used in this setting. Future work may consider whether there the classifier can be supplied with more relevant text, for example by increasing the size of the context window and including _keywords in context_ from the full text, or by exploiting the full texts in other ways, for example by topic modelling or sentiment analysis.
 
 ### Impact estimates
 

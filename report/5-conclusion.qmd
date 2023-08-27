@@ -15,27 +15,56 @@ I find the following answers to my research questions:
 1. __How well do the methods work and how do they compare to each other?__
    - The __instrumental variable__ method is not suitable for my setting of measuring the impact of single events because most instruments are very weak, and the only strong instrument clearly fails the placebo checks.
    - The other three methods -- regression, inverse propensity weighting, and synthetic control -- all reduce bias in comparison to simple correlation.
-     - Based on __propensity scores__, IPW exhibits systematic bias in both types of placebo tests.
+     - Based on __propensity scores__, IPW exhibits systematic bias in both types of placebo tests. Obtaining propensity scores from texts does not mitigate this.
      - __Regression__ shows bias in outcome placebo tests; the bias has weekly patterns, suggesting insufficient interaction modeling that may also involve other variables than only weekdays.
      - The __synthetic control__ method is relatively unbiased in placebo tests but also shows some weekly bias in outcome placebo tests. It estimates an increase in coverage already before a protest event happens; this is acceptable only if (a) this coverage anticipates the event rather than triggers it, and (b) one accepts a definition of a protest event that includes certain pre-event activity.
    - Under these conditions and under further limitations discussed in @sec-disc-synth, the synthetic control method gives plausible causal estimates. The other methods give clearly biased results in my setting, but this may be improved.
 
-2. __What is the general ATT and what are the ATTs for the protest groups?__ TODO: fill in the numbers
-<!-- According to the synthetic control method -- which is not clearly valid -- the ATT on cumulative regional newspaper converage in the first week after the protests is 7.XX±X.XX. The ATTs for the individual groups are ... (not significant?) TODO -->
+2. __What is the general ATT and what are the ATTs for the protest groups?__ According to the synthetic control method, the average climate protest event in the ACLED dataset from 2020 to 2022 creates additional 9.70 [3.49, 15.91] articles that mention climate change within one week. How this is further subdivided by group and newspaper medium and topics, and how it is estimated by the other methods and on the other datasets, is displayed in multiple figures in @sec-res-est and @sec-app1-datasets.
 
-1. __Do protests distract from constructive discussion of the climate crisis?__
-   - According to the synthetic control method -- which is not clearly valid -- the ATT is positive (according to synthetic control) or close to zero (according to regression) for the number of articles that do not mention any protest activity. This suggests that there is no backfiring effect on constructive discussion, but the results are not statistically significant at p=0.05.
-   - This also holds specifically for _Fridays for Future_ and for _Greenpeace_. For _Letzte Generation_ and _Ende Gelände_ the results suggest a non-significant decrease in coverage that does not mention protest articles; further research, for example using full texts, would be necessary to determine whether this distracts from constructive discussion. For _Extinction Rebellion_ there is a significant increase in coverage that does not mention protest activity; if the synthetic control method is valid, this is strong evidence that their protests do not distract from constructive discussion.
+3. __Do protests distract from constructive discussion of the climate crisis?__
+   - The ATT is positive (according to synthetic control) or close to zero (according to regression) for the number of articles that do not mention any protest activity. This suggests that there is no backfiring effect on constructive discussion, but the results are not statistically significant at p=0.05.
+   - This observation also holds specifically for _Fridays for Future_ and for _Greenpeace_. For _Letzte Generation_ and _Ende Gelände_ the results suggest a non-significant decrease in coverage that does not mention protest articles; further research, for example using full texts, would be necessary to determine whether this may distract from constructive discussion. For _Extinction Rebellion_ there is a significant increase in coverage that does not mention protest activity; if the synthetic control method is valid, this is strong evidence that their protests do not distract from constructive discussion but contribute to it.
 
-2. __How suitable are datasets from authorities or from semi-automatic collection and processing?__
+4. __How suitable are datasets from authorities or from semi-automatic collection and processing?__
    - It is feasible to collect a comprehensive dataset from protest registration authorities, covering 8 out of 16 regions with high quality data and 3 further regions with lower quality data. It comprises more climate protests than ACLED, except for days where protest activity peaks. This is helpful for obtaining more reliable estimates from the synthetic control method (see @sec-disc-synth).
    - Prior work on protest event detection [@wiedemannGeneralizedApproachProtest2022] can be successfully applied to detect protests at an F1-score of 0.78. The temporal distribution of the dataset is imbalanced due to technical difficulties with web scraping.
    - Both new datasets yield similar impact estimates to ACLED, except that both show a less "spikey" pattern for the impact on protest-related coverage; presumably due to unregistered protests in 2022 that are not included in either of the new datasets but in ACLED.
    - This suggests that more refined and more large-scale analyses are possible with new types of datasets; but they are not fully leveraged in this analysis, where optimization and detailed checks have only been performed for the ACLED dataset.
 
-My results contribute to closing the large research gap on causal methods that is attested by @jamesozdenLiteratureReviewProtest2022, and may serve as a baseline for further efforts.
+My results contribute to closing the large research gap on causal methods that is attested by @jamesozdenLiteratureReviewProtest2022, and may serve as a baseline for future efforts.
+
+Furthermore, they help settle the theoretical debate on backfiring effects (@sec-newslit): In general, no backfiring effects on climate-related discourse are observable; but they may or may not exist for specific protest groups, where my research design does not give clear insight. Much popular debate revolves around around _Letzte Generation_ (see @sec-case), and specifically for this group the question of a backfiring effect remains completely open; at least we can say that the other groups do more clearly avoid such an effect.
+
+```{python}
+# | echo: false
+from src.visualization.impacts import _synthetic_control
+
+res = _synthetic_control(
+    target="media_combined_all",
+    treatment="occ_protest",
+    steps=[6],
+    cumulative=True,
+    ignore_group=True,
+    ignore_medium=True,
+).iloc[0]
+# print(f"{res['coef']:.2f} [{res['ci_lower']:.2f}, {res['ci_upper']:.2f}]")
+```
+
+### Limitations
+
+- Al contentwise results depend on the validity of the synthetic control method, and its validity is very much unclear (see @sec-disc-synth).
+- My results apply to _regional_ newspaper coverage due to methodical reasons, but the focus of many protest groups may be on _national_ newspaper coverage.
+- Media coverage overall may not be so important for protest movements. @walgraveComplexAgendaSettingPower2012 do not find a significant impact of protests on the legislative agenda. @harlowNewProtestParadigm2023 suggest that especially the importance of the _framing_ of articles may be overestimated.
+- The results may not generalize well to other protest movements. Climate protests in Germany are somewhat of an outlier among protests: Their concern already has relatively large support and they can refer to existing laws and international agreements. For example, it seems possible that even if backfiring effects do not generally exist for this movement, they may well exist for other less popular movements.
 
 ### Future work
+
+__Clarifying my results:__
+
+- For some protest groups, a backfiring effect seems possible. Full-text analyses or topic models could address this open question.
+- The validity of the synthetic control method depends on whether a coverage rise before the protests can be explained as anticipation effects (see @sec-disc-synth). This could also be investigated using full texts.
+- It is very surprising and not conclusively explained that the weather is no valid instrument in my setting (see @sec-disc-iv). Although I have full trust in my results, I believe that a replication could help to confirm or falsify this finding, and could potentially bring about further insight.
 
 __Extending the scope of the content.__ The methods can be applied to national newspaper coverage, social media data, or parliamentary speech [see @sec-data-discourse]. Topic models [see @chenHowClimateMovement2023a] can be used to get finer insights into the impact on different topics.
 
@@ -46,12 +75,6 @@ __Improving the causal methods:__
 - For the synthetic control method, rolling average estimation can be tried out, as well as fitting for the anticipation effect. The extent of bias from missing data can be estimated using simulations. (See @sec-disc-synth.)
 - The propensity score method can be improved by (a) using dedicated time-series models and (b) using small or large language models for the estimation of propensity scores (see @sec-disc-ps). Problems with the doubly robust method should be investigated in more depth.
 - Double machine learning [@chernozhukovDoubleDebiasedMachine2017] is a promising nonparametric method to improve on both regression and propensity score models, while using ideas from the two-stage least squares instrumental variable method. It could build on time-series forecasting methods [for example by @ngSocialMediaActivity2022].
-
-### Limitations
-
-- It should be noted that the results apply to _regional_ newspaper coverage due to methodical reasons, but the focus of many protest groups may be on _national_ newspaper coverage.
-- media coverage frames may not matter
-- climate protests are pro status quo
 
 ### Societal implications
 
