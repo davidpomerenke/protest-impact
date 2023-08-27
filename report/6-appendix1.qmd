@@ -54,61 +54,42 @@ The table below shows the queries for retrieving article counts from online and 
 
 #### Regression {#sec-app1-reg}
 
-\begingroup
-\footnotesize\selectfont
+Detailed regression results are in @tbl-reg-detailed and @tbl-reg-details-occ.
+
 ```{python}
-# | label: fig-reg-details
-# | fig-cap: "Detailed results for the best regression model from @sec-res-reg. Dependent variable is the absolute number of articles mentioning climate change from the treatment date and the following day. Due to including time series lags there are overall 140 parameters plus a constant term, so only the 20 parameters with lowest p-values are displayed. Note that for the weekday dummies the first value (Friday) is dropped and the other dummies are to be interpreted in relation to it."
 # | echo: False
+# | label: tbl-reg-detailed
+# | tbl-cap: Regression tables.
+# | tbl-subcap:
+# |  - "Detailed results for the best regression model from @sec-res-reg. Dependent variable is the absolute number of articles mentioning climate change from the treatment date and the following day. Due to including time series lags there are overall 140 parameters plus a constant term, so only the 20 parameters with lowest p-values are displayed. Note that for the weekday dummies the first value (Friday) is dropped and the other dummies are to be interpreted in relation to it."
+# |  - "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
 
 import pandas as pd
 from IPython.display import display
 import warnings
 from src.models.regression.hyperopt import best_regression
 
-warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action="ignore", category=FutureWarning)
 
-tables = best_regression().summary().tables
-display(tables[0])
-# results_as_html = tables[1].as_html()
-# df = pd.read_html(results_as_html, header=0, index_col=0)[0]
-# display(df.sort_values("P>|z|").head(20).sort_index())
-```
-\endgroup
-
-\begingroup
-\footnotesize\selectfont
-```{python}
-# | fig-cap: Part 2 of the previous figure (some rendering issue TODO)
-# | echo: False
-
-import pandas as pd
-from IPython.display import display
-import warnings
-from src.models.regression.hyperopt import best_regression
-
-warnings.simplefilter(action='ignore', category=FutureWarning)
-
-tables = best_regression().summary().tables
-results_as_html = tables[1].as_html()
+tables_ = best_regression().summary().tables
+results_as_html = tables_[1].as_html()
 df = pd.read_html(results_as_html, header=0, index_col=0)[0]
-display(df.sort_values("P>|z|").head(20).sort_index())
-```
-\endgroup
+df_ = df.sort_values("P>|z|").head(20).sort_index()
+display(df_)
+# df_.to_csv(tables / "regtable.csv", index=False)
 
-\begingroup
-\footnotesize\selectfont
-```{python}
-# | label: fig-reg-details-occ
-# | fig-cap: "Detailed results for the best regression model from @sec-res-reg: Coefficients for the occurrence of a protest."
-# | echo: False
 display(
     df[(df.index.str.startswith("occ") & df.index.str.endswith("lag0"))].sort_index()
 )
 ```
-\endgroup
+
+{{< pagebreak >}}
 
 #### Propensity scores {#sec-app1-ps}
+
+@fig-loss-curves shows the loss curves for finetuning the transformer text classification model.
+
+The following is an example text that has been used for the finetuning process. This text has the label `no`. The format is conceived so that it could also be used with _causal_ language models^[This is confusing terminology: A causal language model is not related to causal inference, but merely predicts a word given the previous words, and this is called "causal" in natural language processing.], but here I train a _classification_ language model, because it is more straightforward to convert the classification logits to probabilities. (For a classification model there are only two possible classes, while a causal model can answer with any word from its vocabulary, but only two of them correspond to the class labels.)
 
 \begingroup
 \footnotesize\selectfont
@@ -206,7 +187,7 @@ import pandas as pd
 import json
 from src.paths import models
 
-with open(models/ "propensity_scores/trainer_state.json") as f:
+with open(models / "propensity_scores/trainer_state.json") as f:
     training_loss = json.load(f)["log_history"]
 validation_loss = [log for log in training_loss if "eval_loss" in log]
 
@@ -227,7 +208,11 @@ f1_scores = [log["eval_f1"] for log in validation_loss if "eval_f1" in log]
 f1_steps = np.linspace(0, len(training_loss_values), len(f1_scores))
 
 fig, ax1 = plt.subplots(figsize=(8, 4))
-ax1.plot(training_steps, pd.Series(training_loss_values).rolling(10).mean(), label="training loss")
+ax1.plot(
+    training_steps,
+    pd.Series(training_loss_values).rolling(10).mean(),
+    label="training loss",
+)
 ax1.plot(validation_steps, validation_loss_values, label="validation loss")
 ax1.set_ylabel("Loss")
 ax1.legend(loc="upper left")
@@ -240,6 +225,8 @@ ax2.set_ylim(0, 0.35)
 
 plt.show()
 ```
+
+{{< pagebreak >}}
 
 #### Impact estimates for the other datasets
 
