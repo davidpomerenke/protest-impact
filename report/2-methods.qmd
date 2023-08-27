@@ -154,7 +154,7 @@ __Dataset__. The resulting dataset contains 49,800 events from 13 cities. For 11
 {{< embed ../src/data/protests/german_protest_registrations/data_map.ipynb#data-official-map >}}
 
 
-#### The German Protest Reports dataset
+#### The German Protest Reports dataset {#sec-gprep}
 
 @wiedemannGeneralizedApproachProtest2022 show how to detect protest events in newspaper articles. They employ the [`gelectra-large`](https://huggingface.co/deepset/gelectra-large) model, a transformer model that is fine-tuned on German texts of various genres. Their dataset consists of almost 4000 newspaper articles from 4 German cities, namely Leipzig, Dresden, Stuttgart, and Bremen, from between 2009 and 2016.
 
@@ -403,22 +403,10 @@ I use _inverse propensity weighting_ (IPW) as a pure propensity score model. IPW
 
 I use the IPW implementation from the `DoWhy` Python package [@sharmaDoWhyEndtoEndLibrary2020], with a normalized weighting scheme (that is, the Hájek estimator, see @sec-app2-ps) for ATT estimation. As an implementation for DRE I use the `LinearDRLearner` from the `EconML` Python package [@econml] with their `StatsModelsLinearRegression` model as regression model. For the computation of propensity scores I use `LogisticRegressionCV` from `scikit-learn` [@pedregosaScikitlearnMachineLearning2011] with the `liblinear` solver.
 
-<!--
+__Propensity scores from text.__ I aim to leverage natural language processing models for incorporating hidden confounders that may be incorporated in texts. Plausible candidates for hidden confounders are the occurrence of related non-protest events [@bundeskriminalamtbkaLagebildLetzteGeneration2023], or the intensity of previous public discourse. I use national press releases and regional print newspaper articles, and query them for `klima*`. Since the context windows of transformer models are limited, I only use the titles, and further filter whether the title contains any of the words from @sec-app-queries. Then I construct time-series of titles from the pre-event days, and add the region name, dates, weekdays, and holidays as further textual components; an example is given in TODO.
 
-##### Propensity scores from full texts
+I use a Longformer model [@beltagyLongformerLongDocumentTransformer2020] because it has a context size of up to 8096 tokens, as opposed to 512 tokens for BERT and some Electra models (confer @sec-gprep). To reduce resources, I stick with a context window of 1024 tokens, and truncate longer texts _from the left side_, so that the information from the day(s) directly before the event is included in any case, and information for up to 30 prior days is included, depending on how many tokens the headlines from the later days take up. I finetune a model that has previously been finetuned on German texts from the [OSCAR](https://oscar-project.org/) project, the so-called [`longformer-gottbert`](https://huggingface.co/LennartKeller/longformer-gottbert-base-8192-aw512) model. I use the `transformers` libary [@wolfHuggingFaceTransformersStateoftheart2020] for finetuning, using 30 epochs with a linear schedule and a 20% warmup ratio, a learning rate of $5e^{-6}$, a weight decay of 20%, and otherwise default settings (notably, the `AdamW` optimizer).
 
-cite Wager, and causal NLP overview
-
-Predicting propensity scores from text: cite causalNLP overviews
-For example, @bundeskriminalamtbkaLagebildLetzteGeneration2023 hypothesize that "Die Fallzahlen unterliegen einem „wellenartigen“ Verlauf, welcher sich vornehmlich durch (das Ausbleiben von) Großveranstaltungen im gleichen Kontext erklären lässt."
-
-possible models:
-
-- gelectra: 100-300M parameters https://huggingface.co/deepset/gelectra-base
-- igel: 6B parameters https://huggingface.co/philschmid/instruct-igel-001
-- llama 2 german https://huggingface.co/flozi00/Llama-2-7b-german-assistant-v2
-
-faster finetuning: https://github.com/huggingface/peft -->
 
 #### Evaluation {#sec-meth-placebo}
 

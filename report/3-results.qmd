@@ -271,6 +271,8 @@ The best logistic regression model achieves a 5-fold time-series cross-validated
 
 Brief experiments with doubly robust estimation show that other than expected it gives estimates that are multiple orders of magnitudes higher than those of regression or inverse propensity weighting; it estimates chaotic time series; and it is overly sensitive to the hyperparameters that create the time series features (number of lags, inclusion of moving averages, etc.), much more than regression or IPW. I do not further investigate the problem and exclude the method from the analysis.
 
+__Propensity scores from text.__ Model finetuning takes roughly 2 hours on 8 RTX 4090 GPUs, at a rental cost of roughly 6 euros. Loss curves are shown in TODO. The F1-score plateaus around 0.25, with the best checkpoint at F1=0.278 (but this may be in part by chance). No cross-validation is performed to save resources. La
+
 ### Placebo tests {#sec-res-placebo}
 
 @fig-placebo-outcome shows placebo tests for the outcome for all models. Further placebo tests concern the treatments: For @fig-placebo-treatment-regional, the treatments are randomized within each region, while for @fig-placebo-treatment-global they are randomized across region (see @sec-meth-placebo).

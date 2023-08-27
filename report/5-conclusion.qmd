@@ -45,7 +45,7 @@ __Improving the causal methods:__
 - Weak instrumental variable beyond maximum likelihood limited information (LIML) can be investigated, for example Fieller–Anderson–Rubin confidence intervals [@dingFirstCourseCausal2023, ch.21.4, ch. 23.6.3].
 - For the synthetic control method, rolling average estimation can be tried out, as well as fitting for the anticipation effect. The extent of bias from missing data can be estimated using simulations. (See @sec-disc-synth.)
 - The propensity score method can be improved by (a) using dedicated time-series models and (b) using small or large language models for the estimation of propensity scores (see @sec-disc-ps). Problems with the doubly robust method should be investigated in more depth.
-- Double machine learning [@chernozhukovDoubleDebiasedMachine2017] is a promising nonparametric method to improve on both regression and propensity score models, while using ideas from the two-stage least squares instrumental variable method.
+- Double machine learning [@chernozhukovDoubleDebiasedMachine2017] is a promising nonparametric method to improve on both regression and propensity score models, while using ideas from the two-stage least squares instrumental variable method. It could build on time-series forecasting methods [for example by @ngSocialMediaActivity2022].
 
 ### Limitations
 
