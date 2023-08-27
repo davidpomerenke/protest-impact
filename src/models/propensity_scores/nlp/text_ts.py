@@ -99,13 +99,15 @@ def process(df, region):
     print(region)
     X = []
     y = []
+    d = []
     for date in tqdm(pd.date_range("2020-02-01", "2022-12-31")):
         start = date - pd.Timedelta(days=30)
         items = get_text_for_dates(start, date, df, region)
         i = items[-1].index("has protests: ") + len("has protests: ")
         X.append("\n".join(items[:-1] + [items[-1][:i]]))
         y.append(items[-1][i : i + 3].strip())
-    return X, y
+        d.append(date)
+    return X, y, d
 
 
 @cache
@@ -122,10 +124,13 @@ def text_timeseries():
             "Bremen",
         ]
     ]
-    X, y = zip(
+    X, y, d = zip(
         *Parallel(n_jobs=-1)(delayed(process)(df, region) for region in tqdm(regions))
     )
     X = [a for b in X for a in b]
     y = [a for b in y for a in b]
-    df = pd.DataFrame({"text": X, "label": y})
+    d = [a for b in d for a in b]
+    df = pd.DataFrame({"text": X, "label": y, "date": d})
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date").drop(columns=["date"])
     return df
