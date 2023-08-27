@@ -87,7 +87,7 @@ def get_text_for_dates(start, end, df, region):
             text += "number of protests: " + str(len(protests)) + "\nProtests:\n"
             for _, protest in protests.iterrows():
                 text += f"{protest['actor']}: {protest['notes']}\n"
-        text += "\nHeadlines:\n"
+        text += "Headlines:\n"
         text += region_headlines(region)[date]
         text += "\n"
         items.append(text)
