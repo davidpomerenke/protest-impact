@@ -4,6 +4,8 @@
 
 #### The German protest registrations dataset
 
+The following table gives an overview of the German Protest Registrations (GPReg) dataset. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available; _incl?_ = whether the data is used in this thesis.
+
 ```{python}
 # | echo: False
 
@@ -25,9 +27,9 @@ df.to_csv(tables / "gpreg-overview.csv", sep=";")
 \endgroup
 :::
 
-Table: Overview of the German Protest Registrations (GPReg) dataset. _kpop_ = population in 1000; _cap?_ = whether the city is the political capital of its region; _reg?_ = whether the number of registered protesters (as per the organizers) is available; _obs?_ = whether the number of observed protesters (as per the police) is available; _incl?_ = whether the data is used in this thesis.
-
 #### Queries for retrieving article counts {#sec-app-queries}
+
+The following table shows the queries for retrieving article counts from online and print newspapers. The words for each category are joined by `OR` operators, and the resulting sub-queries are further combined as described in @sec-data-discourse. The query for the protest events is adapted from @wiedemannGeneralizedApproachProtest2022.
 
 ```{python}
 # | echo: False
@@ -41,14 +43,12 @@ df = climate_query_table()
 df.to_csv(tables / "queries.csv", index=False)
 ```
 
-:::{.column-page}
+The table below shows the queries for retrieving article counts from online and print newspapers. The words for each category are joined by `OR` operators, and the resulting sub-queries are further combined as described in @sec-data-discourse. The query for the protest events is adapted from @wiedemannGeneralizedApproachProtest2022.
+
 \begingroup
 \footnotesize\selectfont
 \csvautobooktabular[separator=comma,respect all]{/Users/david/Repositories/protest-impact/report/tables/queries.csv}
 \endgroup
-:::
-
-Table: Queries for retrieving article counts from online and print newspapers. The words for each category are joined by `OR` operators, and the resulting sub-queries are further combined as described in @sec-data-discourse. The query for the protest events is adapted from @wiedemannGeneralizedApproachProtest2022.
 
 ### Results
 
@@ -107,6 +107,139 @@ display(
 )
 ```
 \endgroup
+
+#### Propensity scores {#sec-app1-ps}
+
+\begingroup
+\footnotesize\selectfont
+```
+Nordrhein-Westfalen, Wednesday, 13. May 2020 (6 days ago)
+has protests: no
+Headlines:
+EU-Klimaziel: Union will bei Lasten neu verteilen
+EU-Klimaziel: Union will bei Lasten neu verteilen
+CDU und CSU bremsen europäischen Klimaschutz
+Programmieren gegen den Klimawandel
+Protest gegen "Führerscheinfalle"
+Klimaschutz-Lasten in EU fair verteilen
+Klimaschutz macht keine Pause
+Merkel will Lastenteilung beim EU-Klimaschutz neu verhandeln
+
+Nordrhein-Westfalen, Thursday, 14. May 2020 (5 days ago)
+has protests: no
+Headlines:
+CDU setzt auf Klimaschutz: Elektroauto für die Gemeinde
+Preise für Klimaschutz, Fairness oder Toleranz
+Kreis drückt beim Klimaschutz aufs Tempo
+Eine Million Euro fließt in Klimaschutz
+Umweltschützer: 1,2 Millionen Unterschriften für EU-Paket rund um Klimaschutz
+
+Nordrhein-Westfalen, Friday, 15. May 2020 (4 days ago)
+has protests: no
+Headlines:
+Gutachten: Pkw-Maut im Bund wäre Klimaschutz
+Gutachten: Bundesweite Pkw-Maut wäre Klimaschutz
+Petition gegen die Rheinspange
+Petition gegen die Rheinspange
+Neue Klimaschutzbeauftragte im Vor-Ort-Einsatz
+Mahnwache " Datteln 4 stoppen"
+Umweltrat kritisiert deutsche Klimapolitik
+Neue Klimaschutzbeauftragte im ersten Einsatz
+Krise bringt Klimaschutz
+Decker arbeitet weiter klimaneutral
+Klimawandel im Fokus
+Umweltministerkonferenz: Klimaschutz in Wirtschaftshilfen verankern
+
+Nordrhein-Westfalen, Saturday, 16. May 2020 (3 days ago)
+has protests: yes
+number of protests: 1
+Protests:
+GP: On 16 May 2020, people protested in Koln for more space for cyclists
+  and pedestrians during the coronavirus pandemic.
+  The protest was organised, amongst others, by ADFC, Greenpeace and VCD.
+Headlines:
+Gartenschau soll klimaneutral sein
+Patriotismus ist wieder brutal
+Petition gegen die Rheinspange
+Verständnis, Proteste und nötige Opfer
+Kreis fördert privaten Klimaschutz
+Fit für den Klimaschutz
+Klimaschutz für die Hosentasche
+Klima-Demo auf zwei Reifen
+Wissenschaftler: 'Demonstrierende nicht pauschal ausgrenzen'
+
+Nordrhein-Westfalen, Sunday, 17. May 2020 (2 days ago)
+has protests: yes
+number of protests: 1
+Protests:
+EG: On 17 May 2020, around 120 to 150 people, including Ende Gelaende activists,
+  protested in Datteln against the coal-fired power station Datteln 4.
+Headlines:
+
+Nordrhein-Westfalen, Monday, 18. May 2020 (1 days ago)
+has protests: no
+
+Headlines:
+Demonstration gegen Kohlekraftwerk Datteln
+Demonstration gegen Kohlekraftwerk Datteln
+Demo für mehr Platz für Radfahrer
+Seit 48 Wochen wird am Schloss fürs Klima gestreikt
+Castop-Rauxeler Klima-Aktivistin: Nicht zu schweigen ist nicht radikal
+Datteln 4: Klimabündnis protestierte gegen Inbetriebnahme
+" Krise nicht gegen Klimaschutz ausspielen "
+Kreis macht Tempo beim Klimaschutz
+Besinnlicher Protest an der Tagebaukante
+
+Nordrhein-Westfalen, Tuesday, 19. May 2020 (today)
+has protests:
+```
+\endgroup
+
+```{python}
+# | echo: false
+# | label: fig-loss-curves
+# | fig-cap: Loss curves for the finetuning of the Longformer model for propensity score computation from texts.
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy import interpolate
+import pandas as pd
+import json
+from src.paths import models
+
+with open(models/ "propensity_scores/trainer_state.json") as f:
+    training_loss = json.load(f)["log_history"]
+validation_loss = [log for log in training_loss if "eval_loss" in log]
+
+training_loss_values = [log["loss"] for log in training_loss if "loss" in log]
+validation_loss_values = [
+    log["eval_loss"] for log in validation_loss if "eval_loss" in log
+]
+
+training_steps = np.linspace(0, len(training_loss_values), len(training_loss_values))
+validation_steps = np.linspace(
+    0, len(training_loss_values), len(validation_loss_values)
+)
+
+f = interpolate.interp1d(validation_steps, validation_loss_values)
+validation_loss_values_interp = f(training_steps)
+
+f1_scores = [log["eval_f1"] for log in validation_loss if "eval_f1" in log]
+f1_steps = np.linspace(0, len(training_loss_values), len(f1_scores))
+
+fig, ax1 = plt.subplots(figsize=(8, 4))
+ax1.plot(training_steps, pd.Series(training_loss_values).rolling(10).mean(), label="training loss")
+ax1.plot(validation_steps, validation_loss_values, label="validation loss")
+ax1.set_ylabel("Loss")
+ax1.legend(loc="upper left")
+ax1.set_ylim(0, 1.6)
+ax2 = ax1.twinx()
+ax2.scatter(f1_steps, f1_scores, label="F1 score", color="g", marker="x")
+ax2.set_ylabel("F1 Score", color="r")
+ax2.legend(loc="upper right")
+ax2.set_ylim(0, 0.35)
+
+plt.show()
+```
 
 #### Impact estimates for the other datasets
 

@@ -62,7 +62,7 @@ get_covariances("weather_covid")
 
 Correlations and Wald estimator results of the original variable are shown in @fig-iv-wald. Note that the Wald estimator is not valid for weak instruments.
 
-Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the covariances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-lit-causal), but the binarization does not change the covariance much. (TODO: give number.)
+Automatically binarizing the variables based on an optimally chosen threshold does not generally increase the covariances, and decreases them slightly in most cases. This is also true for precipiation: The optimal threshold for maximizing the covariance with protest occurrence is at prcp > 0, which is consistent with the choice in most related work (see @sec-lit-causal), but the binarization does not substantially change the covariance.
 
 \begingroup
 \scriptsize\selectfont
