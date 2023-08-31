@@ -118,8 +118,8 @@ Impressively, the instrument allows us to control for confounders without needin
 
 An alternative to indirect least squares that extends to multiple instruments and treatments is the _two-stage least squares_ (TSLS) estimator. It involves two OLS regression steps:
 
-1. Estimate $E(W|Z) = \alpha + \alpha_Z Z$ and obtain predictions $\hat W$. These are the "random components" of $W$.
-2. Estimate $E(Y,\hat W) = \beta + \beta_W \hat W$, and obtain the causal estimate $\hat\tau = \hat\beta_W$.
+1. Estimate $E(W|Z) = \alpha + \alpha_X X + \alpha_Z Z$ and obtain predictions $\hat W$. These are the "random components" of $W$.
+2. Estimate $E(Y|\hat W) = \beta + \beta_X X + \beta_W \hat W$, and obtain the causal estimate $\hat\tau = \hat\beta_W$.
 
 In the case of a single instrument and a single treatment, two-stage least squares is identical to indirect least squares [@dingFirstCourseCausal2023, ch. 23].
 
