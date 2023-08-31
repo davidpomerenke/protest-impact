@@ -27,14 +27,14 @@ Analysis of the results with graphics like bargraphs and boxplots has been made.
 
 The best model uses only a single time-series lag, as well as moving averages and difference features. Metrics for the OLS and the regularized regression models are shown in @tbl-reg-hypopt. Even though the bias is minimized, it is still substantial at around -14 articles within a timespan of one week. (This is only for time-series splits; the bias for conventional shuffled cross-validation splits is very close to 0 for all models.) A regression table with coefficients is appended in @sec-app1-reg.
 
-| Model          | Hyp. opt. obj. | RMSE          | Bias         |
+| Model          | Hyp. opt. obj. | RMSE          | AME          |
 | -------------- | -------------- | ------------- | ------------ |
 | OLS            | min RMSE       | 110.6 ± 24.2  | -18.8 ± 10.4 |
-| OLS            | min bias       | 130.9 ± 21.5  | -14.3 ± 10.1 |
-| BayesianRidge  | min bias       | 119.7 ± 23.4  | -3.85 ± 15.2 |
-| LassoLarsIC    | min bias       | 118.9 ± 24.5  | -2.89 ± 15.7 |
+| OLS            | min AME        | 130.9 ± 21.5  | -14.3 ± 10.1 |
+| BayesianRidge  | min AME        | 119.7 ± 23.4  | -3.85 ± 15.2 |
+| LassoLarsIC    | min AME        | 118.9 ± 24.5  | -2.89 ± 15.7 |
 
-: Bias (mean error) and root mean squared error (RMSE) as a measure for variance for the best models that result from hyperparameter optimization. {#tbl-reg-hypopt}
+: Average mean error (AME) as a measure for bias, and root mean squared error (RMSE) as a measure for variance for the best models that result from hyperparameter optimization. {#tbl-reg-hypopt}
 
 ```{python}
 # | echo: False
