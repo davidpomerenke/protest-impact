@@ -232,15 +232,14 @@ This gives us an estimator for the ATT:
 
 $$
 \begin{aligned}
-\tau &= E(Y|W=1) - E(Y(0)|W=1) \\
-&= \hat{\bar{Y}}(1) - \frac{1}{n} \sum_{i=1}^{n} \frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)Y_i}{1-e(X_i)}
+\hat\tau &= \hat{\bar{Y}}(1) - \frac{1}{n} \sum_{i=1}^{n} \frac{e(X_i)}{1-e(X_i)}\frac{(1-W_i)Y_i}{P(W=1)}
 \end{aligned}
 $$ {#eq-prop-est}
 
 The estimator from @eq-prop-est is reported to have various problems in practice, therefore I use the alternative _Hájek estimator_, which is empirically more stable [@dingFirstCourseCausal2023, pp. 146, 166; @abdiaPropensityScoresBased2017]:
 
 $$
-\tau^{\text{Hájek}} = \hat{\bar{Y}}(1) - \frac{1}{n} \frac{\sum_{i=1}^{n}\frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)Y_i}{1-e(X_i)}}{\sum_{i=1}^{n}\frac{e(X_i)}{P(W_i=1)}\frac{(1-W_i)}{1-e(X_i)}}
+\hat\tau^{\text{Hájek}} = \hat{\bar{Y}}(1) - \frac{1}{n} \frac{\sum_{i=1}^{n}\frac{e(X_i)}{P(W=1)}\frac{(1-W)Y_i}{1-e(X_i)}}{\sum_{i=1}^{n}\frac{e(X_i)}{P(W=1)}\frac{(1-W)}{1-e(X_i)}}
 $$
 
 #### Doubly robust estimation {#sec-app2-dre}
