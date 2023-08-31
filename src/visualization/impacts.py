@@ -1,6 +1,7 @@
 from functools import partial
 
 import altair as alt
+import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -80,10 +81,10 @@ _doubly_robust = partial(
 _methods = dict(
     correlation=_correlation,
     propensity_weighting=_propensity_weighting,
+    # doubly_robust=_doubly_robust,
     regression=_regression,
     synthetic_control=_synthetic_control,
     instrumental_variable_liml=_instrumental_variable_liml,
-    # doubly_robust=_doubly_robust,
 )
 
 
@@ -197,6 +198,7 @@ def plot_groups(
         case "methods":
             groups = ["occ_protest"]
             methods = list(_methods.keys())
+            # methods.remove("instrumental_variable_liml")
             sources = ["acled"]
         case "sources":
             groups = ["occ_protest"]
@@ -224,62 +226,58 @@ def plot_groups(
     )
     results["target"] = results["target"].str.replace("media_combined_", "")
     dimensions = ["protest", "not_protest", "framing", "goal", "subsidiary_goal"]
-    x = alt.X(
-        "target:N",
-        title="",
-        sort=dimensions,
-    )
-    yname = "ATT estimate (#articles)"
-    bars = (
-        alt.Chart(results)
-        .mark_bar()
-        .encode(
-            x=x,
-            y=alt.Y(
-                "coef:Q",
-                title=yname,
-                scale=alt.Scale(
-                    zero=True,  # does not seem to work
-                ),
-            ),
-            color=alt.Color(
-                "target:N",
-                title="",
-                sort=dimensions,
-            ),
-        )
-        .properties(
-            width=100,
-            height=150,
-        )
-    )
+    colors = list(mcolors.TABLEAU_COLORS.keys())  # Use Tableau's color scheme
+    color_dict = dict(zip(dimensions, colors[: len(dimensions)]))
 
-    error_bars = (
-        alt.Chart()
-        .mark_errorbar()
-        .encode(
-            alt.Y("ci_lower:Q", title=yname),
-            alt.Y2("ci_upper:Q", title=yname),
-            x=x,
-        )
-    )
-    match kind:
-        case "groups":
-            return alt.layer(bars, error_bars, data=results).facet(
-                column=alt.Column("treatment:N", title="", sort=groups),
+    if kind == "groups":
+        fig, axs = plt.subplots(1, len(groups), sharey=True)
+        for i, group in enumerate(results["treatment"].unique()):
+            group_results = results[results["treatment"] == group]
+            error = [
+                group_results["coef"] - group_results["ci_lower"],
+                group_results["ci_upper"] - group_results["coef"],
+            ]
+            axs[i].bar(
+                group_results["target"],
+                group_results["coef"],
+                yerr=error,
+                color=[color_dict[t] for t in group_results["target"]],
             )
-        case "methods":
-            return (
-                alt.layer(bars, error_bars, data=results)
-                .facet(
-                    column=alt.Column("method:N", title="", sort=list(_methods.keys())),
-                )
-                .resolve_scale(y="independent")
+            axs[i].set_title(group)
+    elif kind == "methods":
+        fig, axs = plt.subplots(1, len(methods), sharey=False)
+        for i, method in enumerate(methods):
+            method_results = results[results["method"] == method]
+            error = [
+                method_results["coef"] - method_results["ci_lower"],
+                method_results["ci_upper"] - method_results["coef"],
+            ]
+            axs[i].bar(
+                method_results["target"],
+                method_results["coef"],
+                yerr=error,
+                color=[color_dict[t] for t in method_results["target"]],
             )
-        case "sources":
-            return alt.layer(bars, error_bars, data=results).facet(
-                column=alt.Column("source:N", title=""),
+            axs[i].set_title(method)
+    elif kind == "sources":
+        fig, axs = plt.subplots(1, len(sources), sharey=True)
+        for i, source in enumerate(sources):
+            source_results = results[results["source"] == source]
+            error = [
+                source_results["coef"] - source_results["ci_lower"],
+                source_results["ci_upper"] - source_results["coef"],
+            ]
+            axs[i].bar(
+                source_results["target"],
+                source_results["coef"],
+                yerr=error,
+                color=[color_dict[t] for t in source_results["target"]],
             )
+            axs[i].set_title(source)
+    fig.set_figwidth(4 * len(dimensions))
+    for ax in axs:
+        ax.set_xticklabels(dimensions, rotation=90)
+    return fig, axs
 
 
 # plot_groups(kind="methods", step=1)

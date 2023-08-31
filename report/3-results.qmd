@@ -403,12 +403,17 @@ plt.show()
 # | column: page
 # | echo: false
 
-# problem: y axis visualization; maybe switch to matplotlib
-import altair as alt
 from src.visualization.impacts import plot_groups
+import matplotlib.pyplot as plt
 
-alt.renderers.enable("altair_saver", fmts=["html", "svg"])
-plot_groups(kind="methods", step=6)
+fig, axes = plot_groups(kind="methods", step=6)
+axes[0].set_ylim(-60, 180)
+axes[1].set_ylim(-30, 90)
+axes[2].set_ylim(-4, 12)
+axes[3].set_ylim(-4, 12)
+axes[4].set_ylim(-1000, 3000)
+
+plt.show()
 ```
 
 @fig-impact-medium differentiates between the impact on online newspapers and on print newspapers, only for the synthetic control method. @fig-impact-groups-7 break down the 7-day cumulative impact for the different protest groups, as estimated by the synthetic control method.
@@ -458,11 +463,12 @@ plt.show()
 # | column: page
 # | echo: false
 
-import altair as alt
 from src.visualization.impacts import plot_groups
+import matplotlib.pyplot as plt
 
-alt.renderers.enable("altair_saver", fmts=["html", "svg"])
-plot_groups(kind="groups", step=6)
+fig, axes = plot_groups(kind="groups", step=6)
+axes[0].set_ylim(-15, 25)
+plt.show()
 ```
 
 @fig-impact-dataset and @fig-impact-groups-sources show how the impact estimates differ by dataset, for using the synthetic control method. Detailed results for the _German Protest Registrations_ and _German Protest Reports_ datasets for all causal methods are in the appendix in @fig-impact-ts-gpreg and @fig-impact-ts-gprep, respectively.
