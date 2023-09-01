@@ -473,7 +473,7 @@ fig.set_size_inches(12,3)
 plt.show()
 ```
 
-@fig-impact-dataset and @fig-impact-groups-sources show how the impact estimates differ by dataset, for using the synthetic control method.
+@fig-impact-dataset and @fig-impact-groups-sources show how the impact estimates differ by dataset, for using the synthetic control method. Detailed results for the _German Protest Registrations_ and _German Protest Reports_ datasets for all causal methods are in the appendix in @fig-impact-ts-gpreg and @fig-impact-ts-gprep, respectively.
 
 ```{python}
 # | label: fig-impact-dataset
@@ -516,11 +516,9 @@ fig.tight_layout()
 plt.show()
 ```
 
-Detailed results for the _German Protest Registrations_ and _German Protest Reports_ datasets for all causal methods are in the appendix in @fig-impact-ts-gpreg and @fig-impact-ts-gprep, respectively.
-
 ```{python}
 # | label: fig-impact-groups-sources
-# | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
+# | fig-cap: 7-day cumulative causal impact estimates by dataset, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | echo: false
 
 from src.visualization.impacts import plot_groups
