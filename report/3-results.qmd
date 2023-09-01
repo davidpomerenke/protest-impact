@@ -412,7 +412,8 @@ axes[1].set_ylim(-30, 90)
 axes[2].set_ylim(-4, 12)
 axes[3].set_ylim(-4, 12)
 axes[4].set_ylim(-1000, 3000)
-
+fig.set_size_inches(15,4)
+fig.tight_layout()
 plt.show()
 ```
 
@@ -468,10 +469,11 @@ import matplotlib.pyplot as plt
 
 fig, axes = plot_groups(kind="groups", step=6)
 axes[0].set_ylim(-15, 25)
+fig.set_size_inches(12,3)
 plt.show()
 ```
 
-@fig-impact-dataset and @fig-impact-groups-sources show how the impact estimates differ by dataset, for using the synthetic control method. Detailed results for the _German Protest Registrations_ and _German Protest Reports_ datasets for all causal methods are in the appendix in @fig-impact-ts-gpreg and @fig-impact-ts-gprep, respectively.
+@fig-impact-dataset and @fig-impact-groups-sources show how the impact estimates differ by dataset, for using the synthetic control method.
 
 ```{python}
 # | label: fig-impact-dataset
@@ -514,15 +516,17 @@ fig.tight_layout()
 plt.show()
 ```
 
+Detailed results for the _German Protest Registrations_ and _German Protest Reports_ datasets for all causal methods are in the appendix in @fig-impact-ts-gpreg and @fig-impact-ts-gprep, respectively.
 
 ```{python}
 # | label: fig-impact-groups-sources
 # | fig-cap: 7-day cumulative causal impact estimates by protest group, as estimated by the synthetic control method. Error bars are 95% confidence intervals. Pay attention to differing y-axis scaling.
 # | echo: false
 
-import altair as alt
 from src.visualization.impacts import plot_groups
+import matplotlib.pyplot as plt
 
-alt.renderers.enable("altair_saver", fmts=["html", "svg"])
-plot_groups(kind="sources", step=6)
+fig, axes = plot_groups(kind="sources", step=6)
+fig.set_size_inches(10,4)
+plt.show()
 ```

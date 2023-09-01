@@ -261,7 +261,7 @@ def plot_groups(
             axs[i].set_title(method)
     elif kind == "sources":
         fig, axs = plt.subplots(1, len(sources), sharey=True)
-        for i, source in enumerate(sources):
+        for i, source in enumerate(results["source"].unique()):
             source_results = results[results["source"] == source]
             error = [
                 source_results["coef"] - source_results["ci_lower"],
@@ -276,6 +276,7 @@ def plot_groups(
             axs[i].set_title(source)
     fig.set_figwidth(4 * len(dimensions))
     for ax in axs:
+        ax.set_xticks(dimensions)
         ax.set_xticklabels(dimensions, rotation=90)
     return fig, axs
 
